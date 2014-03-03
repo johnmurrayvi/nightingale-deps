@@ -1,0 +1,25 @@
+CFLAGS="-I/opt/mingw/include"
+CPPFLAGS="-I/opt/mingw/include"
+LDFLAGS="-L/opt/mingw/lib"
+XDG_DATA_DIRS="/opt/mingw/share"
+
+CC=i586-mingw32msvc-gcc
+CXX=i586-mingw32msvc-g++
+LD=i586-mingw32msvc-ld
+RANLIB=i586-mingw32msvc-ranlib
+AR=i586-mingw32msvc-ar
+AS=i586-mingw32msvc-as
+STRIP=i586-mingw32msvc-strip
+
+export CFLAGS
+export CPPFLAGS
+export LDFLAGS
+export XDG_DATA_DIRS
+
+export CC
+export CXX
+export LD
+export RANLIB
+export AR
+export AS
+export STRIP
