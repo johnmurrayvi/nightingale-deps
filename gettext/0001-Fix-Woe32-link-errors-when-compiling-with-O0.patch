@@ -1,0 +1,241 @@
+From 4f360065f201c52982d144308ba003bab4bd35a3 Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Fri, 13 Dec 2013 02:16:22 +0000
+Subject: [PATCH] Fix Woe32 link errors when compiling with -O0.
+
+Original patch by:
+Daiki Ueno <ueno@gnu.org>
+Date: Thu, 17 Jan 2013 18:33:40 +0900
+
+Additional fix (color.c/c++color.cc) by:
+Ray Donnelly <mingw.android@gmail.com>
+Date: Fri, 13 Dec 2013 02:16:45 +0000
+---
+ gettext-tools/src/Makefile.am                  | 23 ++++++++++++++++++++++-
+ gettext-tools/src/color.c                      |  1 +
+ gettext-tools/woe32dll/c++color.cc             |  1 +
+ gettext-tools/woe32dll/c++file-ostream.cc      |  2 ++
+ gettext-tools/woe32dll/c++html-ostream.cc      |  1 +
+ gettext-tools/woe32dll/c++styled-ostream.cc    |  1 +
+ gettext-tools/woe32dll/c++term-ostream.cc      |  1 +
+ gettext-tools/woe32dll/c++write-catalog.cc     |  1 +
+ gettext-tools/woe32dll/c++write-po.cc          |  1 +
+ gettext-tools/woe32dll/c++write-properties.cc  |  1 +
+ gettext-tools/woe32dll/c++write-stringtable.cc |  1 +
+ gnulib-local/modules/file-ostream              |  4 ++++
+ gnulib-local/modules/html-ostream              |  4 ++++
+ gnulib-local/modules/ostream                   |  4 ++++
+ gnulib-local/modules/styled-ostream            |  4 ++++
+ gnulib-local/modules/term-ostream              |  4 ++++
+ 16 files changed, 53 insertions(+), 1 deletion(-)
+ create mode 100644 gettext-tools/woe32dll/c++color.cc
+ create mode 100644 gettext-tools/woe32dll/c++file-ostream.cc
+ create mode 100644 gettext-tools/woe32dll/c++html-ostream.cc
+ create mode 100644 gettext-tools/woe32dll/c++styled-ostream.cc
+ create mode 100644 gettext-tools/woe32dll/c++term-ostream.cc
+ create mode 100644 gettext-tools/woe32dll/c++write-catalog.cc
+ create mode 100644 gettext-tools/woe32dll/c++write-po.cc
+ create mode 100644 gettext-tools/woe32dll/c++write-properties.cc
+ create mode 100644 gettext-tools/woe32dll/c++write-stringtable.cc
+
+diff --git a/gettext-tools/src/Makefile.am b/gettext-tools/src/Makefile.am
+index e6713af..db3f0c0 100644
+--- a/gettext-tools/src/Makefile.am
++++ b/gettext-tools/src/Makefile.am
+@@ -141,15 +141,36 @@ FORMAT_SOURCE += \
+   format-lua.c \
+   format-javascript.c
+ 
++if !WOE32DLL
++COLOR_SOURCE = color.c
++else
++COLOR_SOURCE = ../woe32dll/c++color.cc
++endif
++
++if !WOE32DLL
++OUTPUT_SOURCE = \
++  write-catalog.c \
++  write-po.c \
++  write-properties.c \
++  write-stringtable.c
++else
++OUTPUT_SOURCE = \
++  ../woe32dll/c++write-catalog.cc \
++  ../woe32dll/c++write-po.cc \
++  ../woe32dll/c++write-properties.cc \
++  ../woe32dll/c++write-stringtable.cc
++endif
++
+ # libgettextsrc contains all code that is needed by at least two programs.
+ libgettextsrc_la_SOURCES = \
+ $(COMMON_SOURCE) read-catalog.c \
+-color.c write-catalog.c write-properties.c write-stringtable.c write-po.c \
++$(COLOR_SOURCE) $(OUTPUT_SOURCE) \
+ msgl-ascii.c msgl-iconv.c msgl-equal.c msgl-cat.c msgl-header.c msgl-english.c \
+ msgl-check.c file-list.c msgl-charset.c po-time.c plural-exp.c plural-eval.c \
+ plural-table.c \
+ $(FORMAT_SOURCE)
+ 
++
+ # msggrep needs pattern matching.
+ LIBGREP = ../libgrep/libgrep.a
+ 
+diff --git a/gettext-tools/src/color.c b/gettext-tools/src/color.c
+index 47daf00..98b3201 100644
+--- a/gettext-tools/src/color.c
++++ b/gettext-tools/src/color.c
+@@ -28,6 +28,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ 
++#include "ostream.h"
+ #include "term-ostream.h"
+ #include "xalloc.h"
+ #include "relocatable.h"
+diff --git a/gettext-tools/woe32dll/c++color.cc b/gettext-tools/woe32dll/c++color.cc
+new file mode 100644
+index 0000000..811114e
+--- /dev/null
++++ b/gettext-tools/woe32dll/c++color.cc
+@@ -0,0 +1 @@
++#include "../src/color.c"
+diff --git a/gettext-tools/woe32dll/c++file-ostream.cc b/gettext-tools/woe32dll/c++file-ostream.cc
+new file mode 100644
+index 0000000..c0849c6
+--- /dev/null
++++ b/gettext-tools/woe32dll/c++file-ostream.cc
+@@ -0,0 +1,2 @@
++#include "../gnulib-lib/file-ostream.c"
++
+diff --git a/gettext-tools/woe32dll/c++html-ostream.cc b/gettext-tools/woe32dll/c++html-ostream.cc
+new file mode 100644
+index 0000000..ece796c
+--- /dev/null
++++ b/gettext-tools/woe32dll/c++html-ostream.cc
+@@ -0,0 +1 @@
++#include "../gnulib-lib/html-ostream.c"
+diff --git a/gettext-tools/woe32dll/c++styled-ostream.cc b/gettext-tools/woe32dll/c++styled-ostream.cc
+new file mode 100644
+index 0000000..61495cc
+--- /dev/null
++++ b/gettext-tools/woe32dll/c++styled-ostream.cc
+@@ -0,0 +1 @@
++#include "../gnulib-lib/styled-ostream.c"
+diff --git a/gettext-tools/woe32dll/c++term-ostream.cc b/gettext-tools/woe32dll/c++term-ostream.cc
+new file mode 100644
+index 0000000..96fd47e
+--- /dev/null
++++ b/gettext-tools/woe32dll/c++term-ostream.cc
+@@ -0,0 +1 @@
++#include "../gnulib-lib/term-ostream.c"
+diff --git a/gettext-tools/woe32dll/c++write-catalog.cc b/gettext-tools/woe32dll/c++write-catalog.cc
+new file mode 100644
+index 0000000..539c5bd
+--- /dev/null
++++ b/gettext-tools/woe32dll/c++write-catalog.cc
+@@ -0,0 +1 @@
++#include "../src/write-catalog.c"
+diff --git a/gettext-tools/woe32dll/c++write-po.cc b/gettext-tools/woe32dll/c++write-po.cc
+new file mode 100644
+index 0000000..02856fd
+--- /dev/null
++++ b/gettext-tools/woe32dll/c++write-po.cc
+@@ -0,0 +1 @@
++#include "../src/write-po.c"
+diff --git a/gettext-tools/woe32dll/c++write-properties.cc b/gettext-tools/woe32dll/c++write-properties.cc
+new file mode 100644
+index 0000000..094a3b1
+--- /dev/null
++++ b/gettext-tools/woe32dll/c++write-properties.cc
+@@ -0,0 +1 @@
++#include "../src/write-properties.c"
+diff --git a/gettext-tools/woe32dll/c++write-stringtable.cc b/gettext-tools/woe32dll/c++write-stringtable.cc
+new file mode 100644
+index 0000000..605c2cf
+--- /dev/null
++++ b/gettext-tools/woe32dll/c++write-stringtable.cc
+@@ -0,0 +1 @@
++#include "../src/write-stringtable.c"
+diff --git a/gnulib-local/modules/file-ostream b/gnulib-local/modules/file-ostream
+index 6965c37..6497abf 100644
+--- a/gnulib-local/modules/file-ostream
++++ b/gnulib-local/modules/file-ostream
+@@ -12,7 +12,11 @@ xalloc
+ configure.ac:
+ 
+ Makefile.am:
++if !WOE32DLL
+ lib_SOURCES += file-ostream.c
++else
++lib_SOURCES += ../woe32dll/c++file-ostream.cc
++endif
+ # This is a Makefile rule that generates multiple files at once; see the
+ # automake documentation, node "Multiple Outputs", for details.
+ file-ostream.h : $(top_srcdir)/build-aux/moopp file-ostream.oo.h file-ostream.oo.c ostream.oo.h
+diff --git a/gnulib-local/modules/html-ostream b/gnulib-local/modules/html-ostream
+index 9521336..94a25fa 100644
+--- a/gnulib-local/modules/html-ostream
++++ b/gnulib-local/modules/html-ostream
+@@ -15,7 +15,11 @@ xalloc
+ configure.ac:
+ 
+ Makefile.am:
++if !WOE32DLL
+ lib_SOURCES += html-ostream.c
++else
++lib_SOURCES += ../woe32dll/c++html-ostream.cc
++endif
+ # This is a Makefile rule that generates multiple files at once; see the
+ # automake documentation, node "Multiple Outputs", for details.
+ html-ostream.h : $(top_srcdir)/build-aux/moopp html-ostream.oo.h html-ostream.oo.c ostream.oo.h
+diff --git a/gnulib-local/modules/ostream b/gnulib-local/modules/ostream
+index fa7c72c..b1c380c 100644
+--- a/gnulib-local/modules/ostream
++++ b/gnulib-local/modules/ostream
+@@ -11,7 +11,11 @@ moo
+ configure.ac:
+ 
+ Makefile.am:
++if !WOE32DLL
+ lib_SOURCES += ostream.c
++else
++lib_SOURCES += ../woe32dll/c++ostream.cc
++endif
+ # This is a Makefile rule that generates multiple files at once; see the
+ # automake documentation, node "Multiple Outputs", for details.
+ ostream.h : $(top_srcdir)/build-aux/moopp ostream.oo.h ostream.oo.c
+diff --git a/gnulib-local/modules/styled-ostream b/gnulib-local/modules/styled-ostream
+index be796fb..5345215 100644
+--- a/gnulib-local/modules/styled-ostream
++++ b/gnulib-local/modules/styled-ostream
+@@ -11,7 +11,11 @@ ostream
+ configure.ac:
+ 
+ Makefile.am:
++if !WOE32DLL
+ lib_SOURCES += styled-ostream.c
++else
++lib_SOURCES += ../woe32dll/c++styled-ostream.cc
++endif
+ # This is a Makefile rule that generates multiple files at once; see the
+ # automake documentation, node "Multiple Outputs", for details.
+ styled-ostream.h : $(top_srcdir)/build-aux/moopp styled-ostream.oo.h styled-ostream.oo.c ostream.oo.h
+diff --git a/gnulib-local/modules/term-ostream b/gnulib-local/modules/term-ostream
+index 8b6799e..9f841f7 100644
+--- a/gnulib-local/modules/term-ostream
++++ b/gnulib-local/modules/term-ostream
+@@ -22,7 +22,11 @@ configure.ac:
+ gl_TERM_OSTREAM
+ 
+ Makefile.am:
++if !WOE32DLL
+ lib_SOURCES += term-ostream.c
++else
++lib_SOURCES += ../woe32dll/c++term-ostream.cc
++endif
+ # This is a Makefile rule that generates multiple files at once; see the
+ # automake documentation, node "Multiple Outputs", for details.
+ term-ostream.h : $(top_srcdir)/build-aux/moopp term-ostream.oo.h term-ostream.oo.c ostream.oo.h
+-- 
+1.8.5.1
+
