@@ -1,5 +1,7 @@
 include $(top_srcdir)/glib-tap.mk
 
+AUTOMAKE_OPTIONS = subdir-objects
+
 dist_uninstalled_test_data =
 test_ltlibraries =
 

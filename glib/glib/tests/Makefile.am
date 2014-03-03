@@ -1,5 +1,7 @@
 include $(top_srcdir)/glib-tap.mk
 
+AUTOMAKE_OPTIONS = subdir-objects
+
 LDADD = $(top_builddir)/glib/libglib-2.0.la -lm
 AM_CPPFLAGS = -g $(glib_INCLUDES) $(GLIB_DEBUG_FLAGS)
 DEFS = -DG_LOG_DOMAIN=\"GLib\" -DEXEEXT=\"$(EXEEXT)\"

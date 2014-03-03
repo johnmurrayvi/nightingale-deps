@@ -1,6 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 include $(top_srcdir)/glib.mk
 
+AUTOMAKE_OPTIONS = subdir-objects
+
 #
 # Generate glibconfig.h
 #
