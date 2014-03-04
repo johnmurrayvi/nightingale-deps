@@ -25,42 +25,32 @@
 #
 ################################################################################
 #
-# Makefile for building Nightingale vendor: gettext
+# Makefile for building Nightingale vendor: libtheora
 #
 ################################################################################
 ################################################################################
 
+NG_VENDOR_TARGET_DEP_MODULES := ogg
 
-# We don't want this on linux because -lintl (which this will add) doesn't
-# exist there - it's integrated into libc.
-ifneq (,$(filter Linux,$(NG_VENDOR_ARCH)))
-  NG_VENDOR_TARGET_DEP_MODULES := gettext
-endif
-ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_VENDOR_TARGET_DEP_MODULES := gettext
-endif
-
-NG_VENDOR_TARGET = glib
-NG_VENDOR_TARGET_VERSION = 2.39.90
+NG_VENDOR_TARGET = libtheora
+NG_VENDOR_TARGET_VERSION = 1.1.1
 
 include $(CURDIR)/../vendor-defs.mk
 
-NG_VENDOR_TARGET_CONFIGURE_OPTS :=
-
-ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-cxx-warnings=no
+ifeq (Msys,$(NG_VENDOR_ARCH))
+   NG_CC = $(CURDIR)/../clwrapper.py
+   NG_CXX = $(CURDIR)/../clwrapper.py
 endif
 
-ifneq (,$(filter Msys Darwin,$(NG_VENDOR_ARCH)))
-  ifneq (1,$(NG_VENDOR_CROSS_COMP))
-    NG_VENDOR_TARGET_CONFIGURE_OPTS += --with-libiconv=gnu
-  endif
-endif
+NG_ACLOCAL_FLAGS += -I common/m4 \
+                    $(NULL)
 
-NG_VENDOR_TARGET_DYLIB_FIXUPS := \
-  libglib-2.0 \
-  libgobject-2.0 \
-  libgmodule-2.0 \
-  libgthread-2.0 \
+NG_VENDOR_TARGET_CONFIGURE_OPTS := \
+  --disable-examples
+
+NG_VENDOR_TARGET_DYLIB_FIXUPS := libtheora.0 \
+                                 libtheoraenc.1 \
+                                 libtheoradec.1 \
+                                 $(NULL)
 
 include $(CURDIR)/../vendor-rules.mk

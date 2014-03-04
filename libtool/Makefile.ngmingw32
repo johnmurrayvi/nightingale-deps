@@ -25,42 +25,24 @@
 #
 ################################################################################
 #
-# Makefile for building Nightingale vendor: gettext
+# Makefile for building Nightingale vendor: libtool
 #
 ################################################################################
 ################################################################################
 
+NG_VENDOR_TARGET = libtool
+NG_VENDOR_TARGET_VERSION = 2.4.2
 
-# We don't want this on linux because -lintl (which this will add) doesn't
-# exist there - it's integrated into libc.
-ifneq (,$(filter Linux,$(NG_VENDOR_ARCH)))
-  NG_VENDOR_TARGET_DEP_MODULES := gettext
-endif
-ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_VENDOR_TARGET_DEP_MODULES := gettext
-endif
+NG_VENDOR_SKIP_DEBUG_BUILD = 1
+NG_VENDOR_GENERATE_SYMBOLS = 0
 
-NG_VENDOR_TARGET = glib
-NG_VENDOR_TARGET_VERSION = 2.39.90
+NG_VENDOR_TARGET_DEP_MODULES = $(NULL)
 
 include $(CURDIR)/../vendor-defs.mk
 
-NG_VENDOR_TARGET_CONFIGURE_OPTS :=
-
-ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-cxx-warnings=no
-endif
-
-ifneq (,$(filter Msys Darwin,$(NG_VENDOR_ARCH)))
-  ifneq (1,$(NG_VENDOR_CROSS_COMP))
-    NG_VENDOR_TARGET_CONFIGURE_OPTS += --with-libiconv=gnu
-  endif
-endif
-
-NG_VENDOR_TARGET_DYLIB_FIXUPS := \
-  libglib-2.0 \
-  libgobject-2.0 \
-  libgmodule-2.0 \
-  libgthread-2.0 \
-
 include $(CURDIR)/../vendor-rules.mk
+
+NG_VENDOR_TARGET_CONFIGURE_OPTS = --disable-ltdl-install
+
+module_setup_build:
+	cd $(NG_VENDOR_BUILD_DIR) && ./bootstrap

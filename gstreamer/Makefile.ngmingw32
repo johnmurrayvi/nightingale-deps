@@ -25,42 +25,43 @@
 #
 ################################################################################
 #
-# Makefile for building Nightingale vendor: gettext
+# Makefile for building Nightingale vendor: gstreamer (core)
 #
 ################################################################################
 ################################################################################
 
-
-# We don't want this on linux because -lintl (which this will add) doesn't
-# exist there - it's integrated into libc.
-ifneq (,$(filter Linux,$(NG_VENDOR_ARCH)))
-  NG_VENDOR_TARGET_DEP_MODULES := gettext
-endif
-ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_VENDOR_TARGET_DEP_MODULES := gettext
-endif
-
-NG_VENDOR_TARGET = glib
-NG_VENDOR_TARGET_VERSION = 2.39.90
+NG_VENDOR_TARGET = gstreamer
+NG_VENDOR_TARGET_VERSION = 1.2.3
 
 include $(CURDIR)/../vendor-defs.mk
 
-NG_VENDOR_TARGET_CONFIGURE_OPTS :=
+NG_CFLAGS += -DYY_NO_UNISTD_H
+GST_PARSE_LA = parse/libgstparse_la-lex._gst_parse_yy.lo \
+               parse/libgstparse_la-grammar.tab.lo
 
-ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-cxx-warnings=no
-endif
+NG_VENDOR_TARGET_CONFIGURE_OPTS := \
+      --disable-loadsave \
+      --enable-binary-registry \
+      --disable-examples \
+      --disable-tests \
+      --disable-trace \
+      --disable-gtk-doc \
+      --disable-alloc-trace
 
-ifneq (,$(filter Msys Darwin,$(NG_VENDOR_ARCH)))
-  ifneq (1,$(NG_VENDOR_CROSS_COMP))
-    NG_VENDOR_TARGET_CONFIGURE_OPTS += --with-libiconv=gnu
-  endif
+ifeq (Msys,$(NG_VENDOR_ARCH))
+  # use clwrapper in libtool-based modules for symbol generation (see bug 6486)
+  NG_CC = $(CURDIR)/../clwrapper.py
+  NG_CXX = $(CURDIR)/../clwrapper.py
+  NG_CFLAGS += -D_USE_MATH_DEFINES -D_UNICODE -DUNICODE
 endif
 
 NG_VENDOR_TARGET_DYLIB_FIXUPS := \
-  libglib-2.0 \
-  libgobject-2.0 \
-  libgmodule-2.0 \
-  libgthread-2.0 \
+      libgstreamer-1.0 \
+      libgstbase-1.0 \
+      libgstcontroller-1.0 \
+      libgstdataprotocol-1.0 \
+      libgstnet-1.0 \
+      libgstelements-1.0 \
+      libgstindexers-1.0
 
 include $(CURDIR)/../vendor-rules.mk

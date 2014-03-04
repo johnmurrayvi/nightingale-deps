@@ -25,42 +25,37 @@
 #
 ################################################################################
 #
-# Makefile for building Nightingale vendor: gettext
+# Makefile for building Nightingale vendor: gstreamer (core)
 #
 ################################################################################
 ################################################################################
 
-
-# We don't want this on linux because -lintl (which this will add) doesn't
-# exist there - it's integrated into libc.
-ifneq (,$(filter Linux,$(NG_VENDOR_ARCH)))
-  NG_VENDOR_TARGET_DEP_MODULES := gettext
-endif
-ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_VENDOR_TARGET_DEP_MODULES := gettext
-endif
-
-NG_VENDOR_TARGET = glib
-NG_VENDOR_TARGET_VERSION = 2.39.90
+NG_VENDOR_TARGET = gst-plugins-base
+NG_VENDOR_TARGET_VERSION = 1.2.3
 
 include $(CURDIR)/../vendor-defs.mk
 
-NG_VENDOR_TARGET_CONFIGURE_OPTS :=
+NG_VENDOR_TARGET_CONFIGURE_OPTS := \
+        --disable-examples \
+        --disable-gtk-doc \
+        --disable-pango \
+        --disable-cdparanoia --disable-gio --disable-libvisual
 
-ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-cxx-warnings=no
+NG_CFLAGS += -Wl,-rpath=$(NG_VENDOR_BINARIES_DIR)/gstreamer/$(NG_BUILD_TYPE)/lib
+
+ifeq (Darwin,$(NG_VENDOR_ARCH))
+  NG_VENDOR_TARGET_CONFIGURE_OPTS += \
+    --disable-x --disable-xvideo --disable-xshm --disable-alsa
 endif
 
-ifneq (,$(filter Msys Darwin,$(NG_VENDOR_ARCH)))
-  ifneq (1,$(NG_VENDOR_CROSS_COMP))
-    NG_VENDOR_TARGET_CONFIGURE_OPTS += --with-libiconv=gnu
-  endif
+ifeq (Msys,$(NG_VENDOR_ARCH))
+  # use clwrapper in libtool-based modules for symbol generation (see bug 6486)
+  NG_CC = $(CURDIR)/../clwrapper.py
+  NG_CXX = $(CURDIR)/../clwrapper.py
+  NG_CFLAGS += -D_USE_MATH_DEFINES -D_UNICODE -DUNICODE
 endif
 
-NG_VENDOR_TARGET_DYLIB_FIXUPS := \
-  libglib-2.0 \
-  libgobject-2.0 \
-  libgmodule-2.0 \
-  libgthread-2.0 \
+NG_VENDOR_TARGET_DYLIB_FIXUPS = $(addprefix libgst, \
+  $(addsuffix -1.0, $(sort $(GST_BASE_DYLIBS))))
 
 include $(CURDIR)/../vendor-rules.mk

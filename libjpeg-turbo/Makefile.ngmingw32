@@ -1,5 +1,3 @@
-################################################################################
-################################################################################
 #
 # BEGIN NIGHTINGALE GPL
 # 
@@ -23,44 +21,26 @@
 # 
 # END NIGHTINGALE GPL
 #
+
 ################################################################################
 #
-# Makefile for building Nightingale vendor: gettext
+# Makefile for building Nightingale vendor: libjpeg-turbo
 #
 ################################################################################
-################################################################################
 
-
-# We don't want this on linux because -lintl (which this will add) doesn't
-# exist there - it's integrated into libc.
-ifneq (,$(filter Linux,$(NG_VENDOR_ARCH)))
-  NG_VENDOR_TARGET_DEP_MODULES := gettext
-endif
-ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_VENDOR_TARGET_DEP_MODULES := gettext
-endif
-
-NG_VENDOR_TARGET = glib
-NG_VENDOR_TARGET_VERSION = 2.39.90
+NG_VENDOR_TARGET = libjpeg-turbo
+NG_VENDOR_TARGET_VERSION = 1.3.0
 
 include $(CURDIR)/../vendor-defs.mk
 
-NG_VENDOR_TARGET_CONFIGURE_OPTS :=
-
-ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-cxx-warnings=no
-endif
-
-ifneq (,$(filter Msys Darwin,$(NG_VENDOR_ARCH)))
-  ifneq (1,$(NG_VENDOR_CROSS_COMP))
-    NG_VENDOR_TARGET_CONFIGURE_OPTS += --with-libiconv=gnu
-  endif
+ifeq (Msys,$(NG_VENDOR_ARCH))
+  # use clwrapper in libtool-based modules for symbol generation (see bug 6486)
+  NG_CC = $(CURDIR)/../clwrapper.py
+  NG_CXX = $(CURDIR)/../clwrapper.py
+  NG_CFLAGS += -D_USE_MATH_DEFINES -D_UNICODE -DUNICODE
 endif
 
 NG_VENDOR_TARGET_DYLIB_FIXUPS := \
-  libglib-2.0 \
-  libgobject-2.0 \
-  libgmodule-2.0 \
-  libgthread-2.0 \
+      libjpeg-turbo
 
 include $(CURDIR)/../vendor-rules.mk

@@ -25,42 +25,41 @@
 #
 ################################################################################
 #
-# Makefile for building Nightingale vendor: gettext
+# Makefile for building Nightingale vendor: flac
 #
 ################################################################################
 ################################################################################
 
+NG_VENDOR_TARGET_DEP_MODULES :=
 
-# We don't want this on linux because -lintl (which this will add) doesn't
-# exist there - it's integrated into libc.
-ifneq (,$(filter Linux,$(NG_VENDOR_ARCH)))
-  NG_VENDOR_TARGET_DEP_MODULES := gettext
-endif
-ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_VENDOR_TARGET_DEP_MODULES := gettext
-endif
-
-NG_VENDOR_TARGET = glib
-NG_VENDOR_TARGET_VERSION = 2.39.90
+NG_VENDOR_TARGET = flac
+NG_VENDOR_TARGET_VERSION = 1.3.0
 
 include $(CURDIR)/../vendor-defs.mk
 
-NG_VENDOR_TARGET_CONFIGURE_OPTS :=
+NG_VENDOR_TARGET_CONFIGURE_OPTS := --disable-ogg \
+                                   --disable-cpplibs \
+                                   --disable-rpath \
+                                   --disable-doxygen-docs \
+                                   --disable-oggtest \
+                                   --disable-asm-optimizations \
+                                   $(NULL)
 
-ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-cxx-warnings=no
+NG_CFLAGS += -DFLAC_API_EXPORTS
+
+NG_CXXFLAGS += $(NG_CFLAGS)
+
+NG_VENDOR_TARGET_DYLIB_FIXUPS := libFLAC \
+                                 $(NULL)
+
+NG_ACLOCAL_FLAGS += -I common/m4 \
+                    $(NULL)
+
+ifeq (Msys,$(NG_VENDOR_ARCH))
+   # use clwrapper in libtool-based modules for symbol generation (see bug 6486)
+   NG_CC = $(CURDIR)/../clwrapper.py
+   NG_CXX = $(CURDIR)/../clwrapper.py
+   NG_USE_MOZCRT = 1
 endif
-
-ifneq (,$(filter Msys Darwin,$(NG_VENDOR_ARCH)))
-  ifneq (1,$(NG_VENDOR_CROSS_COMP))
-    NG_VENDOR_TARGET_CONFIGURE_OPTS += --with-libiconv=gnu
-  endif
-endif
-
-NG_VENDOR_TARGET_DYLIB_FIXUPS := \
-  libglib-2.0 \
-  libgobject-2.0 \
-  libgmodule-2.0 \
-  libgthread-2.0 \
 
 include $(CURDIR)/../vendor-rules.mk
