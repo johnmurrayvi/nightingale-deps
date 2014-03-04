@@ -59,7 +59,7 @@ case $OSTYPE in
         # echo -e "Building sqlite...\n"
         # make -C sqlite -f Makefile.ngmingw32
 
-        # ### TIER 2 ###
+        ### TIER 2 ###
         # echo -e "Building libogg...\n"
         # make -C libogg -f Makefile.ngmingw32
 
@@ -75,11 +75,11 @@ case $OSTYPE in
         # echo -e "Building taglib...\n"
         # make -C taglib -f Makefile.ngmingw32
 
-        # ### TIER 3 ###
+        ### TIER 3 ###
         # echo -e "Building gstreamer...\n"
         # make -C gstreamer -f Makefile.ngmingw32
 
-        # ### TIER 4 ###
+        ### TIER 4 ###
         # echo -e "Building gst plugins...\n"
         # make -C gst-plugins-base -f Makefile.ngmingw32
         # make -C gst-plugins-good -f Makefile.ngmingw32

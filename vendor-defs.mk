@@ -53,6 +53,7 @@ ifeq (Linux,$(NG_VENDOR_ARCH))
     # mingw32 cross compilation
     ifeq (1,$(NG_VENDOR_CROSS_COMP))
       NG_TARGET_ARCH := windows-i686-msvc10
+      # NG_VENDOR_TARGET_ARCH := i686-pc-mingw32
       NG_VENDOR_HOST_ARCH := i586-mingw32msvc
       NG_VENDOR_BUILD_ARCH := x86_64-linux-gnu
     else
@@ -251,7 +252,6 @@ endif
 
 ###########
 
-# Is typically Makefile.songbird
 NG_VENDOR_MAKEFILE := $(firstword $(MAKEFILE_LIST))
 
 ifeq (,$(NG_VENDOR_BUILD_ROOT))
@@ -379,4 +379,145 @@ ifneq (,$(call enable-ng-lib, glib))
     LDFLAGS += $(foreach GLIB_PART, $(GLIB_PARTS), -Wl,-dylib_file -Wl,libgobject-2.0.dylib:$(NG_GLIB_DIR)/lib/lib$(GLIB_PART)-2.0.dylib)
     NG_DYLD_LIBRARY_PATH += $(NG_GLIB_DIR)/lib
   endif
+  ifeq (1,$(NG_VENDOR_CROSS_COMP)))
+    NG_LDFLAGS += -L$(NG_GLIB_DIR)/lib
+    NG_CFLAGS += -I$(NG_GLIB_DIR)/include
+    NG_CPPFLAGS += -I$(NG_GLIB_DIR)/include
+  endif
 endif
+
+#
+# libIDL
+#
+ifeq (Darwin,$(NG_VENDOR_ARCH))
+   ifneq (,$(call enable-ng-lib, libIDL))
+      $(info Enabling Nightingale vendor lib: libIDL)
+      NG_LIBIDL_DIR := $(call find-dep-dir, libIDL)
+      NG_PATH += $(NG_LIBIDL_DIR)/bin
+      NG_PKG_CONFIG_PATH += $(NG_LIBIDL_DIR)/lib/pkgconfig
+      NG_DYLD_LIBRARY_PATH += $(NG_LIBIDL_DIR)/lib
+   endif
+endif
+
+#
+# gstreamer
+#
+ifneq (,$(call enable-ng-lib, gstreamer))
+   $(info Enabling Nightingale vendor lib: gstreamer)
+   NG_GSTREAMER_DIR = $(call find-dep-dir, gstreamer)
+   NG_PATH += $(NG_GSTREAMER_DIR)/bin
+   NG_PKG_CONFIG_PATH += $(NG_GSTREAMER_DIR)/lib/pkgconfig
+  
+   # A list of basic dylibs on mac that need to be fixed up across all the
+   # gstreamer modules; these are built by various parts of gstreamer and 
+   # base
+   GST_BASE_DYLIBS = audio cdda fft interfaces netbuffer pbutils riff \
+    rtp rtsp sdp tag video
+endif
+
+#
+# gstreamer-plugins-base
+#
+ifneq (,$(call enable-ng-lib, gst-plugins-base))
+   $(info Enabling Nightingale vendor lib: gst-plugins-base)
+   NG_GST_PLUGINS_BASE_DIR = $(call find-dep-dir, gst-plugins-base)
+   NG_PATH += $(NG_GST_PLUGINS_BASE_DIR)/bin
+   NG_PKG_CONFIG_PATH += $(NG_GST_PLUGINS_BASE_DIR)/lib/pkgconfig
+endif
+
+#
+# libogg
+#
+ifneq (,$(call enable-ng-lib, ogg))
+   $(info Enabling Nightingale vendor lib: ogg)
+   NG_LIBOGG_DIR = $(call find-dep-dir, libogg)
+   NG_OGG_LIBS = -L$(NG_LIBOGG_DIR)/lib -logg
+   NG_OGG_CFLAGS := -I$(NG_LIBOGG_DIR)/include
+   NG_PKG_CONFIG_PATH += $(NG_LIBOGG_DIR)/lib/pkgconfig
+
+   ifeq (Msys, $(NG_VENDOR_ARCH))
+      NG_PATH += $(NG_LIBOGG_DIR)/bin
+      NG_CFLAGS += -wd9035
+      ifeq (debug, $(NG_BUILD_TYPE))
+         NG_LIBOGG_LIBS += -Wl,-Zi
+      endif
+   endif
+endif
+
+#
+# libtheora
+#
+ifneq (,$(call enable-ng-lib, theora))
+   $(info Enabling Nightingale vendor lib: theora)
+   NG_LIBTHEORA_DIR = $(call find-dep-dir, libtheora)
+   NG_THEORA_LIBS := -L$(NG_LIBTHEORA_DIR)/lib -ltheora
+   NG_THEORA_LIBS += $(NG_OGG_LIBS)
+   NG_THEORA_CFLAGS = -I$(NG_LIBTHEORA_DIR)/include
+   NG_THEORA_CFLAGS += $(NG_OGG_CFLAGS)
+   NG_PKG_CONFIG_PATH += $(NG_LIBTHEORA_DIR)/lib/pkgconfig
+
+   ifeq (Msys,$(NG_VENDOR_ARCH))
+      NG_PATH += $(NG_LIBTHEORA_DIR)/bin
+      ifeq (debug,$(NG_BUILD_TYPE))
+         NG_THEORA_LIBS += -Wl,-Zi
+      endif
+  endif
+endif
+
+#
+# libvorbis
+#
+ifneq (,$(call enable-ng-lib, vorbis))
+   $(info Enabling Nightingale vendor lib: vorbis)
+   NG_LIBVORBIS_DIR = $(call find-dep-dir, libvorbis)
+   NG_VORBIS_LIBS := -L$(NG_LIBVORBIS_DIR)/lib -lvorbis -lvorbisenc
+   NG_VORBIS_LIBS += $(NG_OGG_LIBS)
+   NG_VORBIS_CFLAGS = -I$(NG_LIBVORBIS_DIR)/include
+   NG_VORBIS_CFLAGS += $(NG_OGG_CFLAGS)
+   NG_PKG_CONFIG_PATH += $(NG_LIBVORBIS_DIR)/lib/pkgconfig
+
+   ifeq (Msys, $(NG_VENDOR_ARCH))
+      NG_PATH += $(NG_LIBVORBIS_DIR)/bin
+      ifeq (debug, $(NG_BUILD_TYPE))
+         NG_VORBIS_LIBS += -Wl,-Zi
+      endif
+   endif
+endif
+
+#
+# libFLAC
+#
+ifneq (,$(call enable-ng-lib, flac))
+   $(info Enabling Nightingale vendor lib: flac)
+   NG_LIBFLAC_DIR = $(call find-dep-dir, flac)
+   NG_LDFLAGS += -L$(NG_LIBFLAC_DIR)/lib
+   ifeq (Msys,$(NG_VENDOR_ARCH))
+      NG_FLAC_LIBS += -lFLAC-8
+      NG_PATH += $(NG_LIBFLAC_DIR)/bin
+      ifeq (debug,$(NG_BUILD_TYPE))
+         NG_FLAC_LIBS += -Wl,-Zi
+      endif
+   endif
+   NG_CPPFLAGS += -I$(NG_LIBFLAC_DIR)/include
+   NG_PKG_CONFIG_PATH += $(NG_LIBFLAC_DIR)/lib/pkgconfig
+endif
+
+#
+# libjpeg-turbo
+#
+ifneq (,$(call enable-ng-lib, jpeg))
+   $(info Enabling Nightingale vendor lib: jpeg)
+   NG_LIBJPEG_DIR = $(call find-dep-dir, libjpeg-turbo)
+   NG_LDFLAGS += -L$(NG_LIBJPEG_DIR)/lib
+
+   NG_CFLAGS = -I$(NG_LIBJPEG_DIR)/include
+
+   ifeq (Msys,$(NG_VENDOR_ARCH))
+      NG_JPEG_LIBS += "-ljpeg"
+      NG_PATH += $(NG_LIBJPEG_DIR)/bin
+      ifeq (debug,$(NG_BUILD_TYPE))
+         NG_JPEG_LIBS += -Wl,-Zi
+      endif
+  endif
+endif
+
