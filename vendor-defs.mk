@@ -379,7 +379,7 @@ ifneq (,$(call enable-ng-lib, glib))
     LDFLAGS += $(foreach GLIB_PART, $(GLIB_PARTS), -Wl,-dylib_file -Wl,libgobject-2.0.dylib:$(NG_GLIB_DIR)/lib/lib$(GLIB_PART)-2.0.dylib)
     NG_DYLD_LIBRARY_PATH += $(NG_GLIB_DIR)/lib
   endif
-  ifeq (1,$(NG_VENDOR_CROSS_COMP)))
+  ifeq (1,$(NG_VENDOR_CROSS_COMP))
     NG_LDFLAGS += -L$(NG_GLIB_DIR)/lib
     NG_CFLAGS += -I$(NG_GLIB_DIR)/include
     NG_CPPFLAGS += -I$(NG_GLIB_DIR)/include
