@@ -11,6 +11,14 @@ export NG_VENDOR_BUILD_ROOT=$DIR
 
 export NG_VENDOR_CROSS_COMP=1
 
+# mingw32msvc
+export CROSS="i586-pc-mingw32msvc-"
+
+# mxe
+export PATH="/opt/mxe:$PATH"
+export CROSS="i686-pc-mingw32.static-"
+
+
 if [ ! -d "build" ]; then
     mkdir build
 fi
@@ -33,7 +41,7 @@ case $OSTYPE in
         # make -C libiconv -f Makefile.ngmingw32
 
         # echo -e "Building libjpeg-turbo...\n"
-        # make -C libjpeg-turbo -f Makefile.ngmingw32
+        make -C libjpeg-turbo -f Makefile.ngmingw32
 
         ### TIER 1 ###
         ### Gettext... the lazy way #############

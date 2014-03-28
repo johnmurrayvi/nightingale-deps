@@ -78,14 +78,15 @@ ifneq (,$(BUILD_TARGET_SET))
     export AR = $(NG_AR)
     export OBJDUMP = $(NG_OBJDUMP)
   else
-    export CC = i586-mingw32msvc-gcc
-    export CXX = i586-mingw32msvc-g++
-    export LD = i586-mingw32msvc-ld
-    export AR = i586-mingw32msvc-ar
-    export AS = i586-mingw32msvc-as
-    export OBJDUMP = i586-mingw32msvc-objdump
-    export RANLIB = i586-mingw32msvc-ranlib
-    export STRIP = i586-mingw32msvc-strip
+    export CC = $(CROSS)gcc
+    export CXX = $(CROSS)g++
+    export LD = $(CROSS)ld
+    export AR = $(CROSS)ar
+    export AS = $(CROSS)as
+    export OBJDUMP = $(CROSS)objdump
+    export RANLIB = $(CROSS)ranlib
+    export STRIP = $(CROSS)strip
+    export PKG_CONFIG = $(CROSS)pkg-config
   endif
 
     export CPPFLAGS = $(NG_CPPFLAGS)

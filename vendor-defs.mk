@@ -24,6 +24,7 @@ NG_VENDOR_SUBARCH := $(shell uname -m 2>&1)
 NG_VENDOR_OS := $(shell uname -o 2>&1)
 
 NG_VENDOR_CROSS_COMP := $(NG_VENDOR_CROSS_COMP)
+CROSS := $(CROSS)
 NG_VENDOR_HOST_ARCH :=
 NG_VENDOR_BUILD_ARCH :=
 
@@ -54,7 +55,8 @@ ifeq (Linux,$(NG_VENDOR_ARCH))
     ifeq (1,$(NG_VENDOR_CROSS_COMP))
       NG_TARGET_ARCH := windows-i686-msvc10
       # NG_VENDOR_TARGET_ARCH := i686-pc-mingw32
-      NG_VENDOR_HOST_ARCH := i586-mingw32msvc
+      # NG_VENDOR_HOST_ARCH := i586-mingw32msvc
+      NG_VENDOR_HOST_ARCH := i686-pc-mingw32
       NG_VENDOR_BUILD_ARCH := x86_64-linux-gnu
     else
       NG_TARGET_ARCH := linux-x86_64
@@ -129,15 +131,16 @@ ifeq (Linux,$(NG_VENDOR_ARCH))
     OTOOL ?= echo otool called on Linux && exit 1;
     NG_AR ?= ar
   else
-    STRIP ?= i586-mingw32msvc-strip
+    STRIP ?= (CROSS)strip
     DUMP_SYMS ?= $(MOZSDK_BIN_DIR)/dump_syms
     INSTALL_NAME_TOOL ?= echo install_name_tool called on Linux && exit 1;
     OTOOL ?= echo otool called on Linux && exit 1;
-    NG_AR = i586-mingw32msvc-ar
-    # NG_CC = i586-mingw32msvc-gcc
-    # NG_CXX = i586-mingw32msvc-g++
-    # NG_LD = i586-mingw32msvc-ld
-    # NG_OBJDUMP = i586-mingw32msvc-objdump
+    NG_AR = $(CROSS)ar
+    NG_CC = $(CROSS)gcc
+    NG_CXX = $(CROSS)g++
+    NG_LD = $(CROSS)ld
+    NG_OBJDUMP = $(CROSS)objdump
+    NG_PKG_CONFIG = $(CROSS)pkg-config
   endif
 endif
 ifeq (Msys,$(NG_VENDOR_ARCH))
@@ -222,10 +225,10 @@ ifneq (,$(CONFIGURE_TARGET))
   NG_CONFIGURE_OPTS += --build=$(CONFIGURE_TARGET)
 endif
 
-# ifeq (1,$(NG_VENDOR_CROSS_COMP))
-#   NG_CONFIGURE_OPTS += --host=$(NG_VENDOR_HOST_ARCH)
+ifeq (1,$(NG_VENDOR_CROSS_COMP))
+  NG_CONFIGURE_OPTS += --host=$(NG_VENDOR_HOST_ARCH)
 #   NG_CONFIGURE_OPTS += --build=$(NG_VENDOR_BUILD_ARCH)
-# endif
+endif
 
 ifneq (,$(filter linux-i686 macosx-i686,$(NG_TARGET_ARCH)))
   NG_CFLAGS += -g -gstabs+
@@ -510,7 +513,7 @@ ifneq (,$(call enable-ng-lib, jpeg))
    NG_LIBJPEG_DIR = $(call find-dep-dir, libjpeg-turbo)
    NG_LDFLAGS += -L$(NG_LIBJPEG_DIR)/lib
 
-   NG_CFLAGS = -I$(NG_LIBJPEG_DIR)/include
+   NG_CFLAGS += -I$(NG_LIBJPEG_DIR)/include
 
    ifeq (Msys,$(NG_VENDOR_ARCH))
       NG_JPEG_LIBS += "-ljpeg"
