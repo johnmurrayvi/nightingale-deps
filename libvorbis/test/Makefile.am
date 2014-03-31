@@ -4,9 +4,9 @@ AUTOMAKE_OPTIONS = foreign
 
 INCLUDES = -I$(top_srcdir)/include @OGG_CFLAGS@
 
-check_PROGRAMS = test
+noinst_PROGRAMS = test
 
-check: $(check_PROGRAMS)
+check: $(noinst_PROGRAMS)
 	./test$(EXEEXT)
 
 test_SOURCES = util.c util.h write_read.c write_read.h test.c

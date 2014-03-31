@@ -1,6 +1,6 @@
 ## Process this with automake to create Makefile.in
 
-SUBDIRS = libvorbis vorbisfile vorbisenc
+SUBDIRS = vorbisfile vorbisenc
 
 docdir = $(datadir)/doc/$(PACKAGE)-$(VERSION)
 
@@ -44,6 +44,7 @@ SPEC_PNG = \
 	hufftree-under.png \
 	residue-pack.png \
 	residue2.png \
+	white-xifish.png \
 	window1.png \
 	window2.png
 SPEC_PDF = xifish.pdf
@@ -71,13 +72,13 @@ built_docs = Vorbis_I_spec.pdf Vorbis_I_spec.html Vorbis_I_spec.css
 
 # conditionally make the generated documentation
 if BUILD_DOCS
-doc_DATA = $(static_docs) $(SPEC_PNG) $(built_docs) doxygen-build.stamp
+doc_DATA = $(static_docs) $(SPEC_PNG) $(built_docs)
 else
-doc_DATA = $(static_docs) doxygen-build.stamp
+doc_DATA = $(static_docs)
 endif
 
 EXTRA_DIST = $(static_docs) $(built_docs) \
-	$(SPEC_TEX) $(SPEC_PNG) $(SPEC_PDF) Vorbis_I_spec.cfg Doxyfile.in
+	$(SPEC_TEX) $(SPEC_PNG) $(SPEC_PDF) Vorbis_I_spec.cfg
 
 # these are expensive; only remove if we have to
 MAINTAINERCLEANFILES = $(built_docs)
@@ -113,36 +114,3 @@ NO_DOCS_ERROR:
 	@echo "Try re-running after passing --enable-docs to configure."
 	@echo
 endif
-
-if HAVE_DOXYGEN
-doxygen-build.stamp: Doxyfile $(top_srcdir)/include/vorbis/*.h
-	doxygen
-	touch doxygen-build.stamp
-else
-doxygen-build.stamp:
-	echo "*** Warning: Doxygen not found; documentation will not be built."
-	touch doxygen-build.stamp
-endif
-
-install-data-local: doxygen-build.stamp
-	$(mkinstalldirs) $(DESTDIR)$(docdir)
-	if test -d vorbis; then \
-	  for dir in vorbis/*; do \
-	    if test -d $$dir; then \
-	      b=`basename $$dir`; \
-	      $(mkinstalldirs) $(DESTDIR)$(docdir)/$$b; \
-	      for f in $$dir/*; do \
-		$(INSTALL_DATA) $$f $(DESTDIR)$(docdir)/$$b; \
-	      done \
-	    fi \
-	  done \
-	fi
-
-uninstall-local:
-	rm -rf $(DESTDIR)$(docdir)
-
-clean-local:
-	if test -d vorbis; then rm -rf vorbis; fi
-	if test -f doxygen-build.stamp; then rm -f doxygen-build.stamp; fi
-
-
