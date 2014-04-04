@@ -83,6 +83,9 @@ ifneq (,$(BUILD_TARGET_SET))
     export LD = $(CROSS)ld
     export AR = $(CROSS)ar
     export AS = $(CROSS)as
+ifeq (1, $(NG_VENDOR_CROSS_COMP))
+    export WINDRES = $(CROSS)windres
+endif
     export OBJDUMP = $(CROSS)objdump
     export RANLIB = $(CROSS)ranlib
     export STRIP = $(CROSS)strip
@@ -94,7 +97,12 @@ ifneq (,$(BUILD_TARGET_SET))
     export CXXFLAGS = $(NG_CXXFLAGS)
     export LDFLAGS = $(NG_LDFLAGS)
     export ACLOCAL_FLAGS = $(NG_ACLOCAL_FLAGS)
+ifeq (1, $(NG_VENDOR_CROSS_COMP))
+	export PKG_CONFIG_PATH_i686_pc_mingw32 = $(NG_PKG_CONFIG_PATH)
     export PKG_CONFIG_PATH = $(NG_PKG_CONFIG_PATH)
+else
+    export PKG_CONFIG_PATH = $(NG_PKG_CONFIG_PATH)
+endif
     export PATH = $(NG_PATH)
 ifeq (Msys,$(NG_VENDOR_ARCH))
   export LIBS = $(NG_LIBS)
@@ -424,7 +432,12 @@ setup_build: \
 	@echo
 	@echo Paths
 	@echo -----
+ifeq (1, $(NG_VENDOR_CROSS_COMP))
+	@echo PKG_CONFIG_PATH_i686_pc_mingw32 = $(PKG_CONFIG_PATH_i686_pc_mingw32)
 	@echo PKG_CONFIG_PATH = $(PKG_CONFIG_PATH)
+else
+	@echo PKG_CONFIG_PATH = $(PKG_CONFIG_PATH)
+endif
 	@echo PATH = "$(PATH)"
 ifeq (Msys,$(NG_VENDOR_ARCH))
 	@echo LIBS = $(LIBS)
