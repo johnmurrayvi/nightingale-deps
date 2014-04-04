@@ -12,10 +12,11 @@ export NG_VENDOR_BUILD_ROOT=$DIR
 export NG_VENDOR_CROSS_COMP=1
 
 # mingw32msvc
-export CROSS="i586-pc-mingw32msvc-"
+# export CROSS="i586-pc-mingw32msvc-"
 
 # mxe
-export PATH="/opt/mxe:$PATH"
+export PATH="/opt/mxe/bin:$PATH"
+echo $PATH
 export CROSS="i686-pc-mingw32.static-"
 
 
@@ -38,15 +39,18 @@ case $OSTYPE in
         # make -C libtool -f Makefile.ngmingw32
 
         # echo -e "Building libiconv...\n"
-        # make -C libiconv -f Makefile.ngmingw32
+#####        make -C libiconv -f Makefile.ngmingw32 #####
 
         # echo -e "Building libjpeg-turbo...\n"
-        make -C libjpeg-turbo -f Makefile.ngmingw32
+# Builds        # make -C libjpeg-turbo -f Makefile.ngmingw32
+
+        # echo -e "Building zlib...\n"
+        # make -C zlib -f Makefile.ngmingw32
 
         ### TIER 1 ###
         ### Gettext... the lazy way #############
         # echo -e "Building gettext...\n"
-        # make -C gettext -f Makefile.ngmingw32
+        make -C gettext -f Makefile.ngmingw32
 
         # cd build/gettext/debug/gettext-tools && autoreconf -f -i
         # cd $DIR
@@ -65,20 +69,22 @@ case $OSTYPE in
         # make -C glib -f Makefile.ngmingw32
 
         # echo -e "Building sqlite...\n"
-        # make -C sqlite -f Makefile.ngmingw32
+# Builds        # make -C sqlite -f Makefile.ngmingw32
 
         ### TIER 2 ###
         # echo -e "Building libogg...\n"
-        # make -C libogg -f Makefile.ngmingw32
+# Builds        # make -C libogg -f Makefile.ngmingw32
+        # make -C libogg -f Makefile.ngmingw32 debug
 
         # echo -e "Building libvorbis...\n"
+#####        # make -C libvorbis -f Makefile.ngmingw32 ######
         # make -C libvorbis -f Makefile.ngmingw32
 
         # echo -e "Building libtheora...\n"
         # make -C libtheora -f Makefile.ngmingw32
 
         # echo -e "Building FLAC...\n"
-        # make -C flac -f Makefile.ngmingw32
+# Builds        # make -C flac -f Makefile.ngmingw32
 
         # echo -e "Building taglib...\n"
         # make -C taglib -f Makefile.ngmingw32
