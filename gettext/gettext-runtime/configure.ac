@@ -22,7 +22,7 @@ AC_CONFIG_SRCDIR([intl/dcigettext.c])
 AC_CONFIG_AUX_DIR([../build-aux])
 . $srcdir/../version.sh
 gl_INIT_PACKAGE([gettext-runtime], [$VERSION_NUMBER])
-AM_INIT_AUTOMAKE([1.11.1 silent-rules parallel-tests])
+AM_INIT_AUTOMAKE([1.14 silent-rules parallel-tests subdir-objects])
 AC_CONFIG_HEADERS([config.h])
 
 dnl Installation directories.

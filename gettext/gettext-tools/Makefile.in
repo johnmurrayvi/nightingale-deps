@@ -90,9 +90,11 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(top_srcdir)/../gettext-runtime/intl/Makefile.in ABOUT-NLS \
 	COPYING ../build-aux/compile ../build-aux/config.guess \
 	../build-aux/config.rpath ../build-aux/config.sub \
-	../build-aux/install-sh ../build-aux/missing \
+	../build-aux/depcomp ../build-aux/install-sh \
+	../build-aux/mdate-sh ../build-aux/missing \
 	../build-aux/mkinstalldirs ../build-aux/texinfo.tex \
-	../build-aux/ltmain.sh $(top_srcdir)/../build-aux/compile \
+	../build-aux/ylwrap ../build-aux/ltmain.sh \
+	$(top_srcdir)/../build-aux/compile \
 	$(top_srcdir)/../build-aux/config.guess \
 	$(top_srcdir)/../build-aux/config.rpath \
 	$(top_srcdir)/../build-aux/config.sub \
@@ -305,11 +307,6 @@ am__aclocal_m4_deps =  \
 	$(top_srcdir)/gnulib-m4/yield.m4 \
 	$(top_srcdir)/../m4/fixautomake.m4 \
 	$(top_srcdir)/../m4/init-package-version.m4 \
-	$(top_srcdir)/../m4/libtool.m4 \
-	$(top_srcdir)/../m4/ltoptions.m4 \
-	$(top_srcdir)/../m4/ltsugar.m4 \
-	$(top_srcdir)/../m4/ltversion.m4 \
-	$(top_srcdir)/../m4/lt~obsolete.m4 \
 	$(top_srcdir)/../m4/woe32-dll.m4 \
 	$(top_srcdir)/../gettext-runtime/m4/codeset.m4 \
 	$(top_srcdir)/../gettext-runtime/m4/extern-inline.m4 \
@@ -340,8 +337,10 @@ am__aclocal_m4_deps =  \
 	$(top_srcdir)/../gettext-runtime/m4/wint_t.m4 \
 	$(top_srcdir)/../gettext-runtime/m4/xsize.m4 \
 	$(top_srcdir)/m4/exported.m4 $(top_srcdir)/m4/hostname.m4 \
-	$(top_srcdir)/m4/setlocale.m4 $(top_srcdir)/m4/siginfo.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/setlocale.m4 \
+	$(top_srcdir)/m4/siginfo.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \

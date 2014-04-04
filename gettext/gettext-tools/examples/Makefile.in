@@ -83,9 +83,10 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/installpaths.in ChangeLog README \
 	../../build-aux/compile ../../build-aux/config.guess \
 	../../build-aux/config.rpath ../../build-aux/config.sub \
-	../../build-aux/install-sh ../../build-aux/missing \
+	../../build-aux/depcomp ../../build-aux/install-sh \
+	../../build-aux/mdate-sh ../../build-aux/missing \
 	../../build-aux/mkinstalldirs ../../build-aux/texinfo.tex \
-	../../build-aux/ltmain.sh \
+	../../build-aux/ylwrap ../../build-aux/ltmain.sh \
 	$(top_srcdir)/../../build-aux/install-sh \
 	$(top_srcdir)/../../build-aux/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4

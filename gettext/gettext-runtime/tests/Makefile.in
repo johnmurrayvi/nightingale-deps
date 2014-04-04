@@ -169,11 +169,6 @@ am__aclocal_m4_deps = $(top_srcdir)/gnulib-m4/00gnulib.m4 \
 	$(top_srcdir)/gnulib-m4/wcwidth.m4 \
 	$(top_srcdir)/../m4/fixautomake.m4 \
 	$(top_srcdir)/../m4/init-package-version.m4 \
-	$(top_srcdir)/../m4/libtool.m4 \
-	$(top_srcdir)/../m4/ltoptions.m4 \
-	$(top_srcdir)/../m4/ltsugar.m4 \
-	$(top_srcdir)/../m4/ltversion.m4 \
-	$(top_srcdir)/../m4/lt~obsolete.m4 \
 	$(top_srcdir)/../m4/woe32-dll.m4 $(top_srcdir)/m4/codeset.m4 \
 	$(top_srcdir)/m4/extern-inline.m4 $(top_srcdir)/m4/fcntl-o.m4 \
 	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/glibc2.m4 \
@@ -182,14 +177,16 @@ am__aclocal_m4_deps = $(top_srcdir)/gnulib-m4/00gnulib.m4 \
 	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/intmax.m4 \
 	$(top_srcdir)/m4/inttypes-pri.m4 \
 	$(top_srcdir)/m4/inttypes_h.m4 $(top_srcdir)/m4/lcmessage.m4 \
-	$(top_srcdir)/m4/lock.m4 $(top_srcdir)/m4/longlong.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/printf-posix.m4 $(top_srcdir)/m4/progtest.m4 \
-	$(top_srcdir)/m4/size_max.m4 $(top_srcdir)/m4/stdint_h.m4 \
-	$(top_srcdir)/m4/threadlib.m4 $(top_srcdir)/m4/uintmax_t.m4 \
-	$(top_srcdir)/m4/visibility.m4 $(top_srcdir)/m4/wchar_t.m4 \
-	$(top_srcdir)/m4/wint_t.m4 $(top_srcdir)/m4/xsize.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/lock.m4 \
+	$(top_srcdir)/m4/longlong.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/printf-posix.m4 \
+	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/size_max.m4 \
+	$(top_srcdir)/m4/stdint_h.m4 $(top_srcdir)/m4/threadlib.m4 \
+	$(top_srcdir)/m4/uintmax_t.m4 $(top_srcdir)/m4/visibility.m4 \
+	$(top_srcdir)/m4/wchar_t.m4 $(top_srcdir)/m4/wint_t.m4 \
+	$(top_srcdir)/m4/xsize.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/../build-aux/mkinstalldirs
@@ -197,8 +194,9 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_test_lock_OBJECTS = test-lock.$(OBJEXT) lock.$(OBJEXT) \
-	threadlib.$(OBJEXT)
+am__dirstamp = $(am__leading_dot)dirstamp
+am_test_lock_OBJECTS = test-lock.$(OBJEXT) ../intl/lock.$(OBJEXT) \
+	../intl/threadlib.$(OBJEXT)
 test_lock_OBJECTS = $(am_test_lock_OBJECTS)
 test_lock_DEPENDENCIES =
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -1381,6 +1379,11 @@ clean-noinstPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+../intl/$(am__dirstamp):
+	@$(MKDIR_P) ../intl
+	@: > ../intl/$(am__dirstamp)
+../intl/lock.$(OBJEXT): ../intl/$(am__dirstamp)
+../intl/threadlib.$(OBJEXT): ../intl/$(am__dirstamp)
 
 test-lock$(EXEEXT): $(test_lock_OBJECTS) $(test_lock_DEPENDENCIES) $(EXTRA_test_lock_DEPENDENCIES) 
 	@rm -f test-lock$(EXEEXT)
@@ -1388,6 +1391,7 @@ test-lock$(EXEEXT): $(test_lock_OBJECTS) $(test_lock_DEPENDENCIES) $(EXTRA_test_
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f ../intl/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -1400,18 +1404,6 @@ distclean-compile:
 
 .c.lo:
 	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
-
-lock.o: ../intl/lock.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lock.o `test -f '../intl/lock.c' || echo '$(srcdir)/'`../intl/lock.c
-
-lock.obj: ../intl/lock.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o lock.obj `if test -f '../intl/lock.c'; then $(CYGPATH_W) '../intl/lock.c'; else $(CYGPATH_W) '$(srcdir)/../intl/lock.c'; fi`
-
-threadlib.o: ../intl/threadlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o threadlib.o `test -f '../intl/threadlib.c' || echo '$(srcdir)/'`../intl/threadlib.c
-
-threadlib.obj: ../intl/threadlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o threadlib.obj `if test -f '../intl/threadlib.c'; then $(CYGPATH_W) '../intl/threadlib.c'; else $(CYGPATH_W) '$(srcdir)/../intl/threadlib.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1698,6 +1690,7 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f ../intl/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"

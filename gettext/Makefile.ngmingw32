@@ -45,7 +45,9 @@ NG_VENDOR_TARGET_CONFIGURE_OPTS := --enable-relocatable \
                                    --disable-openmp
 
 ifeq (Linux,$(NG_VENDOR_ARCH))
-  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-threads=posix
+  ifneq (1, $(NG_VENDOR_CROSS_COMP))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-threads=posix
+  endif
 endif
 
 ifeq (Msys,$(NG_VENDOR_ARCH))

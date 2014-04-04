@@ -87,9 +87,11 @@ DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(top_srcdir)/intl/Makefile.in ABOUT-NLS COPYING \
 	../build-aux/compile ../build-aux/config.guess \
 	../build-aux/config.rpath ../build-aux/config.sub \
-	../build-aux/install-sh ../build-aux/missing \
+	../build-aux/depcomp ../build-aux/install-sh \
+	../build-aux/mdate-sh ../build-aux/missing \
 	../build-aux/mkinstalldirs ../build-aux/texinfo.tex \
-	../build-aux/ltmain.sh $(top_srcdir)/../build-aux/compile \
+	../build-aux/ylwrap ../build-aux/ltmain.sh \
+	$(top_srcdir)/../build-aux/compile \
 	$(top_srcdir)/../build-aux/config.guess \
 	$(top_srcdir)/../build-aux/config.rpath \
 	$(top_srcdir)/../build-aux/config.sub \
@@ -182,11 +184,6 @@ am__aclocal_m4_deps = $(top_srcdir)/gnulib-m4/00gnulib.m4 \
 	$(top_srcdir)/gnulib-m4/wcwidth.m4 \
 	$(top_srcdir)/../m4/fixautomake.m4 \
 	$(top_srcdir)/../m4/init-package-version.m4 \
-	$(top_srcdir)/../m4/libtool.m4 \
-	$(top_srcdir)/../m4/ltoptions.m4 \
-	$(top_srcdir)/../m4/ltsugar.m4 \
-	$(top_srcdir)/../m4/ltversion.m4 \
-	$(top_srcdir)/../m4/lt~obsolete.m4 \
 	$(top_srcdir)/../m4/woe32-dll.m4 $(top_srcdir)/m4/codeset.m4 \
 	$(top_srcdir)/m4/extern-inline.m4 $(top_srcdir)/m4/fcntl-o.m4 \
 	$(top_srcdir)/m4/gettext.m4 $(top_srcdir)/m4/glibc2.m4 \
@@ -195,14 +192,16 @@ am__aclocal_m4_deps = $(top_srcdir)/gnulib-m4/00gnulib.m4 \
 	$(top_srcdir)/m4/intlmacosx.m4 $(top_srcdir)/m4/intmax.m4 \
 	$(top_srcdir)/m4/inttypes-pri.m4 \
 	$(top_srcdir)/m4/inttypes_h.m4 $(top_srcdir)/m4/lcmessage.m4 \
-	$(top_srcdir)/m4/lock.m4 $(top_srcdir)/m4/longlong.m4 \
-	$(top_srcdir)/m4/nls.m4 $(top_srcdir)/m4/po.m4 \
-	$(top_srcdir)/m4/printf-posix.m4 $(top_srcdir)/m4/progtest.m4 \
-	$(top_srcdir)/m4/size_max.m4 $(top_srcdir)/m4/stdint_h.m4 \
-	$(top_srcdir)/m4/threadlib.m4 $(top_srcdir)/m4/uintmax_t.m4 \
-	$(top_srcdir)/m4/visibility.m4 $(top_srcdir)/m4/wchar_t.m4 \
-	$(top_srcdir)/m4/wint_t.m4 $(top_srcdir)/m4/xsize.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/lock.m4 \
+	$(top_srcdir)/m4/longlong.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/nls.m4 \
+	$(top_srcdir)/m4/po.m4 $(top_srcdir)/m4/printf-posix.m4 \
+	$(top_srcdir)/m4/progtest.m4 $(top_srcdir)/m4/size_max.m4 \
+	$(top_srcdir)/m4/stdint_h.m4 $(top_srcdir)/m4/threadlib.m4 \
+	$(top_srcdir)/m4/uintmax_t.m4 $(top_srcdir)/m4/visibility.m4 \
+	$(top_srcdir)/m4/wchar_t.m4 $(top_srcdir)/m4/wint_t.m4 \
+	$(top_srcdir)/m4/xsize.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
