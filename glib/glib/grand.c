@@ -263,8 +263,15 @@ g_rand_new (void)
 #else /* G_OS_WIN32 */
   gint i;
 
+#ifdef HAVE_RAND_S
   for (i = 0; i < G_N_ELEMENTS (seed); i++)
     rand_s (&seed[i]);
+#else
+  srand ((unsigned)time (NULL));
+  for (i = 0; i < G_N_ELEMENTS (seed); i++)
+    seed[i] = rand ();
+#endif
+
 #endif
 
   return g_rand_new_with_seed_array (seed, 4);

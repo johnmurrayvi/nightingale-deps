@@ -1030,6 +1030,7 @@ AS_IF([test $glib_native_win32 = yes], [
   # <wspiapi.h> in the Windows SDK and in mingw-w64 has wrappers for
   # inline workarounds for getaddrinfo, getnameinfo and freeaddrinfo if
   # they aren't present at run-time (on Windows 2000).
+  AC_CHECK_FUNCS(rand_s, AC_DEFINE(HAVE_RAND_S, 1, [Have rand_s]))
   AC_CHECK_HEADER([wspiapi.h], [WSPIAPI_INCLUDE="#include <wspiapi.h>"])
   AC_SUBST(WSPIAPI_INCLUDE)
 ], [

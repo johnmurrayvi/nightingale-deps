@@ -9,6 +9,7 @@
 # Debug builds shoud link with msvcrtd release build with msvcrt.
 !IFNDEF DEBUG
 # Full optimization:
+DEFINES = -DHAVE_RAND_S
 OPTIMIZE = -Ox
 # release with debug
 OPTIMIZE = -Zi -DG_ENABLE_DEBUG=1
