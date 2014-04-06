@@ -241,8 +241,10 @@ endif
 
 post_build: module_post_build
 ifneq (,$(filter Darwin Linux, $(NG_VENDOR_ARCH)))
+  ifneq (1, $(NG_VENDOR_CROSS_COMP))
 	@echo Slaying libtool .la files on real platforms...
 	$(FIND) $(NG_CONFIGURE_PREFIX) -type f -name '*.la' -exec $(RM) -fv {} \;
+  endif
 endif
 ifeq (Darwin,$(NG_VENDOR_ARCH))
   ifneq (,$(NG_VENDOR_TARGET_DYLIB_FIXUPS))
