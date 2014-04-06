@@ -41,6 +41,18 @@ NG_VENDOR_TARGET_CONFIGURE_OPTS := --enable-relocatable \
                                    --disable-libsuffix \
                                    --enable-cxx-warnings=no
 
+ifeq (1,$(NG_VENDOR_CROSS_COMP))
+  ifeq (static, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                       --enable-static
+  endif
+  ifeq (shared, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                       --disable-static
+  endif
+endif
+
+
 NG_VENDOR_TARGET_DYLIB_FIXUPS :=
 
 include $(CURDIR)/../vendor-rules.mk

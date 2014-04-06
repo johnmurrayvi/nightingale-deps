@@ -36,6 +36,7 @@
 ifneq (,$(filter Linux,$(NG_VENDOR_ARCH)))
   NG_VENDOR_TARGET_DEP_MODULES := gettext
 endif
+
 ifeq (1,$(NG_VENDOR_CROSS_COMP))
   NG_VENDOR_TARGET_DEP_MODULES := gettext
 endif
@@ -54,6 +55,17 @@ endif
 ifneq (,$(filter Msys Darwin,$(NG_VENDOR_ARCH)))
   ifneq (1,$(NG_VENDOR_CROSS_COMP))
     NG_VENDOR_TARGET_CONFIGURE_OPTS += --with-libiconv=gnu
+  endif
+endif
+
+ifeq (1,$(NG_VENDOR_CROSS_COMP))
+  ifeq (static, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                       --enable-static
+  endif
+  ifeq (shared, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                       --disable-static
   endif
 endif
 

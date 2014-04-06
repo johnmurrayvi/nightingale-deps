@@ -62,4 +62,13 @@ ifeq (Msys,$(NG_VENDOR_ARCH))
    NG_USE_MOZCRT = 1
 endif
 
+ifeq (static, $(CROSS_LIBTYPE))
+  NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                     --enable-static
+endif
+ifeq (shared, $(CROSS_LIBTYPE))
+  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                     --disable-static
+endif
+
 include $(CURDIR)/../vendor-rules.mk

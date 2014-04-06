@@ -48,6 +48,15 @@ NG_ACLOCAL_FLAGS += -I common/m4 \
 NG_VENDOR_TARGET_CONFIGURE_OPTS := \
   --disable-examples
 
+ifeq (static, $(CROSS_LIBTYPE))
+  NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                     --enable-static
+endif
+ifeq (shared, $(CROSS_LIBTYPE))
+  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                     --disable-static
+endif
+
 NG_VENDOR_TARGET_DYLIB_FIXUPS := libtheora.0 \
                                  libtheoraenc.1 \
                                  libtheoradec.1 \

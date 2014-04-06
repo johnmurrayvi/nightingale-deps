@@ -50,6 +50,15 @@ ifeq (Msys,$(NG_VENDOR_ARCH))
    NG_CXX = $(CURDIR)/../clwrapper.py
 endif
 
+ifeq (static, $(CROSS_LIBTYPE))
+  NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                     --enable-static
+endif
+ifeq (shared, $(CROSS_LIBTYPE))
+  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                     --disable-static
+endif
+
 NG_VENDOR_TARGET_DYLIB_FIXUPS := libvorbis.0 \
                                  libvorbisenc.2 \
                                  libvorbisfile.3 \

@@ -53,11 +53,20 @@ endif
 ifeq (Msys,$(NG_VENDOR_ARCH))
   NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-threads=win32
 endif
+
 ifeq (1,$(NG_VENDOR_CROSS_COMP))
   NG_CFLAGS += -O2
   NG_CXXFLAGS += -O2
   NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-threads=win32 \
                                      --without-libintl-prefix
+  ifeq (static, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                       --enable-static
+  endif
+  ifeq (shared, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                       --disable-static
+  endif
 endif
 
 NG_VENDOR_TARGET_DYLIB_FIXUPS := \

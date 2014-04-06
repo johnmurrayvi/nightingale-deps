@@ -55,6 +55,15 @@ ifeq (Msys,$(NG_VENDOR_ARCH))
   NG_CFLAGS += -D_USE_MATH_DEFINES -D_UNICODE -DUNICODE
 endif
 
+ifeq (static, $(CROSS_LIBTYPE))
+  NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                     --enable-static
+endif
+ifeq (shared, $(CROSS_LIBTYPE))
+  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                     --disable-static
+endif
+
 NG_VENDOR_TARGET_DYLIB_FIXUPS := \
       libgstreamer-1.0 \
       libgstbase-1.0 \
