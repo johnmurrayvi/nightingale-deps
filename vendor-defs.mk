@@ -1,4 +1,7 @@
 
+COMMA := ,
+EMPTY :=
+SPACE := $(EMPTY) $(EMPTY)
 
 
 NG_CONFIGURE_OPTS :=
