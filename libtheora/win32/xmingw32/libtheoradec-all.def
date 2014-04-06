@@ -1,35 +1,3 @@
-EXPORTS
-; Old alpha API
-	theora_version_string @ 1
-	theora_version_number @ 2
-
-	theora_decode_header @ 3
-	theora_decode_init @ 4
-	theora_decode_packetin @ 5
-	theora_decode_YUVout @ 6
-
-	theora_control @ 7
-
-	theora_packet_isheader @ 8
-	theora_packet_iskeyframe @ 9
-
-	theora_granule_shift @ 10
-	theora_granule_frame @ 11
-	theora_granule_time @ 12
-
-	theora_info_init @ 13
-	theora_info_clear @ 14
-
-	theora_clear @ 15
-
-	theora_comment_init @ 16
-	theora_comment_add @ 17
-	theora_comment_add_tag @ 18
-	theora_comment_query @ 19
-	theora_comment_query_count @ 20
-	theora_comment_clear @ 21
-
-; New theora-exp API
 	th_version_string @ 22
 	th_version_number @ 23
 
