@@ -218,9 +218,9 @@ typedef enum {
  * @G_FILE_MEASURE_APPARENT_SIZE: Tally usage based on apparent file
  *   sizes.  Normally, the block-size is used, if available, as this is a
  *   more accurate representation of disk space used.
- *   Compare with '<literal>du --apparent-size</literal>'.
+ *   Compare with `du --apparent-size`.
  * @G_FILE_MEASURE_NO_XDEV: Do not cross mount point boundaries.
- *   Compare with '<literal>du -x</literal>'.
+ *   Compare with `du -x`.
  *
  * Flags that can be used with g_file_measure_disk_usage().
  *
@@ -416,7 +416,8 @@ typedef enum {
  */
 /**
  * GIOErrorEnum:
- * @G_IO_ERROR_FAILED: Generic error condition for when any operation fails.
+ * @G_IO_ERROR_FAILED: Generic error condition for when an operation fails
+ *     and no more specific #GIOErrorEnum value is defined.
  * @G_IO_ERROR_NOT_FOUND: File not found.
  * @G_IO_ERROR_EXISTS: File already exists.
  * @G_IO_ERROR_IS_DIRECTORY: File is a directory.
@@ -472,6 +473,19 @@ typedef enum {
  *
  * Error codes returned by GIO functions.
  *
+ * Note that this domain may be extended in future GLib releases. In
+ * general, new error codes either only apply to new APIs, or else
+ * replace #G_IO_ERROR_FAILED in cases that were not explicitly
+ * distinguished before. You should therefore avoid writing code like
+ * |[<!-- language="C" -->
+ * if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_FAILED))
+ *   {
+ *     // Assume that this is EPRINTERONFIRE
+ *     ...
+ *   }
+ * ]|
+ * but should instead treat all unrecognized error codes the same as
+ * #G_IO_ERROR_FAILED.
  **/
 typedef enum {
   G_IO_ERROR_FAILED,
@@ -867,12 +881,11 @@ typedef enum {
  * or a socket created with socketpair()).
  *
  * For abstract sockets, there are two incompatible ways of naming
- * them; the man pages suggest using the entire <literal>struct
- * sockaddr_un</literal> as the name, padding the unused parts of the
- * %sun_path field with zeroes; this corresponds to
- * %G_UNIX_SOCKET_ADDRESS_ABSTRACT_PADDED. However, many programs
- * instead just use a portion of %sun_path, and pass an appropriate
- * smaller length to bind() or connect(). This is
+ * them; the man pages suggest using the entire `struct sockaddr_un`
+ * as the name, padding the unused parts of the %sun_path field with
+ * zeroes; this corresponds to %G_UNIX_SOCKET_ADDRESS_ABSTRACT_PADDED.
+ * However, many programs instead just use a portion of %sun_path, and
+ * pass an appropriate smaller length to bind() or connect(). This is
  * %G_UNIX_SOCKET_ADDRESS_ABSTRACT.
  *
  * Since: 2.26

@@ -2408,6 +2408,7 @@
     <keyword type="function" name="g_application_command_line_get_arguments ()" link="GApplicationCommandLine.html#g-application-command-line-get-arguments" since="2.28"/>
     <keyword type="function" name="g_application_command_line_get_cwd ()" link="GApplicationCommandLine.html#g-application-command-line-get-cwd" since="2.28"/>
     <keyword type="function" name="g_application_command_line_get_environ ()" link="GApplicationCommandLine.html#g-application-command-line-get-environ" since="2.28"/>
+    <keyword type="function" name="g_application_command_line_get_options_dict ()" link="GApplicationCommandLine.html#g-application-command-line-get-options-dict" since="2.40"/>
     <keyword type="function" name="g_application_command_line_get_stdin ()" link="GApplicationCommandLine.html#g-application-command-line-get-stdin" since="2.34"/>
     <keyword type="function" name="g_application_command_line_create_file_for_arg ()" link="GApplicationCommandLine.html#g-application-command-line-create-file-for-arg" since="2.36"/>
     <keyword type="function" name="g_application_command_line_getenv ()" link="GApplicationCommandLine.html#g-application-command-line-getenv" since="2.28"/>

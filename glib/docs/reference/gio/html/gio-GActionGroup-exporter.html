@@ -12,11 +12,10 @@
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
-<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="10"><tr valign="middle">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
 <td width="100%" align="left" class="shortcuts">
-<a href="#" class="shortcut">Top</a><span id="nav_description"> <span class="dim">|</span> 
-                  <a href="#gio-GActionGroup-exporter.description" class="shortcut">Description</a></span><span id="nav_hierarchy"> <span class="dim">|</span> 
-                  <a href="#gio-GActionGroup-exporter.object-hierarchy" class="shortcut">Object Hierarchy</a></span>
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#gio-GActionGroup-exporter.description" class="shortcut">Description</a></span>
 </td>
 <td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
 <td><a accesskey="u" href="application.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
@@ -42,7 +41,7 @@
 <tbody>
 <tr>
 <td class="function_type">
-<a href="../glib/glib-Basic-Types.html#guint"><span class="returnvalue">guint</span></a>
+<a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#guint"><span class="returnvalue">guint</span></a>
 </td>
 <td class="function_name">
 <a class="link" href="gio-GActionGroup-exporter.html#g-dbus-connection-export-action-group" title="g_dbus_connection_export_action_group ()">g_dbus_connection_export_action_group</a> <span class="c_punctuation">()</span>
@@ -58,11 +57,6 @@
 </tr>
 </tbody>
 </table></div>
-</div>
-<div class="refsect1">
-<a name="gio-GActionGroup-exporter.object-hierarchy"></a><h2>Object Hierarchy</h2>
-<pre class="screen">
-</pre>
 </div>
 <div class="refsect1">
 <a name="gio-GActionGroup-exporter.includes"></a><h2>Includes</h2>
@@ -81,11 +75,11 @@ detail.</p>
 <a name="gio-GActionGroup-exporter.functions_details"></a><h2>Functions</h2>
 <div class="refsect2">
 <a name="g-dbus-connection-export-action-group"></a><h3>g_dbus_connection_export_action_group ()</h3>
-<pre class="programlisting"><a href="../glib/glib-Basic-Types.html#guint"><span class="returnvalue">guint</span></a>
+<pre class="programlisting"><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#guint"><span class="returnvalue">guint</span></a>
 g_dbus_connection_export_action_group (<em class="parameter"><code><a class="link" href="GDBusConnection.html" title="GDBusConnection"><span class="type">GDBusConnection</span></a> *connection</code></em>,
-                                       <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *object_path</code></em>,
+                                       <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *object_path</code></em>,
                                        <em class="parameter"><code><a class="link" href="GActionGroup.html" title="GActionGroup"><span class="type">GActionGroup</span></a> *action_group</code></em>,
-                                       <em class="parameter"><code><a href="../glib/glib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
+                                       <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
 <p>Exports <em class="parameter"><code>action_group</code></em>
  on <em class="parameter"><code>connection</code></em>
  at <em class="parameter"><code>object_path</code></em>
@@ -108,7 +102,7 @@ rather likely to cause changes on the action group, this effectively
 limits a given action group to being exported from only one main
 context.</p>
 <div class="refsect3">
-<a name="id-1.4.22.11.7.2.9"></a><h4>Parameters</h4>
+<a name="id-1.4.22.11.6.2.9"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -133,14 +127,14 @@ context.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>error</p></td>
-<td class="parameter_description"><p>a pointer to a <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> <a href="../glib/glib-Error-Reporting.html#GError"><span class="type">GError</span></a>, or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+<td class="parameter_description"><p>a pointer to a <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> <a href="http://library.gnome.org/devel/glib/unstable/glib-Error-Reporting.html#GError"><span class="type">GError</span></a>, or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.22.11.7.2.10"></a><h4>Returns</h4>
+<a name="id-1.4.22.11.6.2.10"></a><h4>Returns</h4>
 <p> the ID of the export (never zero), or 0 in case of failure</p>
 <p></p>
 </div>
@@ -152,14 +146,14 @@ context.</p>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_dbus_connection_unexport_action_group
                                (<em class="parameter"><code><a class="link" href="GDBusConnection.html" title="GDBusConnection"><span class="type">GDBusConnection</span></a> *connection</code></em>,
-                                <em class="parameter"><code><a href="../glib/glib-Basic-Types.html#guint"><span class="type">guint</span></a> export_id</code></em>);</pre>
+                                <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#guint"><span class="type">guint</span></a> export_id</code></em>);</pre>
 <p>Reverses the effect of a previous call to
 <a class="link" href="gio-GActionGroup-exporter.html#g-dbus-connection-export-action-group" title="g_dbus_connection_export_action_group ()"><code class="function">g_dbus_connection_export_action_group()</code></a>.</p>
 <p>It is an error to call this function with an ID that wasn't returned
 from <a class="link" href="gio-GActionGroup-exporter.html#g-dbus-connection-export-action-group" title="g_dbus_connection_export_action_group ()"><code class="function">g_dbus_connection_export_action_group()</code></a> or to call it with the
 same ID more than once.</p>
 <div class="refsect3">
-<a name="id-1.4.22.11.7.3.6"></a><h4>Parameters</h4>
+<a name="id-1.4.22.11.6.3.6"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">

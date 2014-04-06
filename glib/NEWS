@@ -1,3 +1,78 @@
+Overview of changes from GLib 2.39.92 to GLib 2.40.0
+====================================================
+
+There have been no code changes since the release candidate, but there
+have been the following other changes:
+
+ * Disable IPv6 testcases on machines without IPv6
+ * Document that it is a bad idea to match on generic error codes
+
+Translations updated:
+ * Danish
+ * Punjabi
+ * Serbian
+
+Overview of changes from GLib 2.39.91 to GLib 2.39.92
+=====================================================
+
+This is a release candidate for 2.40.0.
+
+There are no major changes in this release, but a few serious bugs have
+been fixed.
+
+* Bugs fixed:
+ 710367 Crash in g_settings_backend_dispatch_signal()
+ 723899 G_DEFINE_TYPE() causes compiler warnings with clang due to foo_get_instance_private
+ 724859 Let the test_wait_until() test also run on non-*nix
+ 724916 gio unmount code makes XFCE's Thunar crash
+ 725651 GSubprocessLauncher: Does not copy the calling process environment.
+ 725656 Unskip GVariantDict
+ 725891 gio tests: add codegen to BUILT_SOURCES
+ 726046 Recent commit created symbolic icons issues
+
+* Translations:
+ Chinese
+ French
+ Korean
+ Latvian
+ Norwegian bokmål
+ Portuguese
+ Russian
+ Traditional Chinese
+
+Overview of changes from GLib 2.39.90 to GLib 2.39.91
+=====================================================
+
+This release introduces a hard dependency on present and functioning
+clock_gettime() and CLOCK_MONOTONIC.  It also introduces a dependency on
+pthread_condattr_setclock() unless your system happens to have
+pthread_cond_timedwait_relative_np() (as do Mac OS and Android).  This
+release is known to be broken with at least GNU/Hurd, pending addition
+of working pthread_condattr_setclock(CLOCK_MONOTONIC) there.
+
+New API: g_str_to_ascii()
+
+* Fixed bugs:
+ 670144 unconditional use of CLOCK_MONOTONIC is broken
+ 673607 invalid assumption in g_cond_wait_until() / g_get_monotonic_time() API
+ 710142 Add more impressive transliteration to GLib
+ 722360 make check fails
+ 722604 (partial) Various tests are failing with 2.39.3
+ 723316 g_hash_table_iter_remove() should be explicit whether or not it is safe while iterating the table
+ 724609 Fix build of GIO on Windows
+ 724687 gmain: make monotonic time really monotonic, everywhere
+ 724706 gsource: document priority of child sources
+ 724707 some GSocket source improvements
+ 724839 GMainContext: some source ID cleanups
+ 724858 Dist gtranslit-data.h
+ 724994 Missing icons for bookmarks in file chooser
+ 725023 Can no longer find apps by executable/desktop file name
+
+* Translations:
+ Lithuanian
+ Polish
+ Thai
+
 Overview of changes from GLib 2.39.4 to GLib 2.39.90
 ====================================================
 

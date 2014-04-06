@@ -12,11 +12,10 @@
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
-<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="10"><tr valign="middle">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
 <td width="100%" align="left" class="shortcuts">
-<a href="#" class="shortcut">Top</a><span id="nav_description"> <span class="dim">|</span> 
-                  <a href="#gio-GNotification.description" class="shortcut">Description</a></span><span id="nav_hierarchy"> <span class="dim">|</span> 
-                  <a href="#gio-GNotification.object-hierarchy" class="shortcut">Object Hierarchy</a></span>
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#gio-GNotification.description" class="shortcut">Description</a></span>
 </td>
 <td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
 <td><a accesskey="u" href="application.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
@@ -145,11 +144,6 @@
 </table></div>
 </div>
 <div class="refsect1">
-<a name="gio-GNotification.object-hierarchy"></a><h2>Object Hierarchy</h2>
-<pre class="screen">
-</pre>
-</div>
-<div class="refsect1">
 <a name="gio-GNotification.includes"></a><h2>Includes</h2>
 <pre class="synopsis">#include &lt;gio/gio.h&gt;
 </pre>
@@ -179,7 +173,7 @@ clicked.</p>
 <div class="refsect2">
 <a name="g-notification-new"></a><h3>g_notification_new ()</h3>
 <pre class="programlisting"><a class="link" href="gio-GNotification.html#GNotification" title="GNotification"><span class="returnvalue">GNotification</span></a> *
-g_notification_new (<em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *title</code></em>);</pre>
+g_notification_new (<em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *title</code></em>);</pre>
 <p>Creates a new <a class="link" href="gio-GNotification.html#GNotification" title="GNotification"><span class="type">GNotification</span></a> with <em class="parameter"><code>title</code></em>
  as its title.</p>
 <p>After populating <em class="parameter"><code>notification</code></em>
@@ -189,7 +183,7 @@ any properties after this call will not have any effect until
 resending <em class="parameter"><code>notification</code></em>
 .</p>
 <div class="refsect3">
-<a name="id-1.4.22.17.8.2.6"></a><h4>Parameters</h4>
+<a name="id-1.4.22.17.7.2.6"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -204,7 +198,7 @@ resending <em class="parameter"><code>notification</code></em>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.22.17.8.2.7"></a><h4>Returns</h4>
+<a name="id-1.4.22.17.7.2.7"></a><h4>Returns</h4>
 <p> a new <a class="link" href="gio-GNotification.html#GNotification" title="GNotification"><span class="type">GNotification</span></a> instance</p>
 <p></p>
 </div>
@@ -215,12 +209,12 @@ resending <em class="parameter"><code>notification</code></em>
 <a name="g-notification-set-title"></a><h3>g_notification_set_title ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_notification_set_title (<em class="parameter"><code><a class="link" href="gio-GNotification.html#GNotification" title="GNotification"><span class="type">GNotification</span></a> *notification</code></em>,
-                          <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *title</code></em>);</pre>
+                          <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *title</code></em>);</pre>
 <p>Sets the title of <em class="parameter"><code>notification</code></em>
  to <em class="parameter"><code>title</code></em>
 .</p>
 <div class="refsect3">
-<a name="id-1.4.22.17.8.3.5"></a><h4>Parameters</h4>
+<a name="id-1.4.22.17.7.3.5"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -249,12 +243,12 @@ g_notification_set_title (<em class="parameter"><code><a class="link" href="gio-
 <a name="g-notification-set-body"></a><h3>g_notification_set_body ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_notification_set_body (<em class="parameter"><code><a class="link" href="gio-GNotification.html#GNotification" title="GNotification"><span class="type">GNotification</span></a> *notification</code></em>,
-                         <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *body</code></em>);</pre>
+                         <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *body</code></em>);</pre>
 <p>Sets the body of <em class="parameter"><code>notification</code></em>
  to <em class="parameter"><code>body</code></em>
 .</p>
 <div class="refsect3">
-<a name="id-1.4.22.17.8.4.5"></a><h4>Parameters</h4>
+<a name="id-1.4.22.17.7.4.5"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -270,7 +264,7 @@ g_notification_set_body (<em class="parameter"><code><a class="link" href="gio-G
 <tr>
 <td class="parameter_name"><p>body</p></td>
 <td class="parameter_description"><p> the new body for <em class="parameter"><code>notification</code></em>
-, or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
+, or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is ok, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 </tbody>
@@ -288,7 +282,7 @@ g_notification_set_icon (<em class="parameter"><code><a class="link" href="gio-G
  to <em class="parameter"><code>icon</code></em>
 .</p>
 <div class="refsect3">
-<a name="id-1.4.22.17.8.5.5"></a><h4>Parameters</h4>
+<a name="id-1.4.22.17.7.5.5"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -317,11 +311,11 @@ g_notification_set_icon (<em class="parameter"><code><a class="link" href="gio-G
 <a name="g-notification-set-urgent"></a><h3>g_notification_set_urgent ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_notification_set_urgent (<em class="parameter"><code><a class="link" href="gio-GNotification.html#GNotification" title="GNotification"><span class="type">GNotification</span></a> *notification</code></em>,
-                           <em class="parameter"><code><a href="../glib/glib-Basic-Types.html#gboolean"><span class="type">gboolean</span></a> urgent</code></em>);</pre>
+                           <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gboolean"><span class="type">gboolean</span></a> urgent</code></em>);</pre>
 <p>Sets or unsets whether <em class="parameter"><code>notification</code></em>
  is marked as urgent.</p>
 <div class="refsect3">
-<a name="id-1.4.22.17.8.6.5"></a><h4>Parameters</h4>
+<a name="id-1.4.22.17.7.6.5"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -336,7 +330,7 @@ g_notification_set_urgent (<em class="parameter"><code><a class="link" href="gio
 </tr>
 <tr>
 <td class="parameter_name"><p>urgent</p></td>
-<td class="parameter_description"><p><a href="../glib/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if <em class="parameter"><code>notification</code></em>
+<td class="parameter_description"><p><a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if <em class="parameter"><code>notification</code></em>
 is urgent</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
@@ -350,7 +344,7 @@ is urgent</p></td>
 <a name="g-notification-set-default-action"></a><h3>g_notification_set_default_action ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_notification_set_default_action (<em class="parameter"><code><a class="link" href="gio-GNotification.html#GNotification" title="GNotification"><span class="type">GNotification</span></a> *notification</code></em>,
-                                   <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *detailed_action</code></em>);</pre>
+                                   <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *detailed_action</code></em>);</pre>
 <p>Sets the default action of <em class="parameter"><code>notification</code></em>
  to <em class="parameter"><code>detailed_action</code></em>
 . This
@@ -366,7 +360,7 @@ for <em class="parameter"><code>detailed_action</code></em>
 <p>When no default action is set, the application that the notification
 was sent on is activated.</p>
 <div class="refsect3">
-<a name="id-1.4.22.17.8.7.7"></a><h4>Parameters</h4>
+<a name="id-1.4.22.17.7.7.7"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -395,8 +389,8 @@ was sent on is activated.</p>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_notification_set_default_action_and_target
                                (<em class="parameter"><code><a class="link" href="gio-GNotification.html#GNotification" title="GNotification"><span class="type">GNotification</span></a> *notification</code></em>,
-                                <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *action</code></em>,
-                                <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *target_format</code></em>,
+                                <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *action</code></em>,
+                                <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *target_format</code></em>,
                                 <em class="parameter"><code>...</code></em>);</pre>
 <p>Sets the default action of <em class="parameter"><code>notification</code></em>
  to <em class="parameter"><code>action</code></em>
@@ -406,13 +400,13 @@ application-wide action (it must start with "app.").</p>
 <p>If <em class="parameter"><code>target_format</code></em>
  is given, it is used to collect remaining
 positional parameters into a GVariant instance, similar to
-<a href="../glib/glib-GVariant.html#g-variant-new"><code class="function">g_variant_new()</code></a>. <em class="parameter"><code>action</code></em>
+<a href="http://library.gnome.org/devel/glib/unstable/glib-GVariant.html#g-variant-new"><code class="function">g_variant_new()</code></a>. <em class="parameter"><code>action</code></em>
  will be activated with that GVariant as its
 parameter.</p>
 <p>When no default action is set, the application that the notification
 was sent on is activated.</p>
 <div class="refsect3">
-<a name="id-1.4.22.17.8.8.7"></a><h4>Parameters</h4>
+<a name="id-1.4.22.17.7.8.7"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -432,7 +426,7 @@ was sent on is activated.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>target_format</p></td>
-<td class="parameter_description"><p> a GVariant format string, or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
+<td class="parameter_description"><p> a GVariant format string, or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is ok, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 <tr>
@@ -452,8 +446,8 @@ was sent on is activated.</p>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_notification_set_default_action_and_target_value
                                (<em class="parameter"><code><a class="link" href="gio-GNotification.html#GNotification" title="GNotification"><span class="type">GNotification</span></a> *notification</code></em>,
-                                <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *action</code></em>,
-                                <em class="parameter"><code><a href="../glib/glib-GVariant.html#GVariant"><span class="type">GVariant</span></a> *target</code></em>);</pre>
+                                <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *action</code></em>,
+                                <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-GVariant.html#GVariant"><span class="type">GVariant</span></a> *target</code></em>);</pre>
 <p>Sets the default action of <em class="parameter"><code>notification</code></em>
  to <em class="parameter"><code>action</code></em>
 . This action is
@@ -462,16 +456,16 @@ application-wide action (start with "app.").</p>
 <p>If <em class="parameter"><code>target_format</code></em>
  is given, it is used to collect remaining
 positional parameters into a GVariant instance, similar to
-<a href="../glib/glib-GVariant.html#g-variant-new"><code class="function">g_variant_new()</code></a>.</p>
+<a href="http://library.gnome.org/devel/glib/unstable/glib-GVariant.html#g-variant-new"><code class="function">g_variant_new()</code></a>.</p>
 <p>If <em class="parameter"><code>target</code></em>
- is non-<a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>, <em class="parameter"><code>action</code></em>
+ is non-<a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>, <em class="parameter"><code>action</code></em>
  will be activated with <em class="parameter"><code>target</code></em>
  as
 its parameter.</p>
 <p>When no default action is set, the application that the notification
 was sent on is activated.</p>
 <div class="refsect3">
-<a name="id-1.4.22.17.8.9.8"></a><h4>Parameters</h4>
+<a name="id-1.4.22.17.7.9.8"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -492,7 +486,7 @@ was sent on is activated.</p>
 <tr>
 <td class="parameter_name"><p>target</p></td>
 <td class="parameter_description"><p> a GVariant to use as <em class="parameter"><code>action</code></em>
-'s parameter, or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
+'s parameter, or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is ok, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 </tbody>
@@ -505,8 +499,8 @@ was sent on is activated.</p>
 <a name="g-notification-add-button"></a><h3>g_notification_add_button ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_notification_add_button (<em class="parameter"><code><a class="link" href="gio-GNotification.html#GNotification" title="GNotification"><span class="type">GNotification</span></a> *notification</code></em>,
-                           <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *label</code></em>,
-                           <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *detailed_action</code></em>);</pre>
+                           <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *label</code></em>,
+                           <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *detailed_action</code></em>);</pre>
 <p>Adds a button to <em class="parameter"><code>notification</code></em>
  that activates the action in
 <em class="parameter"><code>detailed_action</code></em>
@@ -519,7 +513,7 @@ its parameter.</p>
 for <em class="parameter"><code>detailed_action</code></em>
 .</p>
 <div class="refsect3">
-<a name="id-1.4.22.17.8.10.6"></a><h4>Parameters</h4>
+<a name="id-1.4.22.17.7.10.6"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -552,9 +546,9 @@ for <em class="parameter"><code>detailed_action</code></em>
 <a name="g-notification-add-button-with-target"></a><h3>g_notification_add_button_with_target ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_notification_add_button_with_target (<em class="parameter"><code><a class="link" href="gio-GNotification.html#GNotification" title="GNotification"><span class="type">GNotification</span></a> *notification</code></em>,
-                                       <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *label</code></em>,
-                                       <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *action</code></em>,
-                                       <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *target_format</code></em>,
+                                       <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *label</code></em>,
+                                       <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *action</code></em>,
+                                       <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *target_format</code></em>,
                                        <em class="parameter"><code>...</code></em>);</pre>
 <p>Adds a button to <em class="parameter"><code>notification</code></em>
  that activates <em class="parameter"><code>action</code></em>
@@ -564,11 +558,11 @@ g_notification_add_button_with_target (<em class="parameter"><code><a class="lin
 <p>If <em class="parameter"><code>target_format</code></em>
  is given, it is used to collect remaining
 positional parameters into a GVariant instance, similar to
-<a href="../glib/glib-GVariant.html#g-variant-new"><code class="function">g_variant_new()</code></a>. <em class="parameter"><code>action</code></em>
+<a href="http://library.gnome.org/devel/glib/unstable/glib-GVariant.html#g-variant-new"><code class="function">g_variant_new()</code></a>. <em class="parameter"><code>action</code></em>
  will be activated with that GVariant as its
 parameter.</p>
 <div class="refsect3">
-<a name="id-1.4.22.17.8.11.6"></a><h4>Parameters</h4>
+<a name="id-1.4.22.17.7.11.6"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -593,7 +587,7 @@ parameter.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>target_format</p></td>
-<td class="parameter_description"><p> a GVariant format string, or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
+<td class="parameter_description"><p> a GVariant format string, or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is ok, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 <tr>
@@ -613,21 +607,21 @@ parameter.</p>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_notification_add_button_with_target_value
                                (<em class="parameter"><code><a class="link" href="gio-GNotification.html#GNotification" title="GNotification"><span class="type">GNotification</span></a> *notification</code></em>,
-                                <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *label</code></em>,
-                                <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *action</code></em>,
-                                <em class="parameter"><code><a href="../glib/glib-GVariant.html#GVariant"><span class="type">GVariant</span></a> *target</code></em>);</pre>
+                                <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *label</code></em>,
+                                <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *action</code></em>,
+                                <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-GVariant.html#GVariant"><span class="type">GVariant</span></a> *target</code></em>);</pre>
 <p>Adds a button to <em class="parameter"><code>notification</code></em>
  that activates <em class="parameter"><code>action</code></em>
  when clicked.
 <em class="parameter"><code>action</code></em>
  must be an application-wide action (it must start with "app.").</p>
 <p>If <em class="parameter"><code>target</code></em>
- is non-<a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>, <em class="parameter"><code>action</code></em>
+ is non-<a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>, <em class="parameter"><code>action</code></em>
  will be activated with <em class="parameter"><code>target</code></em>
  as
 its parameter.</p>
 <div class="refsect3">
-<a name="id-1.4.22.17.8.12.6"></a><h4>Parameters</h4>
+<a name="id-1.4.22.17.7.12.6"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -653,7 +647,7 @@ its parameter.</p>
 <tr>
 <td class="parameter_name"><p>target</p></td>
 <td class="parameter_description"><p> a GVariant to use as <em class="parameter"><code>action</code></em>
-'s parameter, or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
+'s parameter, or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p></td>
 <td class="parameter_annotations"><span class="annotation">[<acronym title="NULL is ok, both for passing and for returning."><span class="acronym">allow-none</span></acronym>]</span></td>
 </tr>
 </tbody>

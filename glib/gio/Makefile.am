@@ -1,7 +1,5 @@
 include $(top_srcdir)/glib.mk
 
-AUTOMAKE_OPTIONS = subdir-objects
-
 SUBDIRS = gdbus-2.0/codegen
 
 if OS_UNIX

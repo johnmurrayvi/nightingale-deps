@@ -1,8 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 include $(top_srcdir)/glib.mk
 
-AUTOMAKE_OPTIONS = subdir-objects
-
 #
 # Generate glibconfig.h
 #
@@ -174,6 +172,8 @@ libglib_2_0_la_SOURCES = 	\
 	gthreadpool.c		\
 	gtimer.c		\
 	gtimezone.c	 	\
+	gtranslit.c		\
+	gtranslit-data.h	\
 	gtrashstack.c		\
 	gtree.c			\
 	guniprop.c		\

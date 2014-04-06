@@ -1,7 +1,5 @@
 include $(top_srcdir)/glib-tap.mk
 
-AUTOMAKE_OPTIONS = subdir-objects
-
 dist_uninstalled_test_data =
 test_ltlibraries =
 
@@ -437,6 +435,7 @@ gdbus_threading_SOURCES                  = $(gdbus_sessionbus_sources) gdbus-thr
 gmenumodel_SOURCES                       = $(gdbus_sessionbus_sources) gmenumodel.c
 gnotification_SOURCES                    = $(gdbus_sessionbus_sources) gnotification.c gnotification-server.h gnotification-server.c
 
+BUILT_SOURCES += gdbus-test-codegen-generated.c gdbus-test-codegen-generated.h
 gdbus-test-codegen.o: gdbus-test-codegen-generated.h
 gdbus-test-codegen-generated.h: test-codegen.xml Makefile $(top_builddir)/gio/gdbus-2.0/codegen/gdbus-codegen
 	$(AM_V_GEN) UNINSTALLED_GLIB_SRCDIR=$(top_srcdir) \

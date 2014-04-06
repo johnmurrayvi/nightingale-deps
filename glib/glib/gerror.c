@@ -271,7 +271,11 @@
  * - If there's a "generic" or "unknown" error code for unrecoverable
  *   errors it doesn't make sense to distinguish with specific codes,
  *   it should be called <NAMESPACE>_<MODULE>_ERROR_FAILED,
- *   for example %G_SPAWN_ERROR_FAILED.
+ *   for example %G_SPAWN_ERROR_FAILED. In the case of error code
+ *   enumerations that may be extended in future releases, you should
+ *   generally not handle this error code explicitly, but should
+ *   instead treat any unrecognized error code as equivalent to
+ *   FAILED.
  *
  * Summary of rules for use of #GError:
  *
@@ -396,7 +400,7 @@ g_error_new_valist (GQuark       domain,
  * Creates a new #GError with the given @domain and @code,
  * and a message formatted with @format.
  *
- * Return value: a new #GError
+ * Returns: a new #GError
  */
 GError*
 g_error_new (GQuark       domain,
@@ -428,7 +432,7 @@ g_error_new (GQuark       domain,
  * @message contains text you don't have control over,
  * that could include printf() escape sequences.
  *
- * Return value: a new #GError
+ * Returns: a new #GError
  **/
 GError*
 g_error_new_literal (GQuark         domain,
@@ -471,7 +475,7 @@ g_error_free (GError *error)
  *
  * Makes a copy of @error.
  *
- * Return value: a new #GError
+ * Returns: a new #GError
  */
 GError*
 g_error_copy (const GError *error)
@@ -502,7 +506,14 @@ g_error_copy (const GError *error)
  * otherwise. In particular, when @error is %NULL, %FALSE will
  * be returned.
  *
- * Return value: whether @error has @domain and @code
+ * If @domain contains a `FAILED` (or otherwise generic) error code,
+ * you should generally not check for it explicitly, but should
+ * instead treat any not-explicitly-recognized error code as being
+ * equilalent to the `FAILED` code. This way, if the domain is
+ * extended in the future to provide a more specific error code for
+ * a certain case, your code will still work.
+ *
+ * Returns: whether @error has @domain and @code
  */
 gboolean
 g_error_matches (const GError *error,

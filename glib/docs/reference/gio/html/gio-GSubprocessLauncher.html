@@ -12,11 +12,10 @@
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
-<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="10"><tr valign="middle">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
 <td width="100%" align="left" class="shortcuts">
-<a href="#" class="shortcut">Top</a><span id="nav_description"> <span class="dim">|</span> 
-                  <a href="#gio-GSubprocessLauncher.description" class="shortcut">Description</a></span><span id="nav_hierarchy"> <span class="dim">|</span> 
-                  <a href="#gio-GSubprocessLauncher.object-hierarchy" class="shortcut">Object Hierarchy</a></span>
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#gio-GSubprocessLauncher.description" class="shortcut">Description</a></span>
 </td>
 <td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
 <td><a accesskey="u" href="subprocesses.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
@@ -41,7 +40,7 @@
 </colgroup>
 <tbody>
 <tr>
-<td class="function_type">const <a href="../glib/glib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+<td class="function_type">const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="gio-GSubprocessLauncher.html#g-subprocess-launcher-getenv" title="g_subprocess_launcher_getenv ()">g_subprocess_launcher_getenv</a> <span class="c_punctuation">()</span>
@@ -192,11 +191,6 @@
 </table></div>
 </div>
 <div class="refsect1">
-<a name="gio-GSubprocessLauncher.object-hierarchy"></a><h2>Object Hierarchy</h2>
-<pre class="screen">
-</pre>
-</div>
-<div class="refsect1">
 <a name="gio-GSubprocessLauncher.includes"></a><h2>Includes</h2>
 <pre class="synopsis">#include &lt;gio/gio.h&gt;
 </pre>
@@ -215,9 +209,9 @@ a similar configuration.</p>
 <a name="gio-GSubprocessLauncher.functions_details"></a><h2>Functions</h2>
 <div class="refsect2">
 <a name="g-subprocess-launcher-getenv"></a><h3>g_subprocess_launcher_getenv ()</h3>
-<pre class="programlisting">const <a href="../glib/glib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
+<pre class="programlisting">const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="returnvalue">gchar</span></a> *
 g_subprocess_launcher_getenv (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                              <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *variable</code></em>);</pre>
+                              <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *variable</code></em>);</pre>
 <p>Returns the value of the environment variable <em class="parameter"><code>variable</code></em>
  in the
 environment of processes launched from this launcher.</p>
@@ -225,7 +219,7 @@ environment of processes launched from this launcher.</p>
 means that it can be an arbitrary byte string.  On Windows, it will
 be UTF-8.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.2.6"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.2.6"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -247,8 +241,8 @@ be UTF-8.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.2.7"></a><h4>Returns</h4>
-<p> the value of the environment variable, <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if unset</p>
+<a name="id-1.4.12.3.7.2.7"></a><h4>Returns</h4>
+<p> the value of the environment variable, <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if unset</p>
 <p></p>
 </div>
 <p class="since">Since 2.40</p>
@@ -263,7 +257,7 @@ g_subprocess_launcher_new (<em class="parameter"><code><a class="link" href="GSu
 environment of the calling process is made at the time of this call
 and will be used as the environment that the process is launched in.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.3.6"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.3.6"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -284,9 +278,9 @@ and will be used as the environment that the process is launched in.</p>
 <a name="g-subprocess-launcher-set-child-setup"></a><h3>g_subprocess_launcher_set_child_setup ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_subprocess_launcher_set_child_setup (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                                       <em class="parameter"><code><a href="../glib/glib-Spawning-Processes.html#GSpawnChildSetupFunc"><span class="type">GSpawnChildSetupFunc</span></a> child_setup</code></em>,
-                                       <em class="parameter"><code><a href="../glib/glib-Basic-Types.html#gpointer"><span class="type">gpointer</span></a> user_data</code></em>,
-                                       <em class="parameter"><code><a href="../glib/glib-Datasets.html#GDestroyNotify"><span class="type">GDestroyNotify</span></a> destroy_notify</code></em>);</pre>
+                                       <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Spawning-Processes.html#GSpawnChildSetupFunc"><span class="type">GSpawnChildSetupFunc</span></a> child_setup</code></em>,
+                                       <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gpointer"><span class="type">gpointer</span></a> user_data</code></em>,
+                                       <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Datasets.html#GDestroyNotify"><span class="type">GDestroyNotify</span></a> destroy_notify</code></em>);</pre>
 <p>Sets up a child setup function.</p>
 <p>The child setup function will be called after <code class="function">fork()</code> but before
 <code class="function">exec()</code> on the child's side.</p>
@@ -295,11 +289,11 @@ g_subprocess_launcher_set_child_setup (<em class="parameter"><code><a class="lin
 of the <code class="function">fork()</code>.  It will only be called when the last reference on the
 <a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> is dropped or when a new child setup function is
 given.</p>
-<p><a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> can be given as <em class="parameter"><code>child_setup</code></em>
+<p><a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> can be given as <em class="parameter"><code>child_setup</code></em>
  to disable the functionality.</p>
 <p>Child setup functions are only available on UNIX.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.4.9"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.4.9"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -314,7 +308,7 @@ given.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>child_setup</p></td>
-<td class="parameter_description"><p>a <a href="../glib/glib-Spawning-Processes.html#GSpawnChildSetupFunc"><span class="type">GSpawnChildSetupFunc</span></a> to use as the child setup function</p></td>
+<td class="parameter_description"><p>a <a href="http://library.gnome.org/devel/glib/unstable/glib-Spawning-Processes.html#GSpawnChildSetupFunc"><span class="type">GSpawnChildSetupFunc</span></a> to use as the child setup function</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
@@ -325,7 +319,7 @@ given.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>destroy_notify</p></td>
-<td class="parameter_description"><p>a <a href="../glib/glib-Datasets.html#GDestroyNotify"><span class="type">GDestroyNotify</span></a> for <em class="parameter"><code>user_data</code></em>
+<td class="parameter_description"><p>a <a href="http://library.gnome.org/devel/glib/unstable/glib-Datasets.html#GDestroyNotify"><span class="type">GDestroyNotify</span></a> for <em class="parameter"><code>user_data</code></em>
 </p></td>
 <td class="parameter_annotations"> </td>
 </tr>
@@ -339,13 +333,13 @@ given.</p>
 <a name="g-subprocess-launcher-set-cwd"></a><h3>g_subprocess_launcher_set_cwd ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_subprocess_launcher_set_cwd (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                               <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *cwd</code></em>);</pre>
+                               <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *cwd</code></em>);</pre>
 <p>Sets the current working directory that processes will be launched
 with.</p>
 <p>By default processes are launched with the current working directory
 of the launching process at the time of launch.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.5.6"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.5.6"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -373,19 +367,19 @@ of the launching process at the time of launch.</p>
 <a name="g-subprocess-launcher-set-environ"></a><h3>g_subprocess_launcher_set_environ ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_subprocess_launcher_set_environ (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                                   <em class="parameter"><code><a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> **env</code></em>);</pre>
+                                   <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> **env</code></em>);</pre>
 <p>Replace the entire environment of processes launched from this
 launcher with the given 'environ' variable.</p>
-<p>Typically you will build this variable by using <a href="../glib/glib-Miscellaneous-Utility-Functions.html#g-listenv"><code class="function">g_listenv()</code></a> to copy
-the process 'environ' and using the functions <a href="../glib/glib-Miscellaneous-Utility-Functions.html#g-environ-setenv"><code class="function">g_environ_setenv()</code></a>,
-<a href="../glib/glib-Miscellaneous-Utility-Functions.html#g-environ-unsetenv"><code class="function">g_environ_unsetenv()</code></a>, etc.</p>
+<p>Typically you will build this variable by using <a href="http://library.gnome.org/devel/glib/unstable/glib-Miscellaneous-Utility-Functions.html#g-listenv"><code class="function">g_listenv()</code></a> to copy
+the process 'environ' and using the functions <a href="http://library.gnome.org/devel/glib/unstable/glib-Miscellaneous-Utility-Functions.html#g-environ-setenv"><code class="function">g_environ_setenv()</code></a>,
+<a href="http://library.gnome.org/devel/glib/unstable/glib-Miscellaneous-Utility-Functions.html#g-environ-unsetenv"><code class="function">g_environ_unsetenv()</code></a>, etc.</p>
 <p>As an alternative, you can use <a class="link" href="gio-GSubprocessLauncher.html#g-subprocess-launcher-setenv" title="g_subprocess_launcher_setenv ()"><code class="function">g_subprocess_launcher_setenv()</code></a>,
 <a class="link" href="gio-GSubprocessLauncher.html#g-subprocess-launcher-unsetenv" title="g_subprocess_launcher_unsetenv ()"><code class="function">g_subprocess_launcher_unsetenv()</code></a>, etc.</p>
 <p>All strings in this array are expected to be in the GLib file name
 encoding.  On UNIX, this means that they can be arbitrary byte
 strings.  On Windows, they should be in UTF-8.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.6.8"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.6.8"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -424,7 +418,7 @@ handle a particular stdio stream (eg: specifying both
 function like <a class="link" href="gio-GSubprocessLauncher.html#g-subprocess-launcher-set-stdin-file-path" title="g_subprocess_launcher_set_stdin_file_path ()"><code class="function">g_subprocess_launcher_set_stdin_file_path()</code></a> or
 <a class="link" href="gio-GSubprocessLauncher.html#g-subprocess-launcher-take-stdout-fd" title="g_subprocess_launcher_take_stdout_fd ()"><code class="function">g_subprocess_launcher_take_stdout_fd()</code></a>.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.7.8"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.7.8"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -453,10 +447,10 @@ function like <a class="link" href="gio-GSubprocessLauncher.html#g-subprocess-la
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_subprocess_launcher_set_stderr_file_path
                                (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                                <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *path</code></em>);</pre>
+                                <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *path</code></em>);</pre>
 <p>Sets the file path to use as the stderr for spawned processes.</p>
 <p>If <em class="parameter"><code>path</code></em>
- is <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> then any previously given path is unset.</p>
+ is <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> then any previously given path is unset.</p>
 <p>The file will be created or truncated when the process is spawned, as
 would be the case if using '2&gt;' at the shell.</p>
 <p>If you want to send both stdout and stderr to the same file then use
@@ -465,7 +459,7 @@ would be the case if using '2&gt;' at the shell.</p>
 if the launcher flags contain any flags directing stderr elsewhere.</p>
 <p>This feature is only available on UNIX.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.8.10"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.8.10"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -480,7 +474,7 @@ if the launcher flags contain any flags directing stderr elsewhere.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>path</p></td>
-<td class="parameter_description"><p>a filename or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+<td class="parameter_description"><p>a filename or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
@@ -494,16 +488,16 @@ if the launcher flags contain any flags directing stderr elsewhere.</p>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_subprocess_launcher_set_stdin_file_path
                                (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                                <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *path</code></em>);</pre>
+                                <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *path</code></em>);</pre>
 <p>Sets the file path to use as the stdin for spawned processes.</p>
 <p>If <em class="parameter"><code>path</code></em>
- is <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> then any previously given path is unset.</p>
+ is <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> then any previously given path is unset.</p>
 <p>The file must exist or spawning the process will fail.</p>
 <p>You may not set a stdin file path if a stdin fd is already set or if
 the launcher flags contain any flags directing stdin elsewhere.</p>
 <p>This feature is only available on UNIX.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.9.9"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.9.9"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -518,7 +512,7 @@ the launcher flags contain any flags directing stdin elsewhere.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>path</p></td>
-<td class="parameter_description"><p>a filename or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+<td class="parameter_description"><p>a filename or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
@@ -532,17 +526,17 @@ the launcher flags contain any flags directing stdin elsewhere.</p>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_subprocess_launcher_set_stdout_file_path
                                (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                                <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *path</code></em>);</pre>
+                                <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *path</code></em>);</pre>
 <p>Sets the file path to use as the stdout for spawned processes.</p>
 <p>If <em class="parameter"><code>path</code></em>
- is <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> then any previously given path is unset.</p>
+ is <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> then any previously given path is unset.</p>
 <p>The file will be created or truncated when the process is spawned, as
 would be the case if using '&gt;' at the shell.</p>
 <p>You may not set a stdout file path if a stdout fd is already set or
 if the launcher flags contain any flags directing stdout elsewhere.</p>
 <p>This feature is only available on UNIX.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.10.9"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.10.9"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -557,7 +551,7 @@ if the launcher flags contain any flags directing stdout elsewhere.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>path</p></td>
-<td class="parameter_description"><p>a filename or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
+<td class="parameter_description"><p>a filename or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
@@ -570,9 +564,9 @@ if the launcher flags contain any flags directing stdout elsewhere.</p>
 <a name="g-subprocess-launcher-setenv"></a><h3>g_subprocess_launcher_setenv ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_subprocess_launcher_setenv (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                              <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *variable</code></em>,
-                              <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *value</code></em>,
-                              <em class="parameter"><code><a href="../glib/glib-Basic-Types.html#gboolean"><span class="type">gboolean</span></a> overwrite</code></em>);</pre>
+                              <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *variable</code></em>,
+                              <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *value</code></em>,
+                              <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gboolean"><span class="type">gboolean</span></a> overwrite</code></em>);</pre>
 <p>Sets the environment variable <em class="parameter"><code>variable</code></em>
  in the environment of
 processes launched from this launcher.</p>
@@ -580,7 +574,7 @@ processes launched from this launcher.</p>
 encoding. On UNIX, this means that they can be arbitrary byte
 strings. On Windows, they should be in UTF-8.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.11.6"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.11.6"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -618,13 +612,13 @@ strings. On Windows, they should be in UTF-8.</p>
 <a name="g-subprocess-launcher-spawn"></a><h3>g_subprocess_launcher_spawn ()</h3>
 <pre class="programlisting"><a class="link" href="GSubprocess.html" title="GSubprocess"><span class="returnvalue">GSubprocess</span></a> *
 g_subprocess_launcher_spawn (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                             <em class="parameter"><code><a href="../glib/glib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>,
-                             <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *argv0</code></em>,
+                             <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>,
+                             <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *argv0</code></em>,
                              <em class="parameter"><code>...</code></em>);</pre>
 <p>A convenience helper for creating a <a class="link" href="GSubprocess.html" title="GSubprocess"><span class="type">GSubprocess</span></a> given a provided
 varargs list of arguments.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.12.5"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.12.5"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -649,15 +643,15 @@ varargs list of arguments.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>...</p></td>
-<td class="parameter_description"><p>Continued arguments, <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> terminated</p></td>
+<td class="parameter_description"><p>Continued arguments, <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> terminated</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.12.6"></a><h4>Returns</h4>
-<p> A new <a class="link" href="GSubprocess.html" title="GSubprocess"><span class="type">GSubprocess</span></a>, or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> on error (and <em class="parameter"><code>error</code></em>
+<a name="id-1.4.12.3.7.12.6"></a><h4>Returns</h4>
+<p> A new <a class="link" href="GSubprocess.html" title="GSubprocess"><span class="type">GSubprocess</span></a>, or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> on error (and <em class="parameter"><code>error</code></em>
 will be set). </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -668,12 +662,12 @@ will be set). </p>
 <a name="g-subprocess-launcher-spawnv"></a><h3>g_subprocess_launcher_spawnv ()</h3>
 <pre class="programlisting"><a class="link" href="GSubprocess.html" title="GSubprocess"><span class="returnvalue">GSubprocess</span></a> *
 g_subprocess_launcher_spawnv (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                              <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> * const *argv</code></em>,
-                              <em class="parameter"><code><a href="../glib/glib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
+                              <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> * const *argv</code></em>,
+                              <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Error-Reporting.html#GError"><span class="type">GError</span></a> **error</code></em>);</pre>
 <p>A convenience helper for creating a <a class="link" href="GSubprocess.html" title="GSubprocess"><span class="type">GSubprocess</span></a> given a provided
 array of arguments.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.13.5"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.13.5"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -700,8 +694,8 @@ array of arguments.</p>
 </table></div>
 </div>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.13.6"></a><h4>Returns</h4>
-<p> A new <a class="link" href="GSubprocess.html" title="GSubprocess"><span class="type">GSubprocess</span></a>, or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> on error (and <em class="parameter"><code>error</code></em>
+<a name="id-1.4.12.3.7.13.6"></a><h4>Returns</h4>
+<p> A new <a class="link" href="GSubprocess.html" title="GSubprocess"><span class="type">GSubprocess</span></a>, or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> on error (and <em class="parameter"><code>error</code></em>
 will be set). </p>
 <p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
 </div>
@@ -712,8 +706,8 @@ will be set). </p>
 <a name="g-subprocess-launcher-take-fd"></a><h3>g_subprocess_launcher_take_fd ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_subprocess_launcher_take_fd (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                               <em class="parameter"><code><a href="../glib/glib-Basic-Types.html#gint"><span class="type">gint</span></a> source_fd</code></em>,
-                               <em class="parameter"><code><a href="../glib/glib-Basic-Types.html#gint"><span class="type">gint</span></a> target_fd</code></em>);</pre>
+                               <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint"><span class="type">gint</span></a> source_fd</code></em>,
+                               <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint"><span class="type">gint</span></a> target_fd</code></em>);</pre>
 <p>Transfer an arbitrary file descriptor from parent process to the
 child.  This function takes "ownership" of the fd; it will be closed
 in the parent when <em class="parameter"><code>self</code></em>
@@ -726,7 +720,7 @@ descriptor in the child.</p>
 --passphrase-fd providing a file descriptor number where it expects
 the passphrase to be written.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.14.7"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.14.7"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -758,7 +752,7 @@ the passphrase to be written.</p>
 <a name="g-subprocess-launcher-take-stderr-fd"></a><h3>g_subprocess_launcher_take_stderr_fd ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_subprocess_launcher_take_stderr_fd (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                                      <em class="parameter"><code><a href="../glib/glib-Basic-Types.html#gint"><span class="type">gint</span></a> fd</code></em>);</pre>
+                                      <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint"><span class="type">gint</span></a> fd</code></em>);</pre>
 <p>Sets the file descriptor to use as the stderr for spawned processes.</p>
 <p>If <em class="parameter"><code>fd</code></em>
  is -1 then any previously given fd is unset.</p>
@@ -773,7 +767,7 @@ spawned process.</p>
 if the launcher flags contain any flags directing stderr elsewhere.</p>
 <p>This feature is only available on UNIX.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.15.10"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.15.10"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -801,7 +795,7 @@ if the launcher flags contain any flags directing stderr elsewhere.</p>
 <a name="g-subprocess-launcher-take-stdin-fd"></a><h3>g_subprocess_launcher_take_stdin_fd ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_subprocess_launcher_take_stdin_fd (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                                     <em class="parameter"><code><a href="../glib/glib-Basic-Types.html#gint"><span class="type">gint</span></a> fd</code></em>);</pre>
+                                     <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint"><span class="type">gint</span></a> fd</code></em>);</pre>
 <p>Sets the file descriptor to use as the stdin for spawned processes.</p>
 <p>If <em class="parameter"><code>fd</code></em>
  is -1 then any previously given fd is unset.</p>
@@ -818,7 +812,7 @@ O_CLOEXEC if that's what you want.</p>
 the launcher flags contain any flags directing stdin elsewhere.</p>
 <p>This feature is only available on UNIX.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.16.10"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.16.10"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -846,7 +840,7 @@ the launcher flags contain any flags directing stdin elsewhere.</p>
 <a name="g-subprocess-launcher-take-stdout-fd"></a><h3>g_subprocess_launcher_take_stdout_fd ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_subprocess_launcher_take_stdout_fd (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                                      <em class="parameter"><code><a href="../glib/glib-Basic-Types.html#gint"><span class="type">gint</span></a> fd</code></em>);</pre>
+                                      <em class="parameter"><code><a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gint"><span class="type">gint</span></a> fd</code></em>);</pre>
 <p>Sets the file descriptor to use as the stdout for spawned processes.</p>
 <p>If <em class="parameter"><code>fd</code></em>
  is -1 then any previously given fd is unset.</p>
@@ -862,7 +856,7 @@ O_CLOEXEC if that's what you want.</p>
 if the launcher flags contain any flags directing stdout elsewhere.</p>
 <p>This feature is only available on UNIX.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.17.10"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.17.10"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">
@@ -890,7 +884,7 @@ if the launcher flags contain any flags directing stdout elsewhere.</p>
 <a name="g-subprocess-launcher-unsetenv"></a><h3>g_subprocess_launcher_unsetenv ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 g_subprocess_launcher_unsetenv (<em class="parameter"><code><a class="link" href="gio-GSubprocessLauncher.html#GSubprocessLauncher" title="GSubprocessLauncher"><span class="type">GSubprocessLauncher</span></a> *self</code></em>,
-                                <em class="parameter"><code>const <a href="../glib/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *variable</code></em>);</pre>
+                                <em class="parameter"><code>const <a href="http://library.gnome.org/devel/glib/unstable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *variable</code></em>);</pre>
 <p>Removes the environment variable <em class="parameter"><code>variable</code></em>
  from the environment of
 processes launched from this launcher.</p>
@@ -898,7 +892,7 @@ processes launched from this launcher.</p>
 this means that they can be arbitrary byte strings.  On Windows, they
 should be in UTF-8.</p>
 <div class="refsect3">
-<a name="id-1.4.12.3.8.18.6"></a><h4>Parameters</h4>
+<a name="id-1.4.12.3.7.18.6"></a><h4>Parameters</h4>
 <div class="informaltable"><table width="100%" border="0">
 <colgroup>
 <col width="150px" class="parameters_name">

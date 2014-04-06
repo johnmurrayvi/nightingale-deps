@@ -42,15 +42,11 @@ ifeq (1,$(NG_VENDOR_CROSS_COMP))
 endif
 
 NG_VENDOR_TARGET = glib
-NG_VENDOR_TARGET_VERSION = 2.39.90
+NG_VENDOR_TARGET_VERSION = 2.40.0
 
 include $(CURDIR)/../vendor-defs.mk
 
 NG_VENDOR_TARGET_CONFIGURE_OPTS :=
-
-ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-cxx-warnings=no
-endif
 
 ifneq (,$(filter Msys Darwin,$(NG_VENDOR_ARCH)))
   ifneq (1,$(NG_VENDOR_CROSS_COMP))

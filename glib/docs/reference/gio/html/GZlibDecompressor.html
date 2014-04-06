@@ -12,12 +12,12 @@
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
-<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="10"><tr valign="middle">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
 <td width="100%" align="left" class="shortcuts">
-<a href="#" class="shortcut">Top</a><span id="nav_description"> <span class="dim">|</span> 
-                  <a href="#GZlibDecompressor.description" class="shortcut">Description</a></span><span id="nav_hierarchy"> <span class="dim">|</span> 
-                  <a href="#GZlibDecompressor.object-hierarchy" class="shortcut">Object Hierarchy</a></span><span id="nav_interfaces"> <span class="dim">|</span> 
-                  <a href="#GZlibDecompressor.implemented-interfaces" class="shortcut">Implemented Interfaces</a></span><span id="nav_properties"> <span class="dim">|</span> 
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#GZlibDecompressor.description" class="shortcut">Description</a></span><span id="nav_hierarchy">  <span class="dim">|</span> 
+                  <a href="#GZlibDecompressor.object-hierarchy" class="shortcut">Object Hierarchy</a></span><span id="nav_interfaces">  <span class="dim">|</span> 
+                  <a href="#GZlibDecompressor.implemented-interfaces" class="shortcut">Implemented Interfaces</a></span><span id="nav_properties">  <span class="dim">|</span> 
                   <a href="#GZlibDecompressor.properties" class="shortcut">Properties</a></span>
 </td>
 <td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
@@ -99,7 +99,7 @@
 </div>
 <div class="refsect1">
 <a name="GZlibDecompressor.object-hierarchy"></a><h2>Object Hierarchy</h2>
-<pre class="screen">    <a href="../gobject/gobject-The-Base-Object-Type.html#GObject">GObject</a>
+<pre class="screen">    <a href="http://library.gnome.org/devel/gobject/unstable/gobject-The-Base-Object-Type.html#GObject">GObject</a>
     <span class="lineart">╰──</span> GZlibDecompressor
 </pre>
 </div>
@@ -155,7 +155,7 @@ g_zlib_decompressor_new (<em class="parameter"><code><a class="link" href="GZlib
 g_zlib_decompressor_get_file_info (<em class="parameter"><code><a class="link" href="GZlibDecompressor.html" title="GZlibDecompressor"><span class="type">GZlibDecompressor</span></a> *decompressor</code></em>);</pre>
 <p>Retrieves the <a class="link" href="GFileInfo.html" title="GFileInfo"><span class="type">GFileInfo</span></a> constructed from the GZIP header data
 of compressed data processed by <em class="parameter"><code>compressor</code></em>
-, or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if <em class="parameter"><code>decompressor</code></em>
+, or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if <em class="parameter"><code>decompressor</code></em>
 's
 <a class="link" href="GZlibDecompressor.html#GZlibDecompressor--format" title="The “format” property"><span class="type">“format”</span></a> property is not <a class="link" href="GZlibCompressor.html#G-ZLIB-COMPRESSOR-FORMAT-GZIP:CAPS"><code class="literal">G_ZLIB_COMPRESSOR_FORMAT_GZIP</code></a>,
 or the header data was not fully processed yet, or it not present in the
@@ -177,7 +177,7 @@ data stream at all.</p>
 </div>
 <div class="refsect3">
 <a name="id-1.4.6.5.10.3.6"></a><h4>Returns</h4>
-<p> a <a class="link" href="GFileInfo.html" title="GFileInfo"><span class="type">GFileInfo</span></a>, or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p>
+<p> a <a class="link" href="GFileInfo.html" title="GFileInfo"><span class="type">GFileInfo</span></a>, or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>. </p>
 <p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
 </div>
 <p class="since">Since 2.26</p>
@@ -197,7 +197,7 @@ data stream at all.</p>
 <a name="GZlibDecompressor--file-info"></a><h3>The <code class="literal">“file-info”</code> property</h3>
 <pre class="programlisting">  “file-info”                <a class="link" href="GFileInfo.html" title="GFileInfo"><span class="type">GFileInfo</span></a> *</pre>
 <p>A <a class="link" href="GFileInfo.html" title="GFileInfo"><span class="type">GFileInfo</span></a> containing the information found in the GZIP header
-of the data stream processed, or <a href="../glib/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if the header was not yet
+of the data stream processed, or <a href="http://library.gnome.org/devel/glib/unstable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a> if the header was not yet
 fully processed, is not present at all, or the compressor's
 <a class="link" href="GZlibDecompressor.html#GZlibDecompressor--format" title="The “format” property"><span class="type">“format”</span></a> property is not <a class="link" href="GZlibCompressor.html#G-ZLIB-COMPRESSOR-FORMAT-GZIP:CAPS"><code class="literal">G_ZLIB_COMPRESSOR_FORMAT_GZIP</code></a>.</p>
 <p>Flags: Read</p>

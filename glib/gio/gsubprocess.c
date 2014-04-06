@@ -727,8 +727,8 @@ g_subprocess_newv (const gchar * const  *argv,
  * g_subprocess_get_identifier:
  * @subprocess: a #GSubprocess
  *
- * On UNIX, returns the process ID as a decimal string.  On Windows,
- * returns the result of GetProcessId() also as a string.
+ * On UNIX, returns the process ID as a decimal string.
+ * On Windows, returns the result of GetProcessId() also as a string.
  */
 const gchar *
 g_subprocess_get_identifier (GSubprocess *subprocess)
@@ -1420,7 +1420,7 @@ g_subprocess_communicate_made_progress (GObject      *source_object,
       source == state->stdout_buf ||
       source == state->stderr_buf)
     {
-      if (!g_output_stream_splice_finish ((GOutputStream*)source, result, &error))
+      if (g_output_stream_splice_finish ((GOutputStream*) source, result, &error) == -1)
         goto out;
 
       if (source == state->stdout_buf ||
