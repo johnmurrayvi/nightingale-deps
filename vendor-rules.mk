@@ -68,6 +68,14 @@ ifeq (Msys,$(NG_VENDOR_ARCH))
   endif
 endif
 
+ifeq (1, $(NG_VENDOR_CROSS_COMP))
+  ifneq (, $(CROSS))
+    ifneq (, $(CROSS_LIBTYPE))
+    	CROSS_TRIPLET := $(CROSS).$(CROSS_LIBTYPE)-
+    endif
+  endif
+endif
+
 # TODO: define these as a list of exportable targets and expand that, so
 # we can match the printouts in -rules.mk
 ifneq (,$(BUILD_TARGET_SET))
@@ -78,18 +86,19 @@ ifneq (,$(BUILD_TARGET_SET))
     export AR = $(NG_AR)
     export OBJDUMP = $(NG_OBJDUMP)
   else
-    export CC = $(CROSS)gcc
-    export CXX = $(CROSS)g++
-    export LD = $(CROSS)ld
-    export AR = $(CROSS)ar
-    export AS = $(CROSS)as
-ifeq (1, $(NG_VENDOR_CROSS_COMP))
-    export WINDRES = $(CROSS)windres
-endif
-    export OBJDUMP = $(CROSS)objdump
-    export RANLIB = $(CROSS)ranlib
-    export STRIP = $(CROSS)strip
-    export PKG_CONFIG = $(CROSS)pkg-config
+    export CC = $(CROSS_TRIPLET)gcc
+    export CXX = $(CROSS_TRIPLET)g++
+    export LD = $(CROSS_TRIPLET)ld
+    export AR = $(CROSS_TRIPLET)ar
+    export AS = $(CROSS_TRIPLET)as
+    export NM = $(CROSS_TRIPLET)nm
+    export OBJDUMP = $(CROSS_TRIPLET)objdump
+    export RANLIB = $(CROSS_TRIPLET)ranlib
+    export STRIP = $(CROSS_TRIPLET)strip
+    export PKG_CONFIG = $(CROSS_TRIPLET)pkg-config
+    export DLLTOOL = $(CROSS_TRIPLET)dlltool
+    export RC = $(CROSS_TRIPLET)windres
+    export WINDRES = $(CROSS_TRIPLET)windres
   endif
 
     export CPPFLAGS = $(NG_CPPFLAGS)

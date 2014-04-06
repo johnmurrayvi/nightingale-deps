@@ -25,6 +25,7 @@ NG_VENDOR_OS := $(shell uname -o 2>&1)
 
 NG_VENDOR_CROSS_COMP := $(NG_VENDOR_CROSS_COMP)
 CROSS := $(CROSS)
+CROSS_LIBTYPE := $(CROSS_LIBTYPE)
 NG_VENDOR_HOST_ARCH :=
 NG_VENDOR_BUILD_ARCH :=
 
@@ -56,7 +57,7 @@ ifeq (Linux,$(NG_VENDOR_ARCH))
         NG_TARGET_ARCH := windows-i686-msvc10
         # NG_VENDOR_TARGET_ARCH := i686-pc-mingw32
         # NG_VENDOR_HOST_ARCH := i586-mingw32msvc
-        NG_VENDOR_HOST_ARCH := i686-pc-mingw32
+        NG_VENDOR_HOST_ARCH := $(CROSS)
         NG_VENDOR_BUILD_ARCH := x86_64-linux-gnu
      else
         NG_TARGET_ARCH := linux-x86_64
@@ -135,12 +136,12 @@ ifeq (Linux,$(NG_VENDOR_ARCH))
      DUMP_SYMS ?= $(MOZSDK_BIN_DIR)/dump_syms
      INSTALL_NAME_TOOL ?= echo install_name_tool called on Linux && exit 1;
      OTOOL ?= echo otool called on Linux && exit 1;
-     NG_AR = $(CROSS)ar
-     NG_CC = $(CROSS)gcc
-     NG_CXX = $(CROSS)g++
-     NG_LD = $(CROSS)ld
-     NG_OBJDUMP = $(CROSS)objdump
-     NG_PKG_CONFIG = $(CROSS)pkg-config
+     NG_AR = $(CROSS)$(CROSS_LIBTYPE)-ar
+     NG_CC = $(CROSS)$(CROSS_LIBTYPE)-gcc
+     NG_CXX = $(CROSS)$(CROSS_LIBTYPE)-g++
+     NG_LD = $(CROSS)$(CROSS_LIBTYPE)-ld
+     NG_OBJDUMP = $(CROSS)$(CROSS_LIBTYPE)-objdump
+     NG_PKG_CONFIG = $(CROSS)$(CROSS_LIBTYPE)-pkg-config
   endif
 endif
 ifeq (Msys,$(NG_VENDOR_ARCH))
