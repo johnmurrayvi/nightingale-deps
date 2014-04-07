@@ -448,10 +448,10 @@ setup_build: \
 	@echo -----
 ifeq (1, $(NG_VENDOR_CROSS_COMP))
   ifeq (static, $(CROSS_LIBTYPE))
-    @echo PKG_CONFIG_PATH_i686_pc_mingw32_static = $(PKG_CONFIG_PATH_i686_pc_mingw32_static)
+	@echo PKG_CONFIG_PATH_i686_pc_mingw32_static = $(PKG_CONFIG_PATH_i686_pc_mingw32_static)
   endif
   ifeq (shared, $(CROSS_LIBTYPE))
-    @echo PKG_CONFIG_PATH_i686_pc_mingw32_shared = $(PKG_CONFIG_PATH_i686_pc_mingw32_shared)
+	@echo PKG_CONFIG_PATH_i686_pc_mingw32_shared = $(PKG_CONFIG_PATH_i686_pc_mingw32_shared)
   endif
 endif
 	@echo PKG_CONFIG_PATH = $(PKG_CONFIG_PATH)
