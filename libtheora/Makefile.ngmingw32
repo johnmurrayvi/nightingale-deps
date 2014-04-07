@@ -54,7 +54,9 @@ ifeq (static, $(CROSS_LIBTYPE))
 endif
 ifeq (shared, $(CROSS_LIBTYPE))
   NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
-                                     --disable-static
+                                     --disable-static \
+                                     --disable-spec \
+                                     --disable-doc
 endif
 
 NG_VENDOR_TARGET_DYLIB_FIXUPS := libtheora.0 \
