@@ -455,7 +455,6 @@ ifeq (1, $(NG_VENDOR_CROSS_COMP))
   endif
 endif
 	@echo PKG_CONFIG_PATH = $(PKG_CONFIG_PATH)
-endif
 	@echo PATH = "$(PATH)"
 ifeq (Msys,$(NG_VENDOR_ARCH))
 	@echo LIBS = $(LIBS)
