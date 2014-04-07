@@ -3,6 +3,7 @@ xulrunner*/mozilla/*
 xulrunner*/xulrunner*.source.tar.bz2
 xulrunner*/songbird/*
 build/
+build-s*/
 linux-i686*/*
 linux-x86_64*/*
 */autom4te.cache*
