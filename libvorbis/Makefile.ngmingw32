@@ -46,17 +46,22 @@ NG_ACLOCAL_FLAGS += -I common/m4 \
                     $(NULL)
 
 ifeq (Msys,$(NG_VENDOR_ARCH))
-   NG_CC = $(CURDIR)/../clwrapper.py
-   NG_CXX = $(CURDIR)/../clwrapper.py
+  NG_CC = $(CURDIR)/../clwrapper.py
+  NG_CXX = $(CURDIR)/../clwrapper.py
+  NG_USE_MOZCRT = 1
 endif
 
-ifeq (static, $(CROSS_LIBTYPE))
-  NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
-                                     --enable-static
-endif
-ifeq (shared, $(CROSS_LIBTYPE))
-  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
-                                     --disable-static
+ifeq (1, $(NG_VENDOR_CROSS_COMP))
+  NG_USE_MOZCRT = 1
+
+  ifeq (static, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                       --enable-static
+  endif
+  ifeq (shared, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                       --disable-static
+  endif
 endif
 
 NG_VENDOR_TARGET_DYLIB_FIXUPS := libvorbis.0 \

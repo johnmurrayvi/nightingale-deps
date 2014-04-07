@@ -100,6 +100,20 @@ ifeq (Darwin,$(NG_VENDOR_ARCH))
    --with-xul-framework=$(DARWIN_XUL_DIR)
 endif
 
+ifeq (1, $(NG_VENDOR_CROSS_COMP))
+  NG_USE_MOZCRT = 1
+  NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-direct3d
+
+  ifeq (static, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                       --enable-static
+  endif
+  ifeq (shared, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                       --disable-static
+  endif
+endif
+
 NG_VENDOR_TARGET_DYLIB_FIXUPS = $(addprefix libgst, \
   $(addsuffix -0.10, $(sort $(GST_BASE_DYLIBS))))
 

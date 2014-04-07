@@ -38,8 +38,9 @@ NG_VENDOR_TARGET_VERSION = 1.1.1
 include $(CURDIR)/../vendor-defs.mk
 
 ifeq (Msys,$(NG_VENDOR_ARCH))
-   NG_CC = $(CURDIR)/../clwrapper.py
-   NG_CXX = $(CURDIR)/../clwrapper.py
+  NG_CC = $(CURDIR)/../clwrapper.py
+  NG_CXX = $(CURDIR)/../clwrapper.py
+  NG_USE_MOZCRT = 1
 endif
 
 NG_ACLOCAL_FLAGS += -I common/m4 \
@@ -48,17 +49,21 @@ NG_ACLOCAL_FLAGS += -I common/m4 \
 NG_VENDOR_TARGET_CONFIGURE_OPTS := \
   --disable-examples
 
-ifeq (static, $(CROSS_LIBTYPE))
-  NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
-                                     --enable-static \
-                                     --disable-spec \
-                                     --disable-doc
-endif
-ifeq (shared, $(CROSS_LIBTYPE))
-  NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
-                                     --disable-static \
-                                     --disable-spec \
-                                     --disable-doc
+ifeq (1, $(NG_VENDOR_CROSS_COMP))
+  NG_USE_MOZCRT = 1
+
+  ifeq (static, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                       --enable-static \
+                                       --disable-spec \
+                                       --disable-doc
+  endif
+  ifeq (shared, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                       --disable-static \
+                                       --disable-spec \
+                                       --disable-doc
+  endif
 endif
 
 NG_VENDOR_TARGET_DYLIB_FIXUPS := libtheora.0 \

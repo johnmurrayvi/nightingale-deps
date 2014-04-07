@@ -73,10 +73,12 @@ endif
 # TODO: isolate this NG_PULSEAUDIO_DIR 
 
 ifneq (,$(filter-out Msys Darwin,$(NG_VENDOR_ARCH)))
-  NG_PULSEAUDIO_DIR = $(NG_VENDOR_TARGET_BINARY_DEPS_DIR)/usr
-  NG_LDFLAGS += -L$(NG_PULSEAUDIO_DIR)/lib
-  NG_CFLAGS += -I$(NG_PULSEAUDIO_DIR)/include
-  NG_PKG_CONFIG_PATH += $(NG_PULSEAUDIO_DIR)/lib/pkgconfig
+  ifneq (1, $(NG_VENDOR_CROSS_COMP))
+    NG_PULSEAUDIO_DIR = $(NG_VENDOR_TARGET_BINARY_DEPS_DIR)/usr
+    NG_LDFLAGS += -L$(NG_PULSEAUDIO_DIR)/lib
+    NG_CFLAGS += -I$(NG_PULSEAUDIO_DIR)/include
+    NG_PKG_CONFIG_PATH += $(NG_PULSEAUDIO_DIR)/lib/pkgconfig
+  endif
 endif
 
 ifeq (Msys,$(NG_VENDOR_ARCH))
@@ -93,6 +95,20 @@ ifeq (Msys,$(NG_VENDOR_ARCH))
   NG_CXX = $(CURDIR)/../clwrapper.py
   NG_CFLAGS += -D_USE_MATH_DEFINES -D_UNICODE -DUNICODE
   NG_USE_MOZCRT = 1
+endif
+
+ifeq (1, $(NG_VENDOR_CROSS_COMP))
+  NG_USE_MOZCRT = 1
+  NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-directsound
+
+  ifeq (static, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                       --enable-static
+  endif
+  ifeq (shared, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                       --disable-static
+  endif
 endif
 
 NG_VENDOR_TARGET_DYLIB_FIXUPS = $(addprefix libgst, \

@@ -41,7 +41,11 @@ NG_VENDOR_TARGET_CONFIGURE_OPTS := \
         --disable-pango \
         --disable-cdparanoia --disable-gio --disable-libvisual
 
-NG_CFLAGS += -Wl,-rpath=$(NG_VENDOR_BINARIES_DIR)/gstreamer/$(NG_BUILD_TYPE)/lib
+ifeq (,$(filter Msys Darwin,$(SB_VENDOR_ARCH)))
+  ifneq (1, $(NG_VENDOR_CROSS_COMP))
+    SB_CFLAGS += -Wl,-rpath=$(SB_VENDOR_BINARIES_DIR)/gstreamer/$(SB_BUILD_TYPE)/lib
+  endif
+endif
 
 ifeq (Darwin,$(NG_VENDOR_ARCH))
   NG_VENDOR_TARGET_CONFIGURE_OPTS += \
@@ -53,6 +57,20 @@ ifeq (Msys,$(NG_VENDOR_ARCH))
   NG_CC = $(CURDIR)/../clwrapper.py
   NG_CXX = $(CURDIR)/../clwrapper.py
   NG_CFLAGS += -D_USE_MATH_DEFINES -D_UNICODE -DUNICODE
+  NG_USE_MOZCRT = 1
+endif
+
+ifeq (1, $(NG_VENDOR_CROSS_COMP))
+  NG_USE_MOZCRT = 1
+
+  ifeq (static, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                       --enable-static
+  endif
+  ifeq (shared, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                       --disable-static
+  endif
 endif
 
 NG_VENDOR_TARGET_DYLIB_FIXUPS = $(addprefix libgst, \
