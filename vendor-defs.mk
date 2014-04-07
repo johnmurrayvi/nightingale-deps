@@ -393,8 +393,6 @@ ifneq (,$(call enable-ng-lib, glib))
     endif
     ifeq (1,$(NG_VENDOR_CROSS_COMP))
        NG_LDFLAGS += -L$(NG_GLIB_DIR)/lib
-       # NG_LDFLAGS += -L$(NG_GLIB_DIR)/lib -L$(NG_GLIB_DIR)/bin
-       # NG_LDFLAGS += $(foreach GLIB_PART, $(GLIB_PARTS), -l$(GLIB_PART))
        NG_CFLAGS += -I$(NG_GLIB_DIR)/include
        NG_CPPFLAGS += -I$(NG_GLIB_DIR)/include
     endif

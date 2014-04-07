@@ -107,11 +107,14 @@ ifneq (,$(BUILD_TARGET_SET))
     export LDFLAGS = $(NG_LDFLAGS)
     export ACLOCAL_FLAGS = $(NG_ACLOCAL_FLAGS)
 ifeq (1, $(NG_VENDOR_CROSS_COMP))
-	export PKG_CONFIG_PATH_i686_pc_mingw32 = $(NG_PKG_CONFIG_PATH)
-    export PKG_CONFIG_PATH = $(NG_PKG_CONFIG_PATH)
-else
-    export PKG_CONFIG_PATH = $(NG_PKG_CONFIG_PATH)
+  ifeq (static, $(CROSS_LIBTYPE))
+	export PKG_CONFIG_PATH_i686_pc_mingw32_static = $(NG_PKG_CONFIG_PATH)
+  endif
+  ifeq (static, $(CROSS_LIBTYPE))
+	export PKG_CONFIG_PATH_i686_pc_mingw32_shared = $(NG_PKG_CONFIG_PATH)
+  endif
 endif
+    export PKG_CONFIG_PATH = $(NG_PKG_CONFIG_PATH)
     export PATH = $(NG_PATH)
 ifeq (Msys,$(NG_VENDOR_ARCH))
   export LIBS = $(NG_LIBS)
