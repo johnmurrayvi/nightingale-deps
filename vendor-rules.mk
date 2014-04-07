@@ -108,10 +108,10 @@ ifneq (,$(BUILD_TARGET_SET))
     export ACLOCAL_FLAGS = $(NG_ACLOCAL_FLAGS)
 ifeq (1, $(NG_VENDOR_CROSS_COMP))
   ifeq (static, $(CROSS_LIBTYPE))
-	export PKG_CONFIG_PATH_i686_pc_mingw32_static = $(NG_PKG_CONFIG_PATH)
+    export PKG_CONFIG_PATH_i686_pc_mingw32_static = $(NG_PKG_CONFIG_PATH)
   endif
-  ifeq (static, $(CROSS_LIBTYPE))
-	export PKG_CONFIG_PATH_i686_pc_mingw32_shared = $(NG_PKG_CONFIG_PATH)
+  ifeq (shared, $(CROSS_LIBTYPE))
+    export PKG_CONFIG_PATH_i686_pc_mingw32_shared = $(NG_PKG_CONFIG_PATH)
   endif
 endif
     export PKG_CONFIG_PATH = $(NG_PKG_CONFIG_PATH)
@@ -447,9 +447,13 @@ setup_build: \
 	@echo Paths
 	@echo -----
 ifeq (1, $(NG_VENDOR_CROSS_COMP))
-	@echo PKG_CONFIG_PATH_i686_pc_mingw32 = $(PKG_CONFIG_PATH_i686_pc_mingw32)
-	@echo PKG_CONFIG_PATH = $(PKG_CONFIG_PATH)
-else
+  ifeq (static, $(CROSS_LIBTYPE))
+    @echo PKG_CONFIG_PATH_i686_pc_mingw32_static = $(PKG_CONFIG_PATH_i686_pc_mingw32_static)
+  endif
+  ifeq (shared, $(CROSS_LIBTYPE))
+    @echo PKG_CONFIG_PATH_i686_pc_mingw32_shared = $(PKG_CONFIG_PATH_i686_pc_mingw32_shared)
+  endif
+endif
 	@echo PKG_CONFIG_PATH = $(PKG_CONFIG_PATH)
 endif
 	@echo PATH = "$(PATH)"
