@@ -534,34 +534,34 @@ ifneq (,$(call enable-ng-lib, flac))
         endif
     endif
     ifeq (1, $(NG_VENDOR_CROSS_COMP))
-        NG_FLAC_LIBS += -lFLAC-8
+        NG_FLAC_LIBS += -lFLAC
         NG_PATH += $(NG_LIBFLAC_DIR)/bin
     endif
 
   endif
 endif
 
-# #
-# # libjpeg-turbo
-# #
-# ifneq (,$(call enable-ng-lib, jpeg))
-#    ifneq ($(wildcard $(NG_VENDOR_BINARIES_DIR)/libjpeg-turbo/$(NG_BUILD_TYPE)),)
-#       $(info Enabling Nightingale vendor lib: jpeg)
-#       NG_LIBJPEG_DIR = $(call find-dep-dir, libjpeg-turbo)
-#       NG_LDFLAGS += -L$(NG_LIBJPEG_DIR)/lib
+#
+# libjpeg-turbo
+#
+ifneq (,$(call enable-ng-lib, jpeg))
+   ifneq ($(wildcard $(NG_VENDOR_BINARIES_DIR)/libjpeg-turbo/$(NG_BUILD_TYPE)),)
+      $(info Enabling Nightingale vendor lib: jpeg)
+      NG_LIBJPEG_DIR = $(call find-dep-dir, libjpeg-turbo)
+      NG_LDFLAGS += -L$(NG_LIBJPEG_DIR)/lib
 
-#       NG_CFLAGS += -I$(NG_LIBJPEG_DIR)/include
+      NG_CFLAGS += -I$(NG_LIBJPEG_DIR)/include
 
-#       ifeq (Msys,$(NG_VENDOR_ARCH))
-#           NG_JPEG_LIBS += "-ljpeg"
-#           NG_PATH += $(NG_LIBJPEG_DIR)/bin
-#           ifeq (debug,$(NG_BUILD_TYPE))
-#               NG_JPEG_LIBS += -Wl,-Zi
-#           endif
-#       endif
-#       ifeq (1, $(NG_VENDOR_CROSS_COMP))
-#           NG_JPEG_LIBS += "-ljpeg"
-#           NG_PATH += $(NG_LIBJPEG_DIR)/bin    
-#       endif
-#    endif
-# endif
+      ifeq (Msys,$(NG_VENDOR_ARCH))
+          NG_JPEG_LIBS += "-ljpeg"
+          NG_PATH += $(NG_LIBJPEG_DIR)/bin
+          ifeq (debug,$(NG_BUILD_TYPE))
+              NG_JPEG_LIBS += -Wl,-Zi
+          endif
+      endif
+      ifeq (1, $(NG_VENDOR_CROSS_COMP))
+          NG_JPEG_LIBS += "-ljpeg"
+          NG_PATH += $(NG_LIBJPEG_DIR)/bin    
+      endif
+   endif
+endif
