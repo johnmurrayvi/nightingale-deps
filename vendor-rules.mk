@@ -14,6 +14,23 @@ ifneq (,$(PKG_CONFIG_PATH))
   NG_PKG_CONFIG_PATH := $(NG_PKG_CONFIG_PATH):$(PKG_CONFIG_PATH)
 endif
 
+# This flag only means anything on Win32 right now, so assert that...
+ifdef NG_USE_MOZCRT
+  ifneq (1, $(NG_VENDOR_CROSS_COMP))
+    ifneq (Msys,$(NG_VENDOR_ARCH))
+      $(error NG_USE_MOZCRT is only meaningful on Win32.)
+    endif
+  endif
+
+  # Add the mozsdk lib dir (containing mozcrt.lib & mozutils.dll) to the runtime
+  # path, so that the configure tests that create executables are
+  # actually runnable; we do this up here because SB_PATH's assignment-type
+  # below.
+  NG_PATH += $(MOZSDK_DIR)/lib
+  NG_LIBS += -L$(MOZSDK_DIR)/lib -lmozutils -lmozcrt
+endif
+
+
 NG_PATH := $(subst $(SPACE),:,$(strip $(NG_PATH))):$(PATH)
 
 NG_DYLD_LIBRARY_PATH := $(subst $(SPACE),:,$(strip $(NG_DYLD_LIBRARY_PATH)))
