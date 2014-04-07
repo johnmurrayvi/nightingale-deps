@@ -717,7 +717,7 @@ GST_ALL_CFLAGS="-I\$(top_srcdir)/libs -I\$(top_srcdir) -I\$(top_builddir)/libs -
 
 dnl FIXME: check if LTLIBINTL is needed everywhere
 dnl I presume it is given that it contains the symbols that _() stuff maps to
-GST_ALL_LIBS="$GLIB_LIBS $LTLIBINTL \$(GCOV_LIBS)"
+GST_ALL_LIBS="$GLIB_LIBS \$(GCOV_LIBS)"
 
 dnl LDFLAGS really should only contain flags, not libs - they get added before
 dnl whatevertarget_LIBS and -L flags here affect the rest of the linking
