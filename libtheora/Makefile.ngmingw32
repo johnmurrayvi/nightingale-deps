@@ -50,7 +50,9 @@ NG_VENDOR_TARGET_CONFIGURE_OPTS := \
 
 ifeq (static, $(CROSS_LIBTYPE))
   NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
-                                     --enable-static
+                                     --enable-static \
+                                     --disable-spec \
+                                     --disable-doc
 endif
 ifeq (shared, $(CROSS_LIBTYPE))
   NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
