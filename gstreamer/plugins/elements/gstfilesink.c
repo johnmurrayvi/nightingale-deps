@@ -56,8 +56,10 @@
 #define lseek _lseeki64
 #undef off_t
 #define off_t guint64
+#ifdef _MSC_VER
 #undef ftruncate
 #define ftruncate _chsize
+#endif
 #ifdef _MSC_VER                 /* Check if we are using MSVC, fileno is deprecated in favour */
 #define fileno _fileno          /* of _fileno */
 #endif
