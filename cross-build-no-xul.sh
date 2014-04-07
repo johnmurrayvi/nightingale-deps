@@ -11,6 +11,12 @@ export NG_VENDOR_BUILD_ROOT=$DIR
 
 export NG_VENDOR_CROSS_COMP=1
 
+
+### NEED AUTOMAKE-1.13!!! ###
+### NEED AUTOMAKE-1.14!!! ###
+### NEED AUTOMAKE-1.14.1!!! ###
+
+
 # mingw32msvc
 # export CROSS="i586-pc-mingw32msvc-"
 
@@ -35,20 +41,15 @@ case $OSTYPE in
             mkdir -p "checkout/windows-i686-msvc10"
         fi
 
-        ### NEED AUTOMAKE-1.13!!! ###
-        ### NEED AUTOMAKE-1.14!!! ###
-        ### NEED AUTOMAKE-1.14.1!!! ###
 
-        export CROSS_LIBTYPE="static"
 
         # echo -e "Building libtool...\n"
         # make -C libtool -f Makefile.ngmingw32
 
-        # echo -e "Building libjpeg-turbo...\n"
-        # make -C libjpeg-turbo -f Makefile.ngmingw32
-
         # echo -e "Building zlib...\n"
         # make -C zlib -f Makefile.ngmingw32
+
+        export CROSS_LIBTYPE="static"
 
 ## ------------------------------------------------------- #
 #
@@ -70,6 +71,11 @@ case $OSTYPE in
 #
 #       # echo -e "Building sqlite...\n"
 #       make -C sqlite -f Makefile.ngmingw32
+#
+## ------------------------------------------------------- #
+#
+#       # echo -e "Building libjpeg-turbo...\n"
+#       make -C libjpeg-turbo -f Makefile.ngmingw32
 #
 ## ------------------------------------------------------- #
 #
@@ -103,21 +109,14 @@ case $OSTYPE in
 #        # echo -e "Building gstreamer...\n"
 #        make -C gstreamer -f Makefile.ngmingw32
 #
-#        # export CROSS_LIBTYPE="static"
-#        # make -C gstreamer -f Makefile.ngmingw32
-#        # mv build/gstreamer build/gstreamer-static
-#        # export CROSS_LIBTYPE="shared"
-#        # make -C gstreamer -f Makefile.ngmingw32
-#        # mv build/gstreamer build/gstreamer-shared
-#
 ## ------------------------------------------------------- #
 #
 #        ### TIER 4 ###
 #        # echo -e "Building gst plugins...\n"
-#        # make -C gst-plugins-base -f Makefile.ngmingw32
-#        # make -C gst-plugins-good -f Makefile.ngmingw32
-#        # make -C gst-plugins-bad -f Makefile.ngmingw32
-#        # make -C gst-plugins-ugly -f Makefile.ngmingw32
+#        make -C gst-plugins-base -f Makefile.ngmingw32
+#        make -C gst-plugins-good -f Makefile.ngmingw32
+#        make -C gst-plugins-bad -f Makefile.ngmingw32
+#        make -C gst-plugins-ugly -f Makefile.ngmingw32
 
 
 
@@ -129,11 +128,7 @@ case $OSTYPE in
 
 
         export CROSS_LIBTYPE="shared"
-## ------------------------------------------------------- #
-#
-#        # echo -e "Building libiconv...\n"
-#        make -C libiconv -f Makefile.ngmingw32
-#
+
 ## ------------------------------------------------------- #
 #
 #        # echo -e "Building libjpeg-turbo...\n"
@@ -141,6 +136,11 @@ case $OSTYPE in
 #
 #        # echo -e "Building zlib...\n"
 #        # make -C zlib -f Makefile.ngmingw32
+#
+## ------------------------------------------------------- #
+#
+#        # echo -e "Building libiconv...\n"
+#        make -C libiconv -f Makefile.ngmingw32
 #
 ## ------------------------------------------------------- #
 #
@@ -157,6 +157,11 @@ case $OSTYPE in
 #
 #        # echo -e "Building sqlite...\n"
 #        make -C sqlite -f Makefile.ngmingw32
+#
+### ------------------------------------------------------- #
+#
+#        # echo -e "Building libjpeg-turbo...\n"
+#        make -C libjpeg-turbo -f Makefile.ngmingw32
 #
 ## ------------------------------------------------------- #
 #
@@ -183,24 +188,19 @@ case $OSTYPE in
 #
 #        ### TIER 3 ###
 #        # echo -e "Building gstreamer...\n"
-#        # make -C gstreamer -f Makefile.ngmingw32
-#
-#        # export CROSS_LIBTYPE="static"
-#        # make -C gstreamer -f Makefile.ngmingw32
-#        # mv build/gstreamer build/gstreamer-static
-#        # export CROSS_LIBTYPE="shared"
-#        # make -C gstreamer -f Makefile.ngmingw32
-#        # mv build/gstreamer build/gstreamer-shared
+#        make -C gstreamer -f Makefile.ngmingw32
 #
 ## ------------------------------------------------------- #
 #
 #        ### TIER 4 ###
 #        # echo -e "Building gst plugins...\n"
-#        # make -C gst-plugins-base -f Makefile.ngmingw32
-#        # make -C gst-plugins-good -f Makefile.ngmingw32
-#        # make -C gst-plugins-bad -f Makefile.ngmingw32
-#        # make -C gst-plugins-ugly -f Makefile.ngmingw32
+#        make -C gst-plugins-base -f Makefile.ngmingw32
+#        make -C gst-plugins-good -f Makefile.ngmingw32
+#        make -C gst-plugins-bad -f Makefile.ngmingw32
+#        make -C gst-plugins-ugly -f Makefile.ngmingw32
 
+        # mv build build-shared
+        # mv windows-i686-msvc10 windows-i686-msvc10-shared
 
     ;;
 
