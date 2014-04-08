@@ -398,8 +398,7 @@ else
 endif
 
 build: setup_environment $(CLEAN_BUILD_DIR_TGT) setup_build module_setup_build
-	# We do this RUN_CONFIGURE insanity to support cmake
-ifeq (1,$(NG_RUN_CONFIGURE))
+ifeq (1,$(NG_RUN_CONFIGURE)) # We do this RUN_CONFIGURE insanity to support cmake
   ifneq (1,$(NG_VENDOR_CROSS_COMP))
 	  cd $(NG_VENDOR_BUILD_DIR) && \
 	          $(CONFIGURE) --prefix=$(NG_CONFIGURE_PREFIX) \
@@ -424,9 +423,7 @@ endif
       #       $(NG_VENDOR_TARGET_CONFIGURE_OPTS) \
       #       $(NG_CONFIGURE_OPTS) \
       #       -C
-
-	# We do this submake-cmd insanity to support cmake
-	$(SUBMAKE_CMD) -C $(NG_VENDOR_BUILD_DIR)
+	$(SUBMAKE_CMD) -C $(NG_VENDOR_BUILD_DIR) # We do this submake-cmd insanity to support cmake
 	$(SUBMAKE_CMD) -C $(NG_VENDOR_BUILD_DIR) install
 
 $(NG_VENDOR_TARGET_BINARY_DEPS_DIR): $(NG_VENDOR_TARGET_DEPENDENT_DEBS)
