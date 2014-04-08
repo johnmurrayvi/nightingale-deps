@@ -42,7 +42,7 @@ SHARED_MODE=0
 #LOC = -DDEBUG -g
 
 PREFIX =
-CC = $(PREFIX)gcc
+# CC = $(PREFIX)gcc
 CFLAGS = $(LOC) -O3 -Wall
 
 AS = $(CC)
@@ -54,7 +54,7 @@ LDFLAGS = $(LOC)
 AR = $(PREFIX)ar
 ARFLAGS = rcs
 
-RC = $(PREFIX)windres
+# RC = $(PREFIX)windres
 RCFLAGS = --define GCC_WINDRES
 
 STRIP = $(PREFIX)strip

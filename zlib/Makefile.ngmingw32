@@ -56,6 +56,19 @@ ifneq (1, $(NG_VENDOR_CROSS_COMP))
   SUBMAKE_CMD = $(MAKE) -f Makefile.ngmingw32.proxy \
                 LOC=$(LOC)
 
+else
+
+  NG_RUN_CONFIGURE := 0
+
+  ifeq (static, $(CROSS_LIBTYPE))
+    SUBMAKE_CMD = $(MAKE) -f Makefile.ngmingw32.proxy SHARED_MODE=0
+  endif
+  ifeq (shared, $(CROSS_LIBTYPE))
+    SUBMAKE_CMD = $(MAKE) -f Makefile.ngmingw32.proxy SHARED_MODE=1
+  endif
+
+endif
+
   NG_RUN_CONFIGURE := 0
 
   # We don't have a debug zlib build right now, so disable it, but also
@@ -71,18 +84,5 @@ ifneq (1, $(NG_VENDOR_CROSS_COMP))
   export CP
   export MKDIR
   export NG_VENDOR_CHECKOUT
-
-else
-
-  ifeq (static, $(CROSS_LIBTYPE))
-    NG_VENDOR_TARGET_CONFIGURE_OPTS += --static \
-                                       $(NULL)
-  endif
-  ifeq (shared, $(CROSS_LIBTYPE))
-    NG_VENDOR_TARGET_CONFIGURE_OPTS += $(NULL)
-  endif
-
-endif
-
 
 include $(CURDIR)/../vendor-rules.mk

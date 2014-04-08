@@ -30,6 +30,8 @@
 ################################################################################
 ################################################################################
 
+ifneq (1, $(NG_VENDOR_CROSS_COMP))
+
 zlib.lib zlib.h zconf.h:
 	$(NG_VENDOR_CHECKOUT)/call-nmake.py -f win32/Makefile.msc $(MAKEOVERRIDES) $@
 
@@ -45,3 +47,29 @@ install:: zlib.h zconf.h
 	$(CP) $+ $(FINAL_DEBUG_INSTALL_DIR)/include/
 	$(CP) $+ $(FINAL_RELEASE_INSTALL_DIR)/include/
 
+else
+
+ifeq (static, $(CROSS_LIBTYPE))
+ZLIB_LIB = libz.a
+endif
+ifeq (shared, $(CROSS_LIBTYPE))
+ZLIB_LIB = zlib1.dll
+ZLIB_IMPLIB = libz.dll.a
+endif
+
+$(ZLIB_LIB) zlib.h zconf.h:
+	$(MAKE) -f win32/Makefile.gcc $(MAKEOVERRIDES) $@
+
+install:: $(ZLIB_LIB) $(ZLIB_IMPLIB)
+	$(MKDIR) $(FINAL_DEBUG_INSTALL_DIR)/lib/
+	$(MKDIR) $(FINAL_RELEASE_INSTALL_DIR)/lib/
+	$(CP) $+ $(FINAL_DEBUG_INSTALL_DIR)/lib/
+	$(CP) $+ $(FINAL_RELEASE_INSTALL_DIR)/lib/
+
+install:: zlib.h zconf.h
+	$(MKDIR) $(FINAL_DEBUG_INSTALL_DIR)/include/
+	$(MKDIR) $(FINAL_RELEASE_INSTALL_DIR)/include/
+	$(CP) $+ $(FINAL_DEBUG_INSTALL_DIR)/include/
+	$(CP) $+ $(FINAL_RELEASE_INSTALL_DIR)/include/
+
+endif
