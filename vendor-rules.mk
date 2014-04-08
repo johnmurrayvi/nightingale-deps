@@ -406,6 +406,7 @@ ifeq (1,$(NG_RUN_CONFIGURE)) # We do this RUN_CONFIGURE insanity to support cmak
 	          $(NG_CONFIGURE_OPTS) \
 	          -C
   else
+    ifneq (zlib, $(NG_VENDOR_TARGET))
 	  cd $(NG_VENDOR_BUILD_DIR) && \
 	          $(CONFIGURE) --build=$(NG_VENDOR_BUILD_ARCH) \
 	          --host=$(NG_VENDOR_HOST_ARCH) \
@@ -413,16 +414,14 @@ ifeq (1,$(NG_RUN_CONFIGURE)) # We do this RUN_CONFIGURE insanity to support cmak
 	          $(NG_VENDOR_TARGET_CONFIGURE_OPTS) \
 	          $(NG_CONFIGURE_OPTS) \
 	          -C
+    else
+	  cd $(NG_VENDOR_BUILD_DIR) && \
+	          $(CONFIGURE) \
+	          --prefix=$(NG_CONFIGURE_PREFIX) \
+	          $(NG_VENDOR_TARGET_CONFIGURE_OPTS)
+    endif
   endif
 endif
-      # cd $(NG_VENDOR_BUILD_DIR) && \
-      #       $(CONFIGURE) --build=$(NG_VENDOR_BUILD_ARCH) \
-      #       --host=$(NG_VENDOR_HOST_ARCH) \
-      #       --target=$(NG_VENDOR_TARGET_ARCH) \
-      #       --prefix=$(NG_CONFIGURE_PREFIX) \
-      #       $(NG_VENDOR_TARGET_CONFIGURE_OPTS) \
-      #       $(NG_CONFIGURE_OPTS) \
-      #       -C
 	$(SUBMAKE_CMD) -C $(NG_VENDOR_BUILD_DIR) # We do this submake-cmd insanity to support cmake
 	$(SUBMAKE_CMD) -C $(NG_VENDOR_BUILD_DIR) install
 
