@@ -239,11 +239,6 @@ ifneq (,$(filter linux-i686 macosx-i686,$(NG_TARGET_ARCH)))
   NG_CXXFLAGS += -g -gstabs+
 endif
 
-# ifeq (i586-mingw32msvc, $(NG_VENDOR_HOST_ARCH))
-#   NG_CFLAGS += -g -gstabs+
-#   NG_CXXFLAGS += -g -gstabs+
-# endif
-
 ifeq (debug,$(NG_BUILD_TYPE))
   NG_CONFIGURE_OPTS += --enable-debug
   NG_BUILD_TYPE_DETECTED = 1
