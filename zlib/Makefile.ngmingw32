@@ -1,0 +1,88 @@
+################################################################################
+################################################################################
+#
+# BEGIN NIGHTINGALE GPL
+# 
+# This file is part of the Nightingale Media Player.
+#
+# Copyright(c) 2014
+# http://www.getnightingale.com
+# 
+# This file may be licensed under the terms of of the
+# GNU General Public License Version 2 (the "GPL").
+# 
+# Software distributed under the License is distributed 
+# on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
+# express or implied. See the GPL for the specific language 
+# governing rights and limitations.
+#
+# You should have received a copy of the GPL along with this 
+# program. If not, go to http://www.gnu.org/licenses/gpl.html
+# or write to the Free Software Foundation, Inc., 
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# 
+# END NIGHTINGALE GPL
+#
+################################################################################
+#
+# Makefile for building Nightingale vendor: zlib
+#
+################################################################################
+################################################################################
+
+NG_VENDOR_TARGET_DEP_MODULES :=
+
+NG_VENDOR_TARGET := zlib
+NG_VENDOR_TARGET_VERSION := 1.2.8
+
+# Symbols don't work for this library, yet (ever?)
+NG_VENDOR_GENERATE_SYMBOLS = 0
+
+include $(CURDIR)/../vendor-defs.mk
+
+# Set compiler flags.
+ifneq (Msys,$(NG_VENDOR_ARCH))
+   ifneq (1, $(NG_VENDOR_CROSS_COMP))
+      $(error zlib is only expected to be built on Windows)
+   endif
+endif
+
+NG_USE_MOZCRT = 1
+
+ifneq (1, $(NG_VENDOR_CROSS_COMP))
+  LOC := "-Zi -Zc:wchar_t-"
+
+  # we kinda want to end up running make with different arguments
+  SUBMAKE_CMD = $(MAKE) -f Makefile.ngmingw32.proxy \
+                LOC=$(LOC)
+
+  NG_RUN_CONFIGURE := 0
+
+  # We don't have a debug zlib build right now, so disable it, but also
+  # copy the result of the build to both the debug and release dirs (export these
+  # values so Makefile.ngmingw32.proxy can use them.
+
+  NG_VENDOR_SKIP_DEBUG_BUILD = 1
+
+  export FINAL_DEBUG_INSTALL_DIR = $(NG_VENDOR_BINARIES_DIR)/$(NG_VENDOR_TARGET)/debug
+  export FINAL_RELEASE_INSTALL_DIR = $(NG_VENDOR_BINARIES_DIR)/$(NG_VENDOR_TARGET)/release
+
+  # export some other things Makefile.ngmingw32.proxy uses
+  export CP
+  export MKDIR
+  export NG_VENDOR_CHECKOUT
+
+else
+
+  ifeq (static, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --static \
+                                       $(NULL)
+  endif
+  ifeq (shared, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += $(NULL)
+  endif
+
+endif
+
+
+include $(CURDIR)/../vendor-rules.mk
