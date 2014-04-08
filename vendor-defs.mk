@@ -519,7 +519,7 @@ ifneq (,$(call enable-ng-lib, flac))
   ifneq ($(wildcard $(NG_VENDOR_BINARIES_DIR)/flac/$(NG_BUILD_TYPE)),)
     $(info Enabling Nightingale vendor lib: flac)
     NG_LIBFLAC_DIR = $(call find-dep-dir, flac)
-    NG_FLAC_LIBS += -L$(NG_LIBFLAC_DIR)/lib
+    NG_FLAC_LIBS := -L$(NG_LIBFLAC_DIR)/lib
     NG_FLAC_CFLAGS += -I$(NG_LIBFLAC_DIR)/include
     NG_PKG_CONFIG_PATH += $(NG_LIBFLAC_DIR)/lib/pkgconfig
     ifeq (Msys,$(NG_VENDOR_ARCH))
@@ -546,7 +546,7 @@ ifneq (,$(call enable-ng-lib, jpeg))
       NG_LIBJPEG_DIR = $(call find-dep-dir, libjpeg-turbo)
       NG_LDFLAGS += -L$(NG_LIBJPEG_DIR)/lib
 
-      NG_CFLAGS += -I$(NG_LIBJPEG_DIR)/include
+      NG_JPEG_CFLAGS += -I$(NG_LIBJPEG_DIR)/include
 
       ifeq (Msys,$(NG_VENDOR_ARCH))
           NG_JPEG_LIBS += "-ljpeg"
@@ -556,7 +556,8 @@ ifneq (,$(call enable-ng-lib, jpeg))
           endif
       endif
       ifeq (1, $(NG_VENDOR_CROSS_COMP))
-          NG_JPEG_LIBS += "-ljpeg"
+          # NG_JPEG_LIBS := -L$(NG_LIBJPEG_DIR)/lib -ljpeg
+          NG_JPEG_LIBS += -ljpeg
           NG_PATH += $(NG_LIBJPEG_DIR)/bin    
       endif
    endif
