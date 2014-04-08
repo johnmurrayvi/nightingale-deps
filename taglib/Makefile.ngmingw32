@@ -106,6 +106,10 @@ NG_RUN_CONFIGURE := 0
 
 include $(CURDIR)/../vendor-rules.mk
 
+ifeq (1, $(NG_VENDOR_CROSS_COMP))
+  CMAKE_ARGS += -DCMAKE_TOOLCHAIN_FILE=$(CROSS_CMAKE_TC_FILE)
+endif
+
 module_setup_build:
 	cd $(NG_VENDOR_BUILD_DIR) && $(CMAKE) $(CMAKE_ARGS) \
           -DCMAKE_C_FLAGS="$(CMAKE_C_FLAGS)" \
