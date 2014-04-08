@@ -62,15 +62,16 @@ ifeq (Msys,$(NG_VENDOR_ARCH))
   CMAKE_ZLIB_FLAGS := -DZLIB_INCLUDE_DIR:PATH="$(NG_ZLIB_DIR)/include" \
    -DZLIB_LIBRARY:FILEPATH="$(NG_ZLIB_DIR)/lib/zlib.lib"
 else
-   ifeq (SunOS,$(NG_VENDOR_ARCH))
-      CMAKE_C_FLAGS_DEBUG += -g
-      CMAKE_CXX_FLAGS_DEBUG += -g
-   else
-      CMAKE_C_FLAGS_DEBUG += -g -gstabs+
-      CMAKE_CXX_FLAGS_DEBUG += -g -gstabs+
-      CMAKE_C_FLAGS_RELEASE += -gstabs+
-      CMAKE_CXX_FLAGS_RELEASE += -gstabs+
-   endif
+
+  ifeq (SunOS,$(NG_VENDOR_ARCH))
+    CMAKE_C_FLAGS_DEBUG += -g
+    CMAKE_CXX_FLAGS_DEBUG += -g
+  else
+    CMAKE_C_FLAGS_DEBUG += -g -gstabs+
+    CMAKE_CXX_FLAGS_DEBUG += -g -gstabs+
+    CMAKE_C_FLAGS_RELEASE += -gstabs+
+    CMAKE_CXX_FLAGS_RELEASE += -gstabs+
+  endif
 endif
 
 # This makefile fixes OS X 10.6, by forcing a 10.4u SDK / GCC4.0 build
