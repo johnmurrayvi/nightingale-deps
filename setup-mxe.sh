@@ -1,6 +1,10 @@
 #!/bin/bash
 
-TOPDIR=$(cd .. && pwd)
+if [ $(pwd) != $(cd ~ && pwd) ] ; then
+    TOPDIR=$(cd .. && pwd)
+else
+    mkdir cross && cd cross
+fi
 
 git clone git@github.com:johnmurrayvi/mxe.git -b master
 
