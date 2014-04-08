@@ -42,12 +42,10 @@ case $OSTYPE in
         fi
 
 
-
+        ### not needed ###
         # echo -e "Building libtool...\n"
         # make -C libtool -f Makefile.ngmingw32
 
-        # echo -e "Building zlib...\n"
-        # make -C zlib -f Makefile.ngmingw32
 
         export CROSS_LIBTYPE="static"
 
@@ -66,6 +64,11 @@ case $OSTYPE in
 #
 #       # echo -e "Building glib...\n"
 #       make -C glib -f Makefile.ngmingw32
+#
+## ------------------------------------------------------- #
+#
+#       # echo -e "Building zlib...\n"
+#        make -C zlib -f Makefile.ngmingw32
 #
 ## ------------------------------------------------------- #
 #
@@ -131,14 +134,6 @@ case $OSTYPE in
 
 ## ------------------------------------------------------- #
 #
-#        # echo -e "Building libjpeg-turbo...\n"
-#        # make -C libjpeg-turbo -f Makefile.ngmingw32
-#
-#        # echo -e "Building zlib...\n"
-#        # make -C zlib -f Makefile.ngmingw32
-#
-## ------------------------------------------------------- #
-#
 #        # echo -e "Building libiconv...\n"
 #        make -C libiconv -f Makefile.ngmingw32
 #
@@ -152,6 +147,11 @@ case $OSTYPE in
 #
 #        # echo -e "Building glib...\n"
 #        make -C glib -f Makefile.ngmingw32
+#
+## ------------------------------------------------------- #
+#
+#       # echo -e "Building zlib...\n"
+#        make -C zlib -f Makefile.ngmingw32
 #
 ## ------------------------------------------------------- #
 #
