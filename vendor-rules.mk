@@ -89,6 +89,7 @@ ifeq (1, $(NG_VENDOR_CROSS_COMP))
   ifneq (, $(CROSS))
     ifneq (, $(CROSS_LIBTYPE))
     	CROSS_TRIPLET := $(CROSS).$(CROSS_LIBTYPE)-
+    	CROSS_CMAKE_TC_FILE := $(CROSS_CMAKE_TC_PATH)/$(CROSS).$(CROSS_LIBTYPE)/share/cmake/mxe-conf.cmake
     endif
   endif
 endif
@@ -116,6 +117,7 @@ ifneq (,$(BUILD_TARGET_SET))
     export DLLTOOL = $(CROSS_TRIPLET)dlltool
     export RC = $(CROSS_TRIPLET)windres
     export WINDRES = $(CROSS_TRIPLET)windres
+    export CMAKE_TOOLCHAIN_FILE = $(CROSS_CMAKE_TC_FILE)
   endif
 
     export CPPFLAGS = $(NG_CPPFLAGS)

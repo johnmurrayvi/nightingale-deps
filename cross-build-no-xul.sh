@@ -26,6 +26,7 @@ export PATH="/opt/cross/mxe/usr/bin:$PATH"
 echo $PATH
 export CROSS="i686-pc-mingw32"
 export CROSS_LIBTYPE="static"
+export CROSS_CMAKE_TC_PATH="/opt/cross/mxe/usr"
 
 
 if [ ! -d "build" ]; then
