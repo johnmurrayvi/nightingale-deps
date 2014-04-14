@@ -1,0 +1,11 @@
+--- accessible/src/msaa/nsHyperTextAccessibleWrap.h	2014-04-14 12:25:15.504210192 -0400
++++ accessible/src/msaa/nsHyperTextAccessibleWrap.h	2014-04-14 12:25:24.884209787 -0400
+@@ -44,7 +44,7 @@
+ #include "nsHyperTextAccessible.h"
+ #include "CAccessibleText.h"
+ #include "CAccessibleEditableText.h"
+-#include "CAccessibleHyperText.h"
++#include "CAccessibleHypertext.h"
+ 
+ class nsHyperTextAccessibleWrap : public nsHyperTextAccessible,
+                                   public CAccessibleHypertext,

@@ -1,0 +1,219 @@
+--- a/accessible/public/msaa/nsIWinAccessNode.idl	
++++ a/accessible/public/msaa/nsIWinAccessNode.idl	
+@@ -2,17 +2,17 @@ 
+  *
+  * This Source Code Form is subject to the terms of the Mozilla Public
+  * License, v. 2.0. If a copy of the MPL was not distributed with this
+  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+ #include "nsISupports.idl"
+ 
+ %{C++
+-#include "Guiddef.h"
++#include "guiddef.h"
+ %}
+ 
+ [ref] native MSCOMIIDRef(IID);
+ 
+ [uuid(63efe9c5-2610-4d2f-861b-e4ddfe1b70d9)]
+ interface nsIWinAccessNode : nsISupports
+ {
+   voidPtr queryNativeInterface([const] in MSCOMIIDRef aIID);
+--- a/accessible/src/msaa/AccessibleWrap.cpp	
++++ a/accessible/src/msaa/AccessibleWrap.cpp	
+@@ -1,14 +1,15 @@ 
+ /* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+ /* This Source Code Form is subject to the terms of the Mozilla Public
+  * License, v. 2.0. If a copy of the MPL was not distributed with this
+  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+ #include "AccessibleWrap.h"
++#include "Accessible-inl.h"
+ 
+ #include "Compatibility.h"
+ #include "DocAccessible-inl.h"
+ #include "EnumVariant.h"
+ #include "ia2AccessibleRelation.h"
+ #include "nsAccUtils.h"
+ #include "nsCoreUtils.h"
+ #include "nsIAccessibleEvent.h"
+@@ -35,17 +36,17 @@ 
+ #include "nsIViewManager.h"
+ #include "nsEventMap.h"
+ #include "nsArrayUtils.h"
+ #include "mozilla/Preferences.h"
+ 
+ #include "Accessible2_i.c"
+ #include "AccessibleRole.h"
+ #include "AccessibleStates.h"
+-#include "OLEACC.H"
++#include "oleacc.h"
+ 
+ using namespace mozilla;
+ using namespace mozilla::a11y;
+ 
+ const uint32_t USE_ROLE_STRING = 0;
+ 
+ /* For documentation of the accessibility architecture,
+  * see http://lxr.mozilla.org/seamonkey/source/accessible/accessible-docs.html
+@@ -1362,17 +1363,17 @@ AccessibleWrap::get_localizedExtendedStates(long aMaxLocalizedExtendedStates,
+   A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_uniqueID(long *uniqueID)
+ {
+   A11Y_TRYBLOCK_BEGIN
+ 
+-  *uniqueID = - reinterpret_cast<long>(UniqueID());
++  *uniqueID = - reinterpret_cast<LONG_PTR>(UniqueID());
+   return S_OK;
+ 
+   A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_windowHandle(HWND *aWindowHandle)
+ {
+--- a/accessible/src/msaa/HyperTextAccessibleWrap.h	
++++ a/accessible/src/msaa/HyperTextAccessibleWrap.h	
+@@ -5,17 +5,17 @@ 
+  * License, v. 2.0. If a copy of the MPL was not distributed with this
+  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+ #ifndef mozilla_a11y_HyperTextAccessibleWrap_h__
+ #define mozilla_a11y_HyperTextAccessibleWrap_h__
+ 
+ #include "HyperTextAccessible.h"
+ #include "ia2AccessibleEditableText.h"
+-#include "ia2AccessibleHyperText.h"
++#include "ia2AccessibleHypertext.h"
+ 
+ namespace mozilla {
+ namespace a11y {
+ 
+ class HyperTextAccessibleWrap : public HyperTextAccessible,
+                                 public ia2AccessibleHypertext,
+                                 public ia2AccessibleEditableText
+ {
+--- a/accessible/src/msaa/nsAccessNodeWrap.h	
++++ a/accessible/src/msaa/nsAccessNodeWrap.h	
+@@ -10,28 +10,30 @@ 
+ #ifndef _nsAccessNodeWrap_H_
+ #define _nsAccessNodeWrap_H_
+ 
+ // Avoid warning C4509:
+ // nonstandard extension used: 'AccessibleWrap::[methodname]' 
+ // uses SEH and 'xpAccessible' has destructor
+ // At this point we're catching a crash which is of much greater
+ // importance than the missing dereference for the nsCOMPtr<>
++#ifdef _MSC_VER
+ #pragma warning( disable : 4509 )
++#endif
+ 
+ #include "nsCOMPtr.h"
+ #include "nsIAccessible.h"
+ #include "nsIAccessibleEvent.h"
+ #include "nsIWinAccessNode.h"
+ #include "ISimpleDOMNode.h"
+ #include "nsIDOMElement.h"
+ #include "nsIContent.h"
+ #include "nsAccessNode.h"
+-#include "OLEIDL.H"
+-#include "OLEACC.H"
++#include "oleidl.h"
++#include "oleacc.h"
+ #include <winuser.h>
+ #ifdef MOZ_CRASHREPORTER
+ #include "nsICrashReporter.h"
+ #endif
+ 
+ #include "nsRefPtrHashtable.h"
+ 
+ #define A11Y_TRYBLOCK_BEGIN                                                    \
+@@ -43,16 +45,23 @@ 
+   { }                                                                          \
+   return E_FAIL;
+ 
+ namespace mozilla {
+ namespace a11y {
+ 
+ class AccTextChangeEvent;
+ 
++#ifdef __GNUC__
++// Inheriting from both XPCOM and MSCOM interfaces causes a lot of warnings
++// about virtual functions being hidden by each other. This is done by
++// design, so silence the warning.
++#pragma GCC diagnostic ignored "-Woverloaded-virtual"
++#endif
++
+ class nsAccessNodeWrap : public nsAccessNode,
+                          public nsIWinAccessNode,
+                          public ISimpleDOMNode,
+                          public IServiceProvider
+ {
+   public:
+     NS_DECL_ISUPPORTS_INHERITED
+     NS_DECL_NSIWINACCESSNODE
+--- a/accessible/src/windows/ia2/ia2AccessibleValue.cpp	
++++ a/accessible/src/windows/ia2/ia2AccessibleValue.cpp	
+@@ -5,16 +5,17 @@ 
+  * License, v. 2.0. If a copy of the MPL was not distributed with this
+  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+ #include "ia2AccessibleValue.h"
+ 
+ #include "AccessibleValue_i.c"
+ 
+ #include "AccessibleWrap.h"
++#include "Accessible-inl.h"
+ 
+ using namespace mozilla::a11y;
+ 
+ // IUnknown
+ 
+ STDMETHODIMP
+ ia2AccessibleValue::QueryInterface(REFIID iid, void** ppv)
+ {
+--- a/accessible/src/windows/uia/uiaRawElmProvider.cpp	
++++ a/accessible/src/windows/uia/uiaRawElmProvider.cpp	
+@@ -67,17 +67,17 @@ uiaRawElmProvider::GetIAccessiblePair(__RPC__deref_out_opt IAccessible** aAcc,
+ STDMETHODIMP
+ uiaRawElmProvider::GetRuntimeId(__RPC__deref_out_opt SAFEARRAY** aRuntimeIds)
+ {
+   A11Y_TRYBLOCK_BEGIN
+ 
+   if (!aRuntimeIds)
+     return E_INVALIDARG;
+ 
+-  int ids[] = { UiaAppendRuntimeId, reinterpret_cast<int>(mAcc->UniqueID()) };
++  int ids[] = { UiaAppendRuntimeId, reinterpret_cast<LONG_PTR>(mAcc->UniqueID()) };
+   *aRuntimeIds = SafeArrayCreateVector(VT_I4, 0, 2);
+   if (!*aRuntimeIds)
+     return E_OUTOFMEMORY;
+ 
+   for (LONG i = 0; i < ArrayLength(ids); i++)
+     SafeArrayPutElement(*aRuntimeIds, &i, (void*)&(ids[i]));
+ 
+   return S_OK;
+--- a/accessible/src/windows/uia/uiaRawElmProvider.h	
++++ a/accessible/src/windows/uia/uiaRawElmProvider.h	
+@@ -4,17 +4,17 @@ 
+  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+ #ifndef mozilla_a11y_uiaRawElmProvider_h__
+ #define mozilla_a11y_uiaRawElmProvider_h__
+ 
+ #include "objbase.h"
+ #include "AccessibleWrap.h"
+-#include "UIAutomation.h"
++#include "uiautomation.h"
+ 
+ namespace mozilla {
+ namespace a11y {
+ 
+ class AccessibleWrap;
+ 
+ /**
+  * IRawElementProviderSimple implementation (maintains IAccessibleEx approach).
