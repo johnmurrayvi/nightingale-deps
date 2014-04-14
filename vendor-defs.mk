@@ -58,7 +58,7 @@ ifeq (Linux,$(NG_VENDOR_ARCH))
   ifeq (x86_64,$(NG_VENDOR_SUBARCH))
      # mingw32 cross compilation
      ifeq (1,$(NG_VENDOR_CROSS_COMP))
-        NG_TARGET_ARCH := windows-i686-msvc10
+        NG_TARGET_ARCH := windows-i686-mingw32
         # NG_VENDOR_TARGET_ARCH := i686-pc-mingw32
         # NG_VENDOR_HOST_ARCH := i586-mingw32msvc
         NG_VENDOR_HOST_ARCH := $(CROSS)
