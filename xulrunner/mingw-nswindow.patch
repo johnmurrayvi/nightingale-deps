@@ -1,0 +1,11 @@
+--- widget/src/windows/nsWindow.h	2014-04-14 10:56:27.327440107 -0400
++++ widget/src/windows/nsWindow.h	2014-04-14 10:56:46.137439295 -0400
+@@ -71,7 +71,7 @@
+ #include "TaskbarWindowPreview.h"
+ 
+ #ifdef ACCESSIBILITY
+-#include "OLEACC.H"
++#include "oleacc.h"
+ #include "nsAccessible.h"
+ #endif
+ 

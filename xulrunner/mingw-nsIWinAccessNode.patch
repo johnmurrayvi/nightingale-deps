@@ -1,0 +1,11 @@
+--- accessible/public/msaa/nsIWinAccessNode.idl	2014-04-14 10:59:14.137432909 -0400
++++ accessible/public/msaa/nsIWinAccessNode.idl	2014-04-14 10:59:19.588432674 -0400
+@@ -40,7 +40,7 @@
+ #include "nsISupports.idl"
+ 
+ %{C++
+-#include "Guiddef.h"
++#include "guiddef.h"
+ %}
+ 
+ [ref] native MSCOMIIDRef(IID);
