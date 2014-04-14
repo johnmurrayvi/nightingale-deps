@@ -71,7 +71,8 @@ XR_CLENAUP = $(CURDIR)/xr_cleanup.sh
 HAVE_XR_release_BUILD = test -d $(CURDIR)/mozilla/compiled/xulrunner-release
 HAVE_XR_debug_BUILD = test -d $(CURDIR)/mozilla/compiled/xulrunner-debug
 
-xr-all: xr-clean xr-build-debug xr-build-release xr-symbols xr-packaging
+# xr-all: xr-clean xr-build-debug xr-build-release xr-symbols xr-packaging
+xr-all: xr-build-debug xr-build-release xr-symbols xr-packaging
 ifdef NG_VENDOR_AUTOCLEAN_OBJDIRS
 	$(RM) -rf $(CURDIR)/mozilla/compiled
 else
@@ -128,10 +129,10 @@ ifeq (macosx-i686,$(NG_XR_PLATFORM)-$(NG_XR_ARCH))
 endif
 	@echo Setting up xulrunner $*-mode build...
 	$(CP) $(CURDIR)/mozconfigs/$(MOZCONFIG) $(CURDIR)/mozilla/.mozconfig
-	$(RM) -r $(CURDIR)/mozilla/compiled/xulrunner-$*
-	$(MKDIR) $(CURDIR)/mozilla/compiled/xulrunner-$*
 	$(MAKE) -C $(CURDIR)/mozilla -f client.mk build
 
+	# $(RM) -r $(CURDIR)/mozilla/compiled/xulrunner-$*
+	# $(MKDIR) $(CURDIR)/mozilla/compiled/xulrunner-$*
 
 .PHONY: xr-% FORCE
 
