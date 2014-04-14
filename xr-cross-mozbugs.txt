@@ -1,0 +1,4 @@
+Bug 670095 - gfxWindowsPlatform.cpp fails to compile on mingw
+Bug 670096 - cairo fails to compile on mingw with D2D and DWrite enabled
+Bug 694008 - xptcinvoke_gcc_x86_unix.cpp fails to compile on mingw
+Bug 815581 - Allow compiling accessibility on mingw
