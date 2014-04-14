@@ -1,0 +1,71 @@
+--- accessible/public/ia2/Makefile.in	2011-12-20 20:06:24.000000000 -0500
++++ accessible/public/ia2/Makefile.in	2014-04-13 18:50:18.254960464 -0400
+@@ -105,13 +105,7 @@
+ 
+ include $(topsrcdir)/config/rules.mk
+ 
+-OS_LIBS = \
+-  kernel32.lib \
+-  rpcns4.lib \
+-  rpcrt4.lib \
+-  ole32.lib \
+-  oleaut32.lib \
+-  $(NULL)
++OS_LIBS = $(call EXPAND_LIBNAME,uuid kernel32 rpcns4 rpcrt4 ole32 oleaut32)
+ 
+ # generate list of to-be-generated files that are missing
+ # but ignore special file dlldata.c
+--- accessible/public/msaa/Makefile.in.orig 2011-12-20 20:06:24.000000000 -0500
++++ accessible/public/msaa/Makefile.in  2014-04-13 18:50:18.254960464 -0400
+@@ -85,12 +85,7 @@
+ 
+ SRCDIR_CSRCS   = $(addprefix $(srcdir)/,$(CSRCS))
+ 
+-OS_LIBS = \
+-   kernel32.lib \
+-   rpcns4.lib \
+-   rpcrt4.lib \
+-   oleaut32.lib \
+-   $(NULL)
++OS_LIBS = $(call EXPAND_LIBNAME,kernel32 rpcns4 rpcrt4 oleaut32)
+ 
+ $(MIDL_GENERATED_FILES): done_gen
+ 
+--- configure.in    2014-04-13 18:56:16.217978017 -0400
++++ configure.in    2014-04-13 18:54:52.941973934 -0400
+@@ -945,6 +945,18 @@
+             AC_MSG_ERROR([windres version $WINDRES_VERSION or higher is required to build.])
+         fi
+ 
++        AC_CHECK_PROGS(MIDL, $target-widl widl)
++        if test -n "$MIDL"; then
++            case "$target" in
++            i*86-*)
++                MIDL_FLAGS="$MIDL_FLAGS --win32 -m32"
++                ;;
++            x86_64-*)
++                MIDL_FLAGS="$MIDL_FLAGS --win64 -m64"
++                ;;
++            esac
++        fi
++
+         MOZ_WINSDK_MAXVER=0x06010000
+     fi # !GNU_CC
+ 
+@@ -5248,6 +5260,16 @@
+     ACCESSIBILITY=,
+     ACCESSIBILITY=1 )
+ if test "$ACCESSIBILITY"; then
++    case "$target" in
++    *-mingw*)
++        if test -z "$MIDL"; then
++            if test "$GCC" != "yes"; then
++                AC_MSG_ERROR([MIDL could not be found. Building accessibility without MIDL is not supported.])
++            else
++                AC_MSG_ERROR([You have accessibility enabled, but widl could not be found. Add --disable-accessibility to your mozconfig or install widl. See https://developer.mozilla.org/en-US/docs/Cross_Compile_Mozilla_for_Mingw32 for details.])
++            fi
++        fi
++    esac
+     AC_DEFINE(ACCESSIBILITY)
+ fi
+ 
