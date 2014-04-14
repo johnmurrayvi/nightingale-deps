@@ -1,0 +1,3316 @@
+--- a/accessible/src/msaa/AccessibleWrap.cpp	
++++ a/accessible/src/msaa/AccessibleWrap.cpp	
+@@ -78,7 +78,8 @@ NS_IMPL_ISUPPORTS_INHERITED0(AccessibleWrap, Accessible);
+ STDMETHODIMP
+ AccessibleWrap::QueryInterface(REFIID iid, void** ppv)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *ppv = NULL;
+ 
+   if (IID_IUnknown == iid || IID_IDispatch == iid || IID_IAccessible == iid)
+@@ -116,9 +117,9 @@ __try {
+     return nsAccessNodeWrap::QueryInterface(iid, ppv);
+ 
+   (reinterpret_cast<IUnknown*>(*ppv))->AddRef();
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+@@ -154,7 +155,8 @@ AccessibleWrap::QueryService(REFGUID aGuidService, REFIID aIID,
+ STDMETHODIMP
+ AccessibleWrap::get_accParent( IDispatch __RPC_FAR *__RPC_FAR *ppdispParent)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *ppdispParent = NULL;
+ 
+   if (IsDefunct())
+@@ -186,15 +188,16 @@ __try {
+   }
+ 
+   *ppdispParent = NativeAccessible(xpParentAcc);
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_accChildCount( long __RPC_FAR *pcountChildren)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!pcountChildren)
+     return E_INVALIDARG;
+ 
+@@ -207,9 +210,9 @@ __try {
+     return S_OK;
+ 
+   *pcountChildren = ChildCount();
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -217,7 +220,8 @@ AccessibleWrap::get_accChild(
+       /* [in] */ VARIANT varChild,
+       /* [retval][out] */ IDispatch __RPC_FAR *__RPC_FAR *ppdispChild)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *ppdispChild = NULL;
+   if (IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -235,10 +239,9 @@ __try {
+     return CO_E_OBJNOTCONNECTED;
+ 
+   *ppdispChild = NativeAccessible(child);
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -246,7 +249,8 @@ AccessibleWrap::get_accName(
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ BSTR __RPC_FAR *pszName)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *pszName = NULL;
+ 
+   if (IsDefunct())
+@@ -271,10 +275,9 @@ __try {
+   *pszName = ::SysAllocStringLen(name.get(), name.Length());
+   if (!*pszName)
+     return E_OUTOFMEMORY;
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ 
+@@ -283,7 +286,8 @@ AccessibleWrap::get_accValue(
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ BSTR __RPC_FAR *pszValue)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *pszValue = NULL;
+ 
+   if (IsDefunct())
+@@ -311,16 +315,17 @@ __try {
+   *pszValue = ::SysAllocStringLen(value.get(), value.Length());
+   if (!*pszValue)
+     return E_OUTOFMEMORY;
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_accDescription(VARIANT varChild,
+                                    BSTR __RPC_FAR *pszDescription)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *pszDescription = NULL;
+ 
+   if (IsDefunct())
+@@ -340,8 +345,7 @@ __try {
+                                         description.Length());
+   return *pszDescription ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -349,7 +353,8 @@ AccessibleWrap::get_accRole(
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ VARIANT __RPC_FAR *pvarRole)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(pvarRole);
+ 
+   if (IsDefunct())
+@@ -432,8 +437,10 @@ __try {
+       return S_OK;
+     }
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return E_FAIL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -441,7 +448,8 @@ AccessibleWrap::get_accState(
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ VARIANT __RPC_FAR *pvarState)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(pvarState);
+   pvarState->vt = VT_I4;
+   pvarState->lVal = 0;
+@@ -467,8 +475,9 @@ __try {
+   uint32_t msaaState = 0;
+   nsAccUtils::To32States(xpAccessible->State(), &msaaState, nullptr);
+   pvarState->lVal = msaaState;
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ 
+@@ -477,13 +486,12 @@ AccessibleWrap::get_accHelp(
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ BSTR __RPC_FAR *pszHelp)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *pszHelp = NULL;
+   return S_FALSE;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(),
+-                                GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -492,14 +500,13 @@ AccessibleWrap::get_accHelpTopic(
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ long __RPC_FAR *pidTopic)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *pszHelpFile = NULL;
+   *pidTopic = 0;
+   return S_FALSE;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(),
+-                                GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -507,7 +514,8 @@ AccessibleWrap::get_accKeyboardShortcut(
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ BSTR __RPC_FAR *pszKeyboardShortcut)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!pszKeyboardShortcut)
+     return E_INVALIDARG;
+   *pszKeyboardShortcut = NULL;
+@@ -532,21 +540,22 @@ __try {
+   *pszKeyboardShortcut = ::SysAllocStringLen(shortcut.get(),
+                                              shortcut.Length());
+   return *pszKeyboardShortcut ? S_OK : E_OUTOFMEMORY;
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_accFocus(
+       /* [retval][out] */ VARIANT __RPC_FAR *pvarChild)
+ {
++  A11Y_TRYBLOCK_BEGIN
++
+   // VT_EMPTY:    None. This object does not have the keyboard focus itself
+   //              and does not contain a child that has the keyboard focus.
+   // VT_I4:       lVal is CHILDID_SELF. The object itself has the keyboard focus.
+   // VT_I4:       lVal contains the child ID of the child element with the keyboard focus.
+   // VT_DISPATCH: pdispVal member is the address of the IDispatch interface
+   //              for the child object with the keyboard focus.
+-__try {
+   if (IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+ 
+@@ -566,8 +575,9 @@ __try {
+     pvarChild->vt = VT_EMPTY;   // No focus or focus is not a child
+   }
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ // This helper class implements IEnumVARIANT for a nsIArray containing nsIAccessible objects.
+@@ -604,7 +614,8 @@ private:
+ HRESULT
+ AccessibleEnumerator::QueryInterface(REFIID iid, void ** ppvObject)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (iid == IID_IEnumVARIANT) {
+     *ppvObject = static_cast<IEnumVARIANT*>(this);
+     AddRef();
+@@ -617,8 +628,9 @@ __try {
+   }
+ 
+   *ppvObject = NULL;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return E_NOINTERFACE;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP_(ULONG)
+@@ -639,7 +651,8 @@ AccessibleEnumerator::Release(void)
+ STDMETHODIMP
+ AccessibleEnumerator::Next(unsigned long celt, VARIANT FAR* rgvar, unsigned long FAR* pceltFetched)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   uint32_t length = 0;
+   mArray->GetLength(&length);
+ 
+@@ -666,27 +679,29 @@ __try {
+     *pceltFetched = celt;
+ 
+   return hr;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+-  return S_OK;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleEnumerator::Clone(IEnumVARIANT FAR* FAR* ppenum)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *ppenum = new AccessibleEnumerator(*this);
+   if (!*ppenum)
+     return E_OUTOFMEMORY;
+   NS_ADDREF(*ppenum);
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleEnumerator::Skip(unsigned long celt)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   uint32_t length = 0;
+   mArray->GetLength(&length);
+   // Check if we can skip the requested number of elements
+@@ -695,8 +710,9 @@ __try {
+     return S_FALSE;
+   }
+   mCurIndex += celt;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ /**
+@@ -719,7 +735,8 @@ __try {
+ STDMETHODIMP
+ AccessibleWrap::get_accSelection(VARIANT __RPC_FAR *pvarChildren)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(pvarChildren);
+   pvarChildren->vt = VT_EMPTY;
+ 
+@@ -740,8 +757,9 @@ __try {
+       NS_ADDREF(pvarChildren->punkVal = pEnum);
+     }
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -749,7 +767,8 @@ AccessibleWrap::get_accDefaultAction(
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ BSTR __RPC_FAR *pszDefaultAction)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *pszDefaultAction = NULL;
+ 
+   if (IsDefunct())
+@@ -770,8 +789,7 @@ __try {
+                                           defaultAction.Length());
+   return *pszDefaultAction ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -779,7 +797,8 @@ AccessibleWrap::accSelect(
+       /* [in] */ long flagsSelect,
+       /* [optional][in] */ VARIANT varChild)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+ 
+@@ -811,8 +830,7 @@ __try {
+     return S_OK;
+   }
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -823,7 +841,8 @@ AccessibleWrap::accLocation(
+       /* [out] */ long __RPC_FAR *pcyHeight,
+       /* [optional][in] */ VARIANT varChild)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+ 
+@@ -844,9 +863,7 @@ __try {
+   *pcyHeight = height;
+   return S_OK;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -855,7 +872,8 @@ AccessibleWrap::accNavigate(
+       /* [optional][in] */ VARIANT varStart,
+       /* [retval][out] */ VARIANT __RPC_FAR *pvarEndUpAt)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!pvarEndUpAt)
+     return E_INVALIDARG;
+ 
+@@ -956,13 +974,14 @@ __try {
+     navAccessible = rel.Next();
+   }
+ 
+-  if (navAccessible) {
+-    pvarEndUpAt->pdispVal = NativeAccessible(navAccessible);
+-    pvarEndUpAt->vt = VT_DISPATCH;
+-    return S_OK;
+-  }
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  if (!navAccessible)
++    return E_FAIL;
++
++  pvarEndUpAt->pdispVal = NativeAccessible(navAccessible);
++  pvarEndUpAt->vt = VT_DISPATCH;
++  return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -971,7 +990,8 @@ AccessibleWrap::accHitTest(
+       /* [in] */ long yTop,
+       /* [retval][out] */ VARIANT __RPC_FAR *pvarChild)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(pvarChild);
+ 
+   if (IsDefunct())
+@@ -994,16 +1014,17 @@ __try {
+     pvarChild->vt = VT_EMPTY;
+     return S_FALSE;
+   }
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::accDoDefaultAction(
+       /* [optional][in] */ VARIANT varChild)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+ 
+@@ -1016,8 +1037,7 @@ __try {
+ 
+   return GetHRESULT(xpAccessible->DoAction(0));
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -1042,7 +1062,8 @@ AccessibleWrap::put_accValue(
+ STDMETHODIMP
+ AccessibleWrap::get_nRelations(long *aNRelations)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aNRelations)
+     return E_INVALIDARG;
+ 
+@@ -1058,15 +1079,16 @@ __try {
+       (*aNRelations)++;
+   }
+   return S_OK;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_relation(long aRelationIndex,
+                              IAccessibleRelation** aRelation)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aRelation)
+     return E_INVALIDARG;
+ 
+@@ -1092,8 +1114,8 @@ __try {
+   }
+ 
+   return E_INVALIDARG;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -1101,7 +1123,8 @@ AccessibleWrap::get_relations(long aMaxRelations,
+                                 IAccessibleRelation **aRelation,
+                                 long *aNRelations)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aRelation || !aNRelations)
+     return E_INVALIDARG;
+ 
+@@ -1123,14 +1146,14 @@ __try {
+   }
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::role(long *aRole)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aRole = 0;
+ 
+   if (IsDefunct())
+@@ -1161,29 +1184,29 @@ __try {
+ 
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::scrollTo(enum IA2ScrollType aScrollType)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+ 
+   nsCoreUtils::ScrollTo(mDoc->PresShell(), mContent, aScrollType);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::scrollToPoint(enum IA2CoordinateType aCoordType,
+                               long aX, long aY)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+       return CO_E_OBJNOTCONNECTED;
+ 
+@@ -1194,8 +1217,7 @@ __try {
+   nsresult rv = ScrollToPoint(geckoCoordType, aX, aY);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -1203,7 +1225,8 @@ AccessibleWrap::get_groupPosition(long *aGroupLevel,
+                                   long *aSimilarItemsInGroup,
+                                   long *aPositionInGroup)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+ 
+@@ -1221,14 +1244,14 @@ __try {
+ 
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_states(AccessibleStates *aStates)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aStates = 0;
+ 
+   // XXX: bug 344674 should come with better approach that we have here.
+@@ -1275,38 +1298,40 @@ __try {
+ 
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_extendedRole(BSTR *aExtendedRole)
+ {
+-__try {
+-  *aExtendedRole = NULL;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++  A11Y_TRYBLOCK_BEGIN
+ 
++  *aExtendedRole = NULL;
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_localizedExtendedRole(BSTR *aLocalizedExtendedRole)
+ {
+-__try {
+-  *aLocalizedExtendedRole = NULL;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++  A11Y_TRYBLOCK_BEGIN
+ 
++  *aLocalizedExtendedRole = NULL;
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_nExtendedStates(long *aNExtendedStates)
+ {
+-__try {
+-  *aNExtendedStates = 0;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++  A11Y_TRYBLOCK_BEGIN
+ 
++  *aNExtendedStates = 0;
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -1314,12 +1339,13 @@ AccessibleWrap::get_extendedStates(long aMaxExtendedStates,
+                                    BSTR **aExtendedStates,
+                                    long *aNExtendedStates)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aExtendedStates = NULL;
+   *aNExtendedStates = 0;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -1327,29 +1353,31 @@ AccessibleWrap::get_localizedExtendedStates(long aMaxLocalizedExtendedStates,
+                                             BSTR** aLocalizedExtendedStates,
+                                             long* aNLocalizedExtendedStates)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aLocalizedExtendedStates = NULL;
+   *aNLocalizedExtendedStates = 0;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_uniqueID(long *uniqueID)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *uniqueID = - reinterpret_cast<long>(UniqueID());
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_windowHandle(HWND *aWindowHandle)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aWindowHandle = 0;
+ 
+   if (IsDefunct())
+@@ -1358,14 +1386,14 @@ __try {
+   *aWindowHandle = GetHWNDFor(this);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_indexInParent(long *aIndexInParent)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aIndexInParent)
+     return E_INVALIDARG;
+ 
+@@ -1378,14 +1406,15 @@ __try {
+     return S_FALSE;
+ 
+   return S_OK;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_locale(IA2Locale *aLocale)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   // Language codes consist of a primary code and a possibly empty series of
+   // subcodes: language-code = primary-code ( "-" subcode )*
+   // Two-letter primary codes are reserved for [ISO639] language abbreviations.
+@@ -1425,16 +1454,16 @@ __try {
+   aLocale->variant = ::SysAllocString(lang.get());
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleWrap::get_attributes(BSTR *aAttributes)
+ {
++  A11Y_TRYBLOCK_BEGIN
++
+   // The format is name:value;name:value; with \ for escaping these
+   // characters ":;=,\".
+-__try {
+   *aAttributes = NULL;
+ 
+   if (IsDefunct())
+@@ -1443,8 +1472,7 @@ __try {
+   nsCOMPtr<nsIPersistentProperties> attributes = Attributes();
+   return ConvertToIA2Attributes(attributes, aAttributes);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+--- a/accessible/src/msaa/AccessibleWrap.h	
++++ a/accessible/src/msaa/AccessibleWrap.h	
+@@ -43,7 +43,7 @@ virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, void**);              \
+ STDMETHODIMP                                                                   \
+ Class::QueryInterface(REFIID aIID, void** aInstancePtr)                        \
+ {                                                                              \
+-__try {                                                                        \
++  A11Y_TRYBLOCK_BEGIN                                                          \
+   if (!aInstancePtr)                                                           \
+     return E_INVALIDARG;                                                       \
+   *aInstancePtr = NULL;                                                        \
+@@ -52,9 +52,7 @@ __try {                                                                        \
+ 
+ #define IMPL_IUNKNOWN_QUERY_TAIL                                               \
+   return hr;                                                                   \
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),        \
+-                                                  GetExceptionInformation())) { } \
+-  return E_NOINTERFACE;                                                        \
++  A11Y_TRYBLOCK_END                                                            \
+ }
+ 
+ #define IMPL_IUNKNOWN_QUERY_IFACE(Iface)                                       \
+--- a/accessible/src/msaa/ApplicationAccessibleWrap.cpp	
++++ a/accessible/src/msaa/ApplicationAccessibleWrap.cpp	
+@@ -64,7 +64,8 @@ ApplicationAccessibleWrap::QueryInterface(REFIID iid, void** ppv)
+ STDMETHODIMP
+ ApplicationAccessibleWrap::get_appName(BSTR* aName)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aName = NULL;
+ 
+   if (IsDefunct())
+@@ -81,14 +82,14 @@ __try {
+   *aName = ::SysAllocStringLen(name.get(), name.Length());
+   return *aName ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ApplicationAccessibleWrap::get_appVersion(BSTR* aVersion)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aVersion = NULL;
+ 
+   if (IsDefunct())
+@@ -105,14 +106,14 @@ __try {
+   *aVersion = ::SysAllocStringLen(version.get(), version.Length());
+   return *aVersion ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ApplicationAccessibleWrap::get_toolkitName(BSTR* aName)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+ 
+@@ -127,14 +128,14 @@ __try {
+   *aName = ::SysAllocStringLen(name.get(), name.Length());
+   return *aName ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ApplicationAccessibleWrap::get_toolkitVersion(BSTR* aVersion)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aVersion = NULL;
+ 
+   if (IsDefunct())
+@@ -151,8 +152,7 @@ __try {
+   *aVersion = ::SysAllocStringLen(version.get(), version.Length());
+   return *aVersion ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+--- a/accessible/src/msaa/DocAccessibleWrap.cpp	
++++ a/accessible/src/msaa/DocAccessibleWrap.cpp	
+@@ -78,7 +78,8 @@ DocAccessibleWrap::QueryInterface(REFIID iid, void** ppv)
+ STDMETHODIMP
+ DocAccessibleWrap::get_URL(/* [out] */ BSTR __RPC_FAR *aURL)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aURL = NULL;
+ 
+   nsAutoString URL;
+@@ -92,14 +93,14 @@ __try {
+   *aURL = ::SysAllocStringLen(URL.get(), URL.Length());
+   return *aURL ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ DocAccessibleWrap::get_title( /* [out] */ BSTR __RPC_FAR *aTitle)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aTitle = NULL;
+ 
+   nsAutoString title;
+@@ -110,14 +111,14 @@ __try {
+   *aTitle = ::SysAllocStringLen(title.get(), title.Length());
+   return *aTitle ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ DocAccessibleWrap::get_mimeType(/* [out] */ BSTR __RPC_FAR *aMimeType)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aMimeType = NULL;
+ 
+   nsAutoString mimeType;
+@@ -131,14 +132,14 @@ __try {
+   *aMimeType = ::SysAllocStringLen(mimeType.get(), mimeType.Length());
+   return *aMimeType ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ DocAccessibleWrap::get_docType(/* [out] */ BSTR __RPC_FAR *aDocType)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aDocType = NULL;
+ 
+   nsAutoString docType;
+@@ -152,15 +153,15 @@ __try {
+   *aDocType = ::SysAllocStringLen(docType.get(), docType.Length());
+   return *aDocType ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ DocAccessibleWrap::get_nameSpaceURIForID(/* [in] */  short aNameSpaceID,
+   /* [out] */ BSTR __RPC_FAR *aNameSpaceURI)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNameSpaceURI = NULL;
+ 
+   if (aNameSpaceID < 0)
+@@ -179,18 +180,18 @@ __try {
+ 
+   return *aNameSpaceURI ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ DocAccessibleWrap::put_alternateViewMediaTypes( /* [in] */ BSTR __RPC_FAR *aCommaSeparatedMediaTypes)
+ {
+-__try {
+-  *aCommaSeparatedMediaTypes = NULL;
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++  A11Y_TRYBLOCK_BEGIN
+ 
++  *aCommaSeparatedMediaTypes = NULL;
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+--- a/accessible/src/msaa/EnumVariant.cpp	
++++ a/accessible/src/msaa/EnumVariant.cpp	
+@@ -23,7 +23,8 @@ STDMETHODIMP
+ ChildrenEnumVariant::Next(ULONG aCount, VARIANT FAR* aItems,
+                           ULONG FAR* aCountFetched)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aItems || !aCountFetched)
+     return E_INVALIDARG;
+ 
+@@ -46,16 +47,14 @@ __try {
+ 
+   return countFetched < aCount ? S_FALSE : S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) { }
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ChildrenEnumVariant::Skip(ULONG aCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (mAnchorAcc->IsDefunct() || mAnchorAcc->GetChildAt(mCurIndex) != mCurAcc)
+     return CO_E_OBJNOTCONNECTED;
+ 
+@@ -64,16 +63,14 @@ __try {
+ 
+   return mCurAcc ? S_OK : S_FALSE;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) { }
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ChildrenEnumVariant::Reset()
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (mAnchorAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+ 
+@@ -82,15 +79,14 @@ __try {
+ 
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ChildrenEnumVariant::Clone(IEnumVARIANT** aEnumVariant)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aEnumVariant)
+     return E_INVALIDARG;
+ 
+@@ -99,8 +95,5 @@ __try {
+ 
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) { }
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+--- a/accessible/src/msaa/TextLeafAccessibleWrap.cpp	
++++ a/accessible/src/msaa/TextLeafAccessibleWrap.cpp	
+@@ -62,7 +62,8 @@ STDMETHODIMP
+ TextLeafAccessibleWrap::get_domText( 
+     /* [retval][out] */ BSTR __RPC_FAR *aDomText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aDomText = NULL;
+ 
+   if (IsDefunct())
+@@ -78,10 +79,9 @@ __try {
+   *aDomText = ::SysAllocStringLen(nodeValue.get(), nodeValue.Length());
+   if (!*aDomText)
+     return E_OUTOFMEMORY;
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -93,7 +93,8 @@ TextLeafAccessibleWrap::get_clippedSubstringBounds(
+     /* [out] */ int __RPC_FAR *aWidth,
+     /* [out] */ int __RPC_FAR *aHeight)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aX = *aY = *aWidth = *aHeight = 0;
+   nscoord x, y, width, height, docX, docY, docWidth, docHeight;
+   HRESULT rv = get_unclippedSubstringBounds(aStartIndex, aEndIndex, &x, &y, &width, &height);
+@@ -117,9 +118,9 @@ __try {
+   *aY = clippedRect.y;
+   *aWidth = clippedRect.width;
+   *aHeight = clippedRect.height;
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -131,7 +132,8 @@ TextLeafAccessibleWrap::get_unclippedSubstringBounds(
+     /* [out] */ int __RPC_FAR *aWidth,
+     /* [out] */ int __RPC_FAR *aHeight)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aX = *aY = *aWidth = *aHeight = 0;
+ 
+   if (IsDefunct())
+@@ -141,9 +143,9 @@ __try {
+                                  aX, aY, aWidth, aHeight))) {
+     return E_FAIL;
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -151,7 +153,8 @@ TextLeafAccessibleWrap::scrollToSubstring(
+     /* [in] */ unsigned int aStartIndex,
+     /* [in] */ unsigned int aEndIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return E_FAIL;
+ 
+@@ -165,10 +168,9 @@ __try {
+   nsresult rv =
+     nsCoreUtils::ScrollSubstringTo(GetFrame(), range,
+                                    nsIAccessibleScrollType::SCROLL_TYPE_ANYWHERE);
+-  if (NS_FAILED(rv))
+-    return E_FAIL;
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return S_OK;
++  return NS_SUCCEEDED(rv) ? S_OK : E_FAIL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ nsIFrame*
+@@ -242,7 +244,8 @@ STDMETHODIMP
+ TextLeafAccessibleWrap::get_fontFamily(
+     /* [retval][out] */ BSTR __RPC_FAR *aFontFamily)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aFontFamily = NULL;
+ 
+   nsIFrame* frame = GetFrame();
+@@ -260,9 +263,7 @@ __try {
+   *aFontFamily = ::SysAllocStringLen(name.get(), name.Length());
+   if (!*aFontFamily)
+     return E_OUTOFMEMORY;
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(),
+-                                GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+--- a/accessible/src/msaa/nsAccessNodeWrap.cpp	
++++ a/accessible/src/msaa/nsAccessNodeWrap.cpp	
+@@ -174,7 +174,8 @@ STDMETHODIMP nsAccessNodeWrap::get_nodeInfo(
+     /* [out] */ unsigned int __RPC_FAR *aUniqueID,
+     /* [out] */ unsigned short __RPC_FAR *aNodeType)
+ {
+-__try{
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNodeName = nullptr;
+   *aNodeValue = nullptr;
+ 
+@@ -209,9 +210,9 @@ __try{
+   *aUniqueID = - NS_PTR_TO_INT32(UniqueID());
+ 
+   *aNumChildren = node->GetChildCount();
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ 
+@@ -223,7 +224,8 @@ STDMETHODIMP nsAccessNodeWrap::get_attributes(
+     /* [length_is][size_is][out] */ BSTR __RPC_FAR *aAttribValues,
+     /* [out] */ unsigned short __RPC_FAR *aNumAttribs)
+ {
+-__try{
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNumAttribs = 0;
+ 
+   if (!mContent || IsDocumentNode())
+@@ -244,9 +246,9 @@ __try{
+     mContent->GetAttr(name->NamespaceID(), name->LocalName(), attributeValue);
+     aAttribValues[index] = ::SysAllocString(attributeValue.get());
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK; 
++
++  A11Y_TRYBLOCK_END
+ }
+         
+ 
+@@ -256,7 +258,8 @@ STDMETHODIMP nsAccessNodeWrap::get_attributesForNames(
+     /* [length_is][size_is][in] */ short __RPC_FAR *aNameSpaceID,
+     /* [length_is][size_is][retval] */ BSTR __RPC_FAR *aAttribValues)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!mContent || !IsElement())
+     return E_FAIL;
+ 
+@@ -283,9 +286,9 @@ __try {
+         aAttribValues[index] = ::SysAllocString(attributeValue.get());
+     }
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK; 
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ /* To do: use media type if not null */
+@@ -296,7 +299,8 @@ STDMETHODIMP nsAccessNodeWrap::get_computedStyle(
+     /* [length_is][size_is][out] */ BSTR __RPC_FAR *aStyleValues,
+     /* [out] */ unsigned short __RPC_FAR *aNumStyleProperties)
+ {
+-__try{
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNumStyleProperties = 0;
+ 
+   if (!mContent || IsDocumentNode())
+@@ -321,9 +325,9 @@ __try{
+     }
+   }
+   *aNumStyleProperties = static_cast<unsigned short>(realIndex);
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ 
+@@ -333,7 +337,8 @@ STDMETHODIMP nsAccessNodeWrap::get_computedStyleForProperties(
+     /* [length_is][size_is][in] */ BSTR __RPC_FAR *aStyleProperties,
+     /* [length_is][size_is][out] */ BSTR __RPC_FAR *aStyleValues)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!mContent || IsDocumentNode())
+     return E_FAIL;
+  
+@@ -348,23 +353,23 @@ __try {
+       cssDecl->GetPropertyValue(nsDependentString(static_cast<PRUnichar*>(aStyleProperties[index])), value);  // Get property value
+     aStyleValues[index] = ::SysAllocString(value.get());
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessNodeWrap::scrollTo(/* [in] */ boolean aScrollTopLeft)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   uint32_t scrollType =
+     aScrollTopLeft ? nsIAccessibleScrollType::SCROLL_TYPE_TOP_LEFT :
+                      nsIAccessibleScrollType::SCROLL_TYPE_BOTTOM_RIGHT;
+ 
+   nsCoreUtils::ScrollTo(mDoc->PresShell(), mContent, scrollType);
+   return S_OK;
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ ISimpleDOMNode*
+@@ -404,79 +409,80 @@ nsAccessNodeWrap::MakeAccessNode(nsINode *aNode)
+ 
+ STDMETHODIMP nsAccessNodeWrap::get_parentNode(ISimpleDOMNode __RPC_FAR *__RPC_FAR *aNode)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsINode* node = GetNode();
+   if (!node)
+     return E_FAIL;
+ 
+   *aNode = MakeAccessNode(node->GetParentNode());
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessNodeWrap::get_firstChild(ISimpleDOMNode __RPC_FAR *__RPC_FAR *aNode)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsINode* node = GetNode();
+   if (!node)
+     return E_FAIL;
+ 
+   *aNode = MakeAccessNode(node->GetFirstChild());
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessNodeWrap::get_lastChild(ISimpleDOMNode __RPC_FAR *__RPC_FAR *aNode)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsINode* node = GetNode();
+   if (!node)
+     return E_FAIL;
+ 
+   *aNode = MakeAccessNode(node->GetLastChild());
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessNodeWrap::get_previousSibling(ISimpleDOMNode __RPC_FAR *__RPC_FAR *aNode)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsINode* node = GetNode();
+   if (!node)
+     return E_FAIL;
+ 
+   *aNode = MakeAccessNode(node->GetPreviousSibling());
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessNodeWrap::get_nextSibling(ISimpleDOMNode __RPC_FAR *__RPC_FAR *aNode)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsINode* node = GetNode();
+   if (!node)
+     return E_FAIL;
+ 
+   *aNode = MakeAccessNode(node->GetNextSibling());
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP 
+ nsAccessNodeWrap::get_childAt(unsigned aChildIndex,
+                               ISimpleDOMNode __RPC_FAR *__RPC_FAR *aNode)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNode = nullptr;
+ 
+   nsINode* node = GetNode();
+@@ -484,16 +490,16 @@ __try {
+     return E_FAIL;
+ 
+   *aNode = MakeAccessNode(node->GetChildAt(aChildIndex));
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP 
+ nsAccessNodeWrap::get_innerHTML(BSTR __RPC_FAR *aInnerHTML)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aInnerHTML = nullptr;
+ 
+   nsCOMPtr<nsIDOMHTMLElement> htmlElement = do_QueryInterface(GetNode());
+@@ -508,16 +514,16 @@ __try {
+   *aInnerHTML = ::SysAllocStringLen(innerHTML.get(), innerHTML.Length());
+   if (!*aInnerHTML)
+     return E_OUTOFMEMORY;
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP 
+ nsAccessNodeWrap::get_language(BSTR __RPC_FAR *aLanguage)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aLanguage = NULL;
+ 
+   nsAutoString language;
+@@ -528,21 +534,22 @@ __try {
+   *aLanguage = ::SysAllocStringLen(language.get(), language.Length());
+   if (!*aLanguage)
+     return E_OUTOFMEMORY;
+-
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP 
+ nsAccessNodeWrap::get_localInterface( 
+     /* [out] */ void __RPC_FAR *__RPC_FAR *localInterface)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *localInterface = static_cast<nsAccessNode*>(this);
+   NS_ADDREF_THIS();
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+  
+ void nsAccessNodeWrap::InitAccessibility()
+--- a/accessible/src/msaa/nsAccessNodeWrap.h	
++++ a/accessible/src/msaa/nsAccessNodeWrap.h	
+@@ -35,10 +35,10 @@ 
+ #include "nsRefPtrHashtable.h"
+ 
+ #define A11Y_TRYBLOCK_BEGIN                                                    \
+-  __try {
++  MOZ_SEH_TRY {
+ 
+ #define A11Y_TRYBLOCK_END                                                      \
+-  } __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),      \
++  } MOZ_SEH_EXCEPT(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),\
+                                                     GetExceptionInformation()))\
+   { }                                                                          \
+   return E_FAIL;
+--- a/accessible/src/windows/ia2/ia2AccessibleAction.cpp	
++++ a/accessible/src/windows/ia2/ia2AccessibleAction.cpp	
+@@ -34,7 +34,8 @@ ia2AccessibleAction::QueryInterface(REFIID iid, void** ppv)
+ STDMETHODIMP
+ ia2AccessibleAction::nActions(long* aActionCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aActionCount)
+     return E_INVALIDARG;
+ 
+@@ -47,14 +48,14 @@ __try {
+   *aActionCount = acc->ActionCount();
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleAction::doAction(long aActionIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   AccessibleWrap* acc = static_cast<AccessibleWrap*>(this);
+   if (acc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -63,14 +64,14 @@ __try {
+   nsresult rv = acc->DoAction(index);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleAction::get_description(long aActionIndex, BSTR *aDescription)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aDescription = NULL;
+ 
+   AccessibleWrap* acc = static_cast<AccessibleWrap*>(this);
+@@ -90,8 +91,7 @@ __try {
+                                       description.Length());
+   return *aDescription ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -99,7 +99,8 @@ ia2AccessibleAction::get_keyBinding(long aActionIndex, long aNumMaxBinding,
+                                   BSTR **aKeyBinding,
+                                   long *aNumBinding)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aKeyBinding)
+     return E_INVALIDARG;
+   *aKeyBinding = NULL;
+@@ -140,14 +141,14 @@ __try {
+   *aNumBinding = 1;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleAction::get_name(long aActionIndex, BSTR *aName)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aName = NULL;
+ 
+   AccessibleWrap* acc = static_cast<AccessibleWrap*>(this);
+@@ -166,17 +167,17 @@ __try {
+   *aName = ::SysAllocStringLen(name.get(), name.Length());
+   return *aName ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleAction::get_localizedName(long aActionIndex, BSTR *aLocalizedName)
+ {
+-__try {
+-  *aLocalizedName = NULL;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++  A11Y_TRYBLOCK_BEGIN
+ 
++  *aLocalizedName = NULL;
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+--- a/accessible/src/windows/ia2/ia2AccessibleComponent.cpp	
++++ a/accessible/src/windows/ia2/ia2AccessibleComponent.cpp	
+@@ -37,7 +37,8 @@ ia2AccessibleComponent::QueryInterface(REFIID iid, void** ppv)
+ STDMETHODIMP
+ ia2AccessibleComponent::get_locationInParent(long* aX, long* aY)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aX = 0;
+   *aY = 0;
+ 
+@@ -77,14 +78,14 @@ __try {
+   *aY = y - parenty;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleComponent::get_foreground(IA2Color* aForeground)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   AccessibleWrap* acc = static_cast<AccessibleWrap*>(this);
+   if (acc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -95,15 +96,14 @@ __try {
+ 
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleComponent::get_background(IA2Color* aBackground)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   AccessibleWrap* acc = static_cast<AccessibleWrap*>(this);
+   if (acc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -114,8 +114,6 @@ __try {
+ 
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+--- a/accessible/src/windows/ia2/ia2AccessibleEditableText.cpp	
++++ a/accessible/src/windows/ia2/ia2AccessibleEditableText.cpp	
+@@ -20,7 +20,8 @@ using namespace mozilla::a11y;
+ STDMETHODIMP
+ ia2AccessibleEditableText::copyText(long aStartOffset, long aEndOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+   if (textAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -28,14 +29,14 @@ __try {
+   nsresult rv = textAcc->CopyText(aStartOffset, aEndOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleEditableText::deleteText(long aStartOffset, long aEndOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+   if (textAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -43,14 +44,14 @@ __try {
+   nsresult rv = textAcc->DeleteText(aStartOffset, aEndOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleEditableText::insertText(long aOffset, BSTR *aText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+   if (textAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -61,14 +62,14 @@ __try {
+   nsresult rv = textAcc->InsertText(text, aOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleEditableText::cutText(long aStartOffset, long aEndOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+   if (textAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -76,14 +77,14 @@ __try {
+   nsresult rv = textAcc->CutText(aStartOffset, aEndOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleEditableText::pasteText(long aOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+   if (textAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -91,15 +92,15 @@ __try {
+   nsresult rv = textAcc->PasteText(aOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleEditableText::replaceText(long aStartOffset, long aEndOffset,
+                                        BSTR *aText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+   if (textAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -114,16 +115,12 @@ __try {
+   rv = textAcc->InsertText(text, aStartOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleEditableText::setAttributes(long aStartOffset, long aEndOffset,
+                                          BSTR *aAttributes)
+ {
+-__try {
+-
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return E_NOTIMPL;
+ }
+--- a/accessible/src/windows/ia2/ia2AccessibleHyperlink.cpp	
++++ a/accessible/src/windows/ia2/ia2AccessibleHyperlink.cpp	
+@@ -38,7 +38,8 @@ ia2AccessibleHyperlink::QueryInterface(REFIID iid, void** ppv)
+ STDMETHODIMP
+ ia2AccessibleHyperlink::get_anchor(long aIndex, VARIANT* aAnchor)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(aAnchor);
+ 
+   Accessible* thisObj = static_cast<AccessibleWrap*>(this);
+@@ -66,14 +67,14 @@ __try {
+   aAnchor->vt = VT_UNKNOWN;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleHyperlink::get_anchorTarget(long aIndex, VARIANT* aAnchorTarget)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(aAnchorTarget);
+ 
+   Accessible* thisObj = static_cast<AccessibleWrap*>(this);
+@@ -109,14 +110,14 @@ __try {
+                                                stringURI.Length());
+   return aAnchorTarget->bstrVal ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleHyperlink::get_startIndex(long* aIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aIndex = 0;
+ 
+   Accessible* thisObj = static_cast<AccessibleWrap*>(this);
+@@ -129,14 +130,14 @@ __try {
+   *aIndex = thisObj->StartOffset();
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleHyperlink::get_endIndex(long* aIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aIndex = 0;
+ 
+   Accessible* thisObj = static_cast<AccessibleWrap*>(this);
+@@ -149,14 +150,14 @@ __try {
+   *aIndex = thisObj->EndOffset();
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleHyperlink::get_valid(boolean* aValid)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aValid = false;
+ 
+   Accessible* thisObj = static_cast<AccessibleWrap*>(this);
+@@ -169,7 +170,6 @@ __try {
+   *aValid = thisObj->IsLinkValid();
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+--- a/accessible/src/windows/ia2/ia2AccessibleHypertext.cpp	
++++ a/accessible/src/windows/ia2/ia2AccessibleHypertext.cpp	
+@@ -18,7 +18,8 @@ using namespace mozilla::a11y;
+ STDMETHODIMP
+ ia2AccessibleHypertext::get_nHyperlinks(long* aHyperlinkCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aHyperlinkCount = 0;
+ 
+   HyperTextAccessibleWrap* hyperText = static_cast<HyperTextAccessibleWrap*>(this);
+@@ -28,15 +29,15 @@ __try {
+   *aHyperlinkCount = hyperText->GetLinkCount();
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleHypertext::get_hyperlink(long aLinkIndex,
+                                       IAccessibleHyperlink** aHyperlink)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aHyperlink = NULL;
+ 
+   HyperTextAccessibleWrap* hyperText = static_cast<HyperTextAccessibleWrap*>(this);
+@@ -57,14 +58,14 @@ __try {
+   *aHyperlink = static_cast<IAccessibleHyperlink*>(instancePtr);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleHypertext::get_hyperlinkIndex(long aCharIndex, long* aHyperlinkIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aHyperlinkIndex = 0;
+ 
+   HyperTextAccessibleWrap* hyperAcc = static_cast<HyperTextAccessibleWrap*>(this);
+@@ -74,7 +75,6 @@ __try {
+   *aHyperlinkIndex = hyperAcc->GetLinkIndexAtOffset(aCharIndex);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+--- a/accessible/src/windows/ia2/ia2AccessibleImage.cpp	
++++ a/accessible/src/windows/ia2/ia2AccessibleImage.cpp	
+@@ -42,7 +42,8 @@ ia2AccessibleImage::QueryInterface(REFIID iid, void** ppv)
+ STDMETHODIMP
+ ia2AccessibleImage::get_description(BSTR* aDescription)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aDescription = NULL;
+ 
+   ImageAccessibleWrap* acc = static_cast<ImageAccessibleWrap*>(this);
+@@ -60,8 +61,7 @@ __try {
+   *aDescription = ::SysAllocStringLen(description.get(), description.Length());
+   return *aDescription ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -69,7 +69,8 @@ ia2AccessibleImage::get_imagePosition(enum IA2CoordinateType aCoordType,
+                                       long* aX,
+                                       long* aY)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aX = 0;
+   *aY = 0;
+ 
+@@ -90,15 +91,14 @@ __try {
+   *aY = y;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleImage::get_imageSize(long* aHeight, long* aWidth)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aHeight = 0;
+   *aWidth = 0;
+ 
+@@ -115,7 +115,6 @@ __try {
+   *aWidth = height;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+--- a/accessible/src/windows/ia2/ia2AccessibleRelation.cpp	
++++ a/accessible/src/windows/ia2/ia2AccessibleRelation.cpp	
+@@ -65,7 +65,8 @@ ia2AccessibleRelation::Release()
+ STDMETHODIMP
+ ia2AccessibleRelation::get_relationType(BSTR *aRelationType)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aRelationType)
+     return E_INVALIDARG;
+ 
+@@ -123,55 +124,57 @@ __try {
+ 
+   return *aRelationType ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleRelation::get_localizedRelationType(BSTR *aLocalizedRelationType)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aLocalizedRelationType)
+     return E_INVALIDARG;
+ 
+   *aLocalizedRelationType = NULL;
+-
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleRelation::get_nTargets(long *aNTargets)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+  if (!aNTargets)
+    return E_INVALIDARG;
+ 
+  *aNTargets = mTargets.Length();
+   return S_OK;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleRelation::get_target(long aTargetIndex, IUnknown **aTarget)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (aTargetIndex < 0 || aTargetIndex >= mTargets.Length() || !aTarget)
+     return E_INVALIDARG;
+ 
+   mTargets[aTargetIndex]->QueryNativeInterface(IID_IUnknown, (void**) aTarget);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleRelation::get_targets(long aMaxTargets, IUnknown **aTargets,
+                                    long *aNTargets)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aNTargets || !aTargets)
+     return E_INVALIDARG;
+ 
+@@ -186,7 +189,6 @@ __try {
+   *aNTargets = maxTargets;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+--- a/accessible/src/windows/ia2/ia2AccessibleTable.cpp	
++++ a/accessible/src/windows/ia2/ia2AccessibleTable.cpp	
+@@ -56,7 +56,8 @@ STDMETHODIMP
+ ia2AccessibleTable::get_accessibleAt(long aRow, long aColumn,
+                                    IUnknown **aAccessible)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aAccessible = NULL;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -81,14 +82,14 @@ __try {
+   *aAccessible = static_cast<IUnknown*>(instancePtr);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_caption(IUnknown** aAccessible)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aAccessible = NULL;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -116,15 +117,15 @@ __try {
+   *aAccessible = static_cast<IUnknown*>(instancePtr);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_childIndex(long aRowIndex, long aColumnIndex,
+                                    long* aChildIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aChildIndex = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -140,15 +141,14 @@ __try {
+   *aChildIndex = childIndex;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_columnDescription(long aColumn, BSTR* aDescription)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aDescription = NULL;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -167,15 +167,15 @@ __try {
+   *aDescription = ::SysAllocStringLen(descr.get(), descr.Length());
+   return *aDescription ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_columnExtentAt(long aRow, long aColumn,
+                                       long* nColumnsSpanned)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *nColumnsSpanned = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -191,27 +191,27 @@ __try {
+   *nColumnsSpanned = columnsSpanned;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_columnHeader(IAccessibleTable** aAccessibleTable,
+                                     long* aStartingRowIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aAccessibleTable = NULL;
+   *aStartingRowIndex = -1;
+-
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_columnIndex(long aChildIndex, long* aColumnIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aColumnIndex = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -227,15 +227,14 @@ __try {
+   *aColumnIndex = columnIndex;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_nColumns(long* aColumnCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aColumnCount = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -251,15 +250,14 @@ __try {
+   *aColumnCount = columnCount;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_nRows(long* aRowCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aRowCount = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -275,15 +273,14 @@ __try {
+   *aRowCount = rowCount;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_nSelectedChildren(long* aChildCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aChildCount = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -299,14 +296,14 @@ __try {
+   *aChildCount = count;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_nSelectedColumns(long* aColumnCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aColumnCount = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -322,14 +319,14 @@ __try {
+   *aColumnCount = count;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_nSelectedRows(long* aRowCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aRowCount = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -345,14 +342,14 @@ __try {
+   *aRowCount = count;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_rowDescription(long aRow, BSTR* aDescription)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aDescription = NULL;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -371,15 +368,15 @@ __try {
+   *aDescription = ::SysAllocStringLen(descr.get(), descr.Length());
+   return *aDescription ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_rowExtentAt(long aRow, long aColumn,
+                                     long* aNRowsSpanned)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNRowsSpanned = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -395,27 +392,27 @@ __try {
+   *aNRowsSpanned = rowsSpanned;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_rowHeader(IAccessibleTable** aAccessibleTable,
+                                   long* aStartingColumnIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aAccessibleTable = NULL;
+   *aStartingColumnIndex = -1;
+-
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_rowIndex(long aChildIndex, long* aRowIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aRowIndex = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -431,65 +428,62 @@ __try {
+   *aRowIndex = rowIndex;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_selectedChildren(long aMaxChildren, long** aChildren,
+                                          long* aNChildren)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetSelectedItems(aChildren, aNChildren, ITEMSTYPE_CELLS);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_selectedColumns(long aMaxColumns, long** aColumns,
+                                         long* aNColumns)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetSelectedItems(aColumns, aNColumns, ITEMSTYPE_COLUMNS);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_selectedRows(long aMaxRows, long** aRows, long* aNRows)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetSelectedItems(aRows, aNRows, ITEMSTYPE_ROWS);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_summary(IUnknown** aAccessible)
+ {
+-__try {
+-  *aAccessible = NULL;
++  A11Y_TRYBLOCK_BEGIN
+ 
+   // Neither html:table nor xul:tree nor ARIA grid/tree have an ability to
+   // link an accessible object to specify a summary. There is closes method
+   // in nsIAccessibleTable::summary to get a summary as a string which is not
+   // mapped directly to IAccessible2.
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++  *aAccessible = NULL;
+   return S_FALSE;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_isColumnSelected(long aColumn, boolean* aIsSelected)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aIsSelected = false;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -505,15 +499,13 @@ __try {
+   *aIsSelected = isSelected;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_isRowSelected(long aRow, boolean* aIsSelected)
+ {
+-__try {
+-  *aIsSelected = false;
++  A11Y_TRYBLOCK_BEGIN
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+   NS_ASSERTION(tableAcc, CANT_QUERY_ASSERTION_MSG);
+@@ -528,15 +520,15 @@ __try {
+   *aIsSelected = isSelected;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_isSelected(long aRow, long aColumn,
+                                    boolean* aIsSelected)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aIsSelected = false;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -552,14 +544,14 @@ __try {
+   *aIsSelected = isSelected;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::selectRow(long aRow)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+   NS_ASSERTION(tableAcc, CANT_QUERY_ASSERTION_MSG);
+   if (!tableAcc)
+@@ -568,14 +560,14 @@ __try {
+   nsresult rv = tableAcc->SelectRow(aRow);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::selectColumn(long aColumn)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+   NS_ASSERTION(tableAcc, CANT_QUERY_ASSERTION_MSG);
+   if (!tableAcc)
+@@ -584,14 +576,14 @@ __try {
+   nsresult rv = tableAcc->SelectColumn(aColumn);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::unselectRow(long aRow)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+   NS_ASSERTION(tableAcc, CANT_QUERY_ASSERTION_MSG);
+   if (!tableAcc)
+@@ -600,14 +592,14 @@ __try {
+   nsresult rv = tableAcc->UnselectRow(aRow);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::unselectColumn(long aColumn)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+   NS_ASSERTION(tableAcc, CANT_QUERY_ASSERTION_MSG);
+   if (!tableAcc)
+@@ -616,8 +608,7 @@ __try {
+   nsresult rv = tableAcc->UnselectColumn(aColumn);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -627,7 +618,8 @@ ia2AccessibleTable::get_rowColumnExtentsAtIndex(long aIndex, long* aRow,
+                                                 long* aColumnExtents,
+                                                 boolean* aIsSelected)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aRow = 0;
+   *aColumn = 0;
+   *aRowExtents = 0;
+@@ -666,16 +658,12 @@ __try {
+   *aIsSelected = isSelected;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_modelChange(IA2TableModelChange* aModelChange)
+ {
+-__try {
+-
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return E_NOTIMPL;
+ }
+ 
+@@ -697,7 +685,8 @@ ia2AccessibleTable::get_nSelectedCells(long* aCellCount)
+ STDMETHODIMP
+ ia2AccessibleTable::get_selectedCells(IUnknown*** aCells, long* aNSelectedCells)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+   NS_ASSERTION(tableAcc, CANT_QUERY_ASSERTION_MSG);
+   if (!tableAcc)
+@@ -710,32 +699,27 @@ __try {
+ 
+   return nsWinUtils::ConvertToIA2Array(geckoCells, aCells, aNSelectedCells);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_selectedColumns(long** aColumns, long* aNColumns)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetSelectedItems(aColumns, aNColumns, ITEMSTYPE_COLUMNS);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTable::get_selectedRows(long** aRows, long* aNRows)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetSelectedItems(aRows, aNRows, ITEMSTYPE_ROWS);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+--- a/accessible/src/windows/ia2/ia2AccessibleTableCell.cpp	
++++ a/accessible/src/windows/ia2/ia2AccessibleTableCell.cpp	
+@@ -47,7 +47,8 @@ ia2AccessibleTableCell::QueryInterface(REFIID iid, void** ppv)
+ STDMETHODIMP
+ ia2AccessibleTableCell::get_table(IUnknown** aTable)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+   NS_ASSERTION(tableCell, TABLECELL_INTERFACE_UNSUPPORTED_MSG);
+   if (!tableCell)
+@@ -70,16 +71,14 @@ __try {
+   *aTable = static_cast<IUnknown*>(instancePtr);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTableCell::get_columnExtent(long* aNColumnsSpanned)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNColumnsSpanned = 0;
+ 
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+@@ -96,17 +95,15 @@ __try {
+ 
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTableCell::get_columnHeaderCells(IUnknown*** aCellAccessibles,
+                                               long* aNColumnHeaderCells)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+   NS_ASSERTION(tableCell, TABLECELL_INTERFACE_UNSUPPORTED_MSG);
+   if (!tableCell)
+@@ -120,16 +117,14 @@ __try {
+   return nsWinUtils::ConvertToIA2Array(headerCells, aCellAccessibles,
+                                        aNColumnHeaderCells);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTableCell::get_columnIndex(long* aColumnIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aColumnIndex = -1;
+ 
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+@@ -146,16 +141,14 @@ __try {
+ 
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTableCell::get_rowExtent(long* aNRowsSpanned)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNRowsSpanned = 0;
+ 
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+@@ -172,17 +165,15 @@ __try {
+ 
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTableCell::get_rowHeaderCells(IUnknown*** aCellAccessibles,
+                                            long* aNRowHeaderCells)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+   NS_ASSERTION(tableCell, TABLECELL_INTERFACE_UNSUPPORTED_MSG);
+   if (!tableCell)
+@@ -196,16 +187,14 @@ __try {
+   return nsWinUtils::ConvertToIA2Array(headerCells, aCellAccessibles,
+                                        aNRowHeaderCells);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTableCell::get_rowIndex(long* aRowIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aRowIndex = -1;
+ 
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+@@ -222,10 +211,7 @@ __try {
+ 
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -234,7 +220,8 @@ ia2AccessibleTableCell::get_rowColumnExtents(long* aRow, long* aColumn,
+                                              long* aColumnExtents,
+                                              boolean* aIsSelected)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aRow = 0;
+   *aRow = 0;
+   *aRow = 0;
+@@ -278,15 +265,14 @@ __try {
+   *aIsSelected = isSel;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleTableCell::get_isSelected(boolean* aIsSelected)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aIsSelected = false;
+ 
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+@@ -303,8 +289,5 @@ __try {
+ 
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+--- a/accessible/src/windows/ia2/ia2AccessibleText.cpp	
++++ a/accessible/src/windows/ia2/ia2AccessibleText.cpp	
+@@ -21,7 +21,8 @@ using namespace mozilla::a11y;
+ STDMETHODIMP
+ ia2AccessibleText::addSelection(long aStartOffset, long aEndOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+   if (textAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -29,15 +30,15 @@ __try {
+   nsresult rv = textAcc->AddSelection(aStartOffset, aEndOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleText::get_attributes(long aOffset, long *aStartOffset,
+                                   long *aEndOffset, BSTR *aTextAttributes)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aStartOffset || !aEndOffset || !aTextAttributes)
+     return E_INVALIDARG;
+ 
+@@ -67,14 +68,14 @@ __try {
+ 
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleText::get_caretOffset(long *aOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aOffset = -1;
+ 
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+@@ -89,8 +90,7 @@ __try {
+   *aOffset = offset;
+   return offset != -1 ? S_OK : S_FALSE;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -99,7 +99,8 @@ ia2AccessibleText::get_characterExtents(long aOffset,
+                                         long *aX, long *aY,
+                                         long *aWidth, long *aHeight)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aX = 0;
+   *aY = 0;
+   *aWidth = 0;
+@@ -125,14 +126,14 @@ __try {
+   *aHeight = height;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleText::get_nSelections(long *aNSelections)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNSelections = 0;
+ 
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+@@ -147,8 +148,7 @@ __try {
+   *aNSelections = selCount;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -156,7 +156,8 @@ ia2AccessibleText::get_offsetAtPoint(long aX, long aY,
+                                      enum IA2CoordinateType aCoordType,
+                                      long *aOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aOffset = 0;
+ 
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+@@ -175,15 +176,15 @@ __try {
+   *aOffset = offset;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleText::get_selection(long aSelectionIndex, long *aStartOffset,
+                                  long *aEndOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aStartOffset = 0;
+   *aEndOffset = 0;
+ 
+@@ -201,14 +202,14 @@ __try {
+   *aEndOffset = endOffset;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleText::get_text(long aStartOffset, long aEndOffset, BSTR *aText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aText = NULL;
+ 
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+@@ -226,8 +227,7 @@ __try {
+   *aText = ::SysAllocStringLen(text.get(), text.Length());
+   return *aText ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -236,7 +236,8 @@ ia2AccessibleText::get_textBeforeOffset(long aOffset,
+                                         long *aStartOffset, long *aEndOffset,
+                                         BSTR *aText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aStartOffset = 0;
+   *aEndOffset = 0;
+   *aText = NULL;
+@@ -273,8 +274,7 @@ __try {
+   *aText = ::SysAllocStringLen(text.get(), text.Length());
+   return *aText ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -283,7 +283,8 @@ ia2AccessibleText::get_textAfterOffset(long aOffset,
+                                        long *aStartOffset, long *aEndOffset,
+                                        BSTR *aText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aStartOffset = 0;
+   *aEndOffset = 0;
+   *aText = NULL;
+@@ -320,8 +321,7 @@ __try {
+   *aText = ::SysAllocStringLen(text.get(), text.Length());
+   return *aText ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -330,7 +330,8 @@ ia2AccessibleText::get_textAtOffset(long aOffset,
+                                     long *aStartOffset, long *aEndOffset,
+                                     BSTR *aText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aStartOffset = 0;
+   *aEndOffset = 0;
+   *aText = NULL;
+@@ -367,14 +368,14 @@ __try {
+   *aText = ::SysAllocStringLen(text.get(), text.Length());
+   return *aText ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleText::removeSelection(long aSelectionIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+   if (textAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -382,14 +383,14 @@ __try {
+   nsresult rv = textAcc->RemoveSelection(aSelectionIndex);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleText::setCaretOffset(long aOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+   if (textAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -397,15 +398,15 @@ __try {
+   nsresult rv = textAcc->SetCaretOffset(aOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleText::setSelection(long aSelectionIndex, long aStartOffset,
+                                 long aEndOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+   if (textAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -414,14 +415,14 @@ __try {
+                                             aStartOffset, aEndOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleText::get_nCharacters(long *aNCharacters)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNCharacters = 0;
+ 
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+@@ -431,15 +432,15 @@ __try {
+   *aNCharacters  = textAcc->CharacterCount();
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleText::scrollSubstringTo(long aStartIndex, long aEndIndex,
+                                      enum IA2ScrollType aScrollType)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+   if (textAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -447,8 +448,7 @@ __try {
+   nsresult rv = textAcc->ScrollSubstringTo(aStartIndex, aEndIndex, aScrollType);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -456,7 +456,8 @@ ia2AccessibleText::scrollSubstringToPoint(long aStartIndex, long aEndIndex,
+                                           enum IA2CoordinateType aCoordType,
+                                           long aX, long aY)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   HyperTextAccessible* textAcc = static_cast<HyperTextAccessibleWrap*>(this);
+   if (textAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -469,28 +470,27 @@ __try {
+                                                 geckoCoordType, aX, aY);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleText::get_newText(IA2TextSegment *aNewText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetModifiedText(true, aNewText);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleText::get_oldText(IA2TextSegment *aOldText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetModifiedText(false, aOldText);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ // ia2AccessibleText
+--- a/accessible/src/windows/ia2/ia2AccessibleValue.cpp	
++++ a/accessible/src/windows/ia2/ia2AccessibleValue.cpp	
+@@ -39,7 +39,8 @@ ia2AccessibleValue::QueryInterface(REFIID iid, void** ppv)
+ STDMETHODIMP
+ ia2AccessibleValue::get_currentValue(VARIANT* aCurrentValue)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(aCurrentValue);
+ 
+   AccessibleWrap* valueAcc = static_cast<AccessibleWrap*>(this);
+@@ -55,14 +56,14 @@ __try {
+   aCurrentValue->dblVal = currentValue;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleValue::setCurrentValue(VARIANT aValue)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   AccessibleWrap* valueAcc = static_cast<AccessibleWrap*>(this);
+   if (valueAcc->IsDefunct())
+     return CO_E_OBJNOTCONNECTED;
+@@ -73,14 +74,14 @@ __try {
+   nsresult rv = valueAcc->SetCurrentValue(aValue.dblVal);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleValue::get_maximumValue(VARIANT* aMaximumValue)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(aMaximumValue);
+ 
+   AccessibleWrap* valueAcc = static_cast<AccessibleWrap*>(this);
+@@ -96,14 +97,14 @@ __try {
+   aMaximumValue->dblVal = maximumValue;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleValue::get_minimumValue(VARIANT* aMinimumValue)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(aMinimumValue);
+ 
+   AccessibleWrap* valueAcc = static_cast<AccessibleWrap*>(this);
+@@ -119,7 +120,6 @@ __try {
+   aMinimumValue->dblVal = minimumValue;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
