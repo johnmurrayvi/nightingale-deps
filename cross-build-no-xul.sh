@@ -69,7 +69,7 @@ case $OSTYPE in
 ## ------------------------------------------------------- #
 #
 #       # echo -e "Building zlib...\n"
-#        make -C zlib -f Makefile.ngmingw32
+#       make -C zlib -f Makefile.ngmingw32
 #
 ## ------------------------------------------------------- #
 #
