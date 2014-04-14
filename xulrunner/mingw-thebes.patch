@@ -1,0 +1,25 @@
+--- a/gfx/thebes/gfxWindowsPlatform.cpp	
++++ a/gfx/thebes/gfxWindowsPlatform.cpp	
+@@ -131,19 +131,19 @@ NS_MEMORY_REPORTER_IMPLEMENT(
+ #define GFX_CLEARTYPE_PARAMS_LEVEL     "gfx.font_rendering.cleartype_params.cleartype_level"
+ #define GFX_CLEARTYPE_PARAMS_STRUCTURE "gfx.font_rendering.cleartype_params.pixel_structure"
+ #define GFX_CLEARTYPE_PARAMS_MODE      "gfx.font_rendering.cleartype_params.rendering_mode"
+ 
+ #ifdef CAIRO_HAS_DWRITE_FONT
+ // DirectWrite is not available on all platforms, we need to use the function
+ // pointer.
+ typedef HRESULT (WINAPI*DWriteCreateFactoryFunc)(
+-  __in   DWRITE_FACTORY_TYPE factoryType,
+-  __in   REFIID iid,
+-  __out  IUnknown **factory
++  DWRITE_FACTORY_TYPE factoryType,
++  REFIID iid,
++  IUnknown **factory
+ );
+ #endif
+ 
+ #ifdef CAIRO_HAS_D2D_SURFACE
+ typedef HRESULT (WINAPI*D3D10CreateDevice1Func)(
+   IDXGIAdapter *pAdapter,
+   D3D10_DRIVER_TYPE DriverType,
+   HMODULE Software,
