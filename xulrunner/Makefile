@@ -56,7 +56,12 @@ endif
 NG_XR_PLATFORM := $(shell echo $(NG_TARGET_ARCH) | $(CUT) -d- -f 1)
 NG_XR_ARCH := $(shell echo $(NG_TARGET_ARCH) | $(CUT) -d- -f 2-)
 
-MOZCONFIG = xulrunner.$(NG_XR_PLATFORM).$*.$(NG_XR_ARCH).mozconfig
+ifneq (1, $(NG_VENDOR_CROSS_COMP))
+   MOZCONFIG = xulrunner.$(NG_XR_PLATFORM).$*.$(NG_XR_ARCH).mozconfig
+else
+   MOZCONFIG = xulrunner.linux-cross.$*.i686.mozconfig
+endif
+
 
 XR_STRIP_SYMBOLS = $(CURDIR)/xr_strip_symbols.sh
 XR_PACKAGE_DEPS = $(CURDIR)/xr_pack_deps.sh
