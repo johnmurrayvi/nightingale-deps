@@ -138,6 +138,9 @@ ifeq (1, $(NG_VENDOR_CROSS_COMP))
   ifeq (shared, $(CROSS_LIBTYPE))
     export PKG_CONFIG_PATH_i686_pc_mingw32_shared = $(NG_PKG_CONFIG_PATH)
   endif
+  ifeq (, $(CROSS_LIBTYPE))
+    export PKG_CONFIG_PATH_MINGWW64 = $(NG_PKG_CONFIG_PATH)
+  endif
 endif
     export PKG_CONFIG_PATH = $(NG_PKG_CONFIG_PATH)
     export PATH = $(NG_PATH)
@@ -466,6 +469,9 @@ ifeq (1, $(NG_VENDOR_CROSS_COMP))
   endif
   ifeq (shared, $(CROSS_LIBTYPE))
 	@echo PKG_CONFIG_PATH_i686_pc_mingw32_shared = $(PKG_CONFIG_PATH_i686_pc_mingw32_shared)
+  endif
+  ifeq (, $(CROSS_LIBTYPE))
+	@echo PKG_CONFIG_PATH_MINGWW64 = $(PKG_CONFIG_PATH_MINGWW64)
   endif
 endif
 	@echo PKG_CONFIG_PATH = $(PKG_CONFIG_PATH)
