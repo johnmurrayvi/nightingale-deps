@@ -134,6 +134,7 @@ sudowpath make install
 cd $TOPDIR
 
 
+# configure, build, and install libffi
 mkdir $FFIVER-mingw32 && cd $FFIVER-mingw32
 ../$FFIVER/configure \
     --prefix=/opt/cross/mingw-w64 \
