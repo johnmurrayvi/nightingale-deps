@@ -28,6 +28,7 @@ GCCVER=gcc-4.8.2
 FFIVER=libffi-3.0.13
 NUMPROC=$(getconf _NPROCESSORS_ONLN)
 JNUM="$(($NUMPROC / 2))"
+PREFIX=/opt/cross/mingw-w64
 
 # NEEDED TO INSTALL CRT AND FINSIH GCC INSTALL
 alias sudowpath="sudo env PATH=$PATH"
@@ -63,7 +64,7 @@ svn co svn://svn.code.sf.net/p/mingw-w64/code/trunk mingw-w64-svn
 mkdir $BINUTILSVER-build32 && cd $BINUTILSVER-build32
 
 ../$BINUTILSVER/configure \
-    --prefix=/opt/cross/mingw-w64/ \
+    --prefix=$PREFIX \
     --target=i686-w64-mingw32
 
 make -j$JNUM
@@ -73,7 +74,7 @@ cd $TOPDIR
 
 # add new toolchain to path
 echo "### Added by mingw-w64 build script ###" | tee -a ~/.bashrc
-echo "export PATH=/opt/cross/mingw-w64:$PATH" | tee -a ~/.bashrc
+echo -e "export PATH=/opt/cross/mingw-w64:\$PATH" | tee -a ~/.bashrc
 source ~/.bashrc
 
 
@@ -81,7 +82,7 @@ source ~/.bashrc
 mkdir mingw-w64-headers32 && cd mingw-w64-headers32
 ../mingw-w64-svn/mingw-w64-headers/configure \
     --host=i686-w64-mingw32 \
-    --prefix=/opt/cross/mingw-w64/i686-w64-mingw32/ \
+    --prefix=$PREFIX/i686-w64-mingw32/ \
     --enable-sdk=all \
     --enable-secure-api \
     --enable-idl
@@ -93,7 +94,7 @@ cd $TOPDIR
 # build and install gcc
 mkdir $GCCVER-mingw32 && cd $GCCVER-mingw32
 ../$GCCVER/configure \
-    --prefix=/opt/cross/mingw-w64/ \
+    --prefix=$PREFIX/ \
     --target=i686-w64-mingw32 \
     --with-gnu-ld \
     --with-gnu-as \
@@ -109,7 +110,7 @@ cd $TOPDIR
 mkdir mingw-w64-crt32 && cd mingw-w64-crt32
 ../mingw-w64-svn/mingw-w64-crt/configure \
     --host=i686-w64-mingw32 \
-    --prefix=/opt/cross/mingw-w64/i686-w64-mingw32/
+    --prefix=$PREFIX/i686-w64-mingw32/
 
 make -j$JNUM
 sudowpath make install
@@ -126,7 +127,7 @@ cd $TOPDIR
 # configure, build, and install widl (replacement for midl)
 mkdir widl32 && cd widl32
 ../mingw-w64-svn/mingw-w64-tools/widl/configure \
-    --prefix=/opt/cross/mingw-w64 \
+    --prefix=$PREFIX \
     --target=i686-w64-mingw32
 
 make -j$JNUM
@@ -137,10 +138,36 @@ cd $TOPDIR
 # configure, build, and install libffi
 mkdir $FFIVER-mingw32 && cd $FFIVER-mingw32
 ../$FFIVER/configure \
-    --prefix=/opt/cross/mingw-w64 \
+    --prefix=$PREFIX \
     --host=i686-w64-mingw32
 make -j$JNUM
 sudo make install
 cd $TOPDIR
+
+
+# set up pkg-config
+PKGCONF=i686-w64-mingw32-pkg-config
+
+(cat << EOF) > $PREFIX/bin/$PKGCONF
+#!/bin/bash
+
+# This file has no copyright assigned and is placed in the Public Domain.
+# No warranty is given.
+
+# When using the mingw32msvc cross compiler tools, the native Linux
+# pkg-config executable works fine as long as the default PKG_CONFIG_LIBDIR
+# is overridden.
+export PKG_CONFIG_LIBDIR=/opt/cross/mingw-w64/lib/pkgconfig
+
+# Also want to override the standard user defined PKG_CONFIG_PATH with
+# a mingw32msvc specific one.
+export PKG_CONFIG_PATH=$PKG_CONFIG_PATH_MINGWW64
+
+# Now just execute pkg-config with the given command line args.
+pkg-config $@
+EOF
+
+sudo chmod +x $PREFIX/bin/$PKGCONF
+
 
 echo "done!"
