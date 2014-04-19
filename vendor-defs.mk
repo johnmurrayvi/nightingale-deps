@@ -372,6 +372,32 @@ ifneq (,$(call enable-ng-lib, iconv))
 endif
 
 #
+# Zlib
+#
+ifeq (Msys,$(NG_VENDOR_ARCH))
+  ifneq (,$(call enable-ng-lib, zlib))
+    ifneq ($(wildcard $(NG_VENDOR_BINARIES_DIR)/zlib/$(NG_BUILD_TYPE)), )
+      $(info Enabling Songbird vendor lib: zlib)
+      NG_ZLIB_DIR := $(call find-dep-dir, zlib)
+      NG_LDFLAGS += -L$(NG_ZLIB_DIR)/lib -lzlib
+      NG_CFLAGS += -I$(NG_ZLIB_DIR)/include
+      NG_PKG_CONFIG_PATH += $(NG_ZLIB_DIR)/lib/pkgconfig
+    endif
+  endif
+else 
+  ifeq (1, $(NG_VENDOR_CROSS_COMP))
+    ifneq (,$(call enable-ng-lib, zlib))
+      ifneq ($(wildcard $(NG_VENDOR_BINARIES_DIR)/zlib/$(NG_BUILD_TYPE)), )
+        $(info Enabling Songbird vendor lib: zlib)
+        NG_ZLIB_DIR := $(call find-dep-dir, zlib)
+        NG_LDFLAGS += -L$(NG_ZLIB_DIR)/lib -lz
+        NG_CFLAGS += -I$(NG_ZLIB_DIR)/include
+      endif
+    endif
+  endif
+endif
+
+#
 # Glib
 # 
 ifneq (,$(call enable-ng-lib, glib))
