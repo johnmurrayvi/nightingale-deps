@@ -1,5 +1,5 @@
-diff -Naur mozilla-release/accessible/public/ia2/Makefile.in mozilla/accessible/public/ia2/Makefile.in
---- mozilla-release/accessible/public/ia2/Makefile.in	2011-12-20 20:06:24.000000000 -0500
+diff -Naur mozilla/accessible/public/ia2/Makefile.in mozilla/accessible/public/ia2/Makefile.in
+--- mozilla/accessible/public/ia2/Makefile.in	2011-12-20 20:06:24.000000000 -0500
 +++ mozilla/accessible/public/ia2/Makefile.in	2014-04-20 13:23:08.747933123 -0400
 @@ -105,13 +105,7 @@
  
@@ -16,8 +16,8 @@ diff -Naur mozilla-release/accessible/public/ia2/Makefile.in mozilla/accessible/
  
  # generate list of to-be-generated files that are missing
  # but ignore special file dlldata.c
-diff -Naur mozilla-release/accessible/public/msaa/Makefile.in mozilla/accessible/public/msaa/Makefile.in
---- mozilla-release/accessible/public/msaa/Makefile.in	2011-12-20 20:06:24.000000000 -0500
+diff -Naur mozilla/accessible/public/msaa/Makefile.in mozilla/accessible/public/msaa/Makefile.in
+--- mozilla/accessible/public/msaa/Makefile.in	2011-12-20 20:06:24.000000000 -0500
 +++ mozilla/accessible/public/msaa/Makefile.in	2014-04-20 13:23:08.747933123 -0400
 @@ -85,12 +85,7 @@
  
@@ -33,8 +33,8 @@ diff -Naur mozilla-release/accessible/public/msaa/Makefile.in mozilla/accessible
  
  $(MIDL_GENERATED_FILES): done_gen
  
-diff -Naur mozilla-release/accessible/public/msaa/nsIWinAccessNode.idl mozilla/accessible/public/msaa/nsIWinAccessNode.idl
---- mozilla-release/accessible/public/msaa/nsIWinAccessNode.idl	2011-12-20 20:06:24.000000000 -0500
+diff -Naur mozilla/accessible/public/msaa/nsIWinAccessNode.idl mozilla/accessible/public/msaa/nsIWinAccessNode.idl
+--- mozilla/accessible/public/msaa/nsIWinAccessNode.idl	2011-12-20 20:06:24.000000000 -0500
 +++ mozilla/accessible/public/msaa/nsIWinAccessNode.idl	2014-04-20 13:23:08.747933123 -0400
 @@ -40,7 +40,7 @@
  #include "nsISupports.idl"
@@ -45,8 +45,8 @@ diff -Naur mozilla-release/accessible/public/msaa/nsIWinAccessNode.idl mozilla/a
  %}
  
  [ref] native MSCOMIIDRef(IID);
-diff -Naur mozilla-release/accessible/src/msaa/CAccessibleAction.cpp mozilla/accessible/src/msaa/CAccessibleAction.cpp
---- mozilla-release/accessible/src/msaa/CAccessibleAction.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/CAccessibleAction.cpp mozilla/accessible/src/msaa/CAccessibleAction.cpp
+--- mozilla/accessible/src/msaa/CAccessibleAction.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/CAccessibleAction.cpp	2014-04-20 15:32:57.801117568 -0400
 @@ -44,6 +44,8 @@
  
@@ -164,8 +164,8 @@ diff -Naur mozilla-release/accessible/src/msaa/CAccessibleAction.cpp mozilla/acc
 +  A11Y_TRYBLOCK_END
  }
  
-diff -Naur mozilla-release/accessible/src/msaa/CAccessibleComponent.cpp mozilla/accessible/src/msaa/CAccessibleComponent.cpp
---- mozilla-release/accessible/src/msaa/CAccessibleComponent.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/CAccessibleComponent.cpp mozilla/accessible/src/msaa/CAccessibleComponent.cpp
+--- mozilla/accessible/src/msaa/CAccessibleComponent.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/CAccessibleComponent.cpp	2014-04-20 15:35:18.158102872 -0400
 @@ -50,6 +50,8 @@
  #include "nsIDOMCSSPrimitiveValue.h"
@@ -241,8 +241,8 @@ diff -Naur mozilla-release/accessible/src/msaa/CAccessibleComponent.cpp mozilla/
 +  A11Y_TRYBLOCK_END
  }
  
-diff -Naur mozilla-release/accessible/src/msaa/CAccessibleEditableText.cpp mozilla/accessible/src/msaa/CAccessibleEditableText.cpp
---- mozilla-release/accessible/src/msaa/CAccessibleEditableText.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/CAccessibleEditableText.cpp mozilla/accessible/src/msaa/CAccessibleEditableText.cpp
+--- mozilla/accessible/src/msaa/CAccessibleEditableText.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/CAccessibleEditableText.cpp	2014-04-20 15:37:31.109088951 -0400
 @@ -44,6 +44,8 @@
  #include "AccessibleEditableText_i.c"
@@ -367,8 +367,8 @@ diff -Naur mozilla-release/accessible/src/msaa/CAccessibleEditableText.cpp mozil
 +
 +  A11Y_TRYBLOCK_END
  }
-diff -Naur mozilla-release/accessible/src/msaa/CAccessibleHyperlink.cpp mozilla/accessible/src/msaa/CAccessibleHyperlink.cpp
---- mozilla-release/accessible/src/msaa/CAccessibleHyperlink.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/CAccessibleHyperlink.cpp mozilla/accessible/src/msaa/CAccessibleHyperlink.cpp
+--- mozilla/accessible/src/msaa/CAccessibleHyperlink.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/CAccessibleHyperlink.cpp	2014-04-20 15:38:10.269084851 -0400
 @@ -47,6 +47,8 @@
  #include "nsAccessible.h"
@@ -470,8 +470,8 @@ diff -Naur mozilla-release/accessible/src/msaa/CAccessibleHyperlink.cpp mozilla/
 +  A11Y_TRYBLOCK_END
  }
  
-diff -Naur mozilla-release/accessible/src/msaa/CAccessibleHypertext.cpp mozilla/accessible/src/msaa/CAccessibleHypertext.cpp
---- mozilla-release/accessible/src/msaa/CAccessibleHypertext.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/CAccessibleHypertext.cpp mozilla/accessible/src/msaa/CAccessibleHypertext.cpp
+--- mozilla/accessible/src/msaa/CAccessibleHypertext.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/CAccessibleHypertext.cpp	2014-04-20 15:38:44.555081261 -0400
 @@ -44,6 +44,8 @@
  
@@ -538,8 +538,8 @@ diff -Naur mozilla-release/accessible/src/msaa/CAccessibleHypertext.cpp mozilla/
 +  A11Y_TRYBLOCK_END
  }
  
-diff -Naur mozilla-release/accessible/src/msaa/CAccessibleImage.cpp mozilla/accessible/src/msaa/CAccessibleImage.cpp
---- mozilla-release/accessible/src/msaa/CAccessibleImage.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/CAccessibleImage.cpp mozilla/accessible/src/msaa/CAccessibleImage.cpp
+--- mozilla/accessible/src/msaa/CAccessibleImage.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/CAccessibleImage.cpp	2014-04-20 15:33:39.502113202 -0400
 @@ -50,6 +50,8 @@
  #include "nsCOMPtr.h"
@@ -608,8 +608,8 @@ diff -Naur mozilla-release/accessible/src/msaa/CAccessibleImage.cpp mozilla/acce
 +  A11Y_TRYBLOCK_END
  }
  
-diff -Naur mozilla-release/accessible/src/msaa/CAccessibleTableCell.cpp mozilla/accessible/src/msaa/CAccessibleTableCell.cpp
---- mozilla-release/accessible/src/msaa/CAccessibleTableCell.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/CAccessibleTableCell.cpp mozilla/accessible/src/msaa/CAccessibleTableCell.cpp
+--- mozilla/accessible/src/msaa/CAccessibleTableCell.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/CAccessibleTableCell.cpp	2014-04-20 15:43:02.437054259 -0400
 @@ -50,6 +50,8 @@
  #include "nsAccessNodeWrap.h"
@@ -803,8 +803,8 @@ diff -Naur mozilla-release/accessible/src/msaa/CAccessibleTableCell.cpp mozilla/
 -  return E_FAIL;
 +  A11Y_TRYBLOCK_END
  }
-diff -Naur mozilla-release/accessible/src/msaa/CAccessibleTable.cpp mozilla/accessible/src/msaa/CAccessibleTable.cpp
---- mozilla-release/accessible/src/msaa/CAccessibleTable.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/CAccessibleTable.cpp mozilla/accessible/src/msaa/CAccessibleTable.cpp
+--- mozilla/accessible/src/msaa/CAccessibleTable.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/CAccessibleTable.cpp	2014-04-20 15:41:59.065060895 -0400
 @@ -50,6 +50,8 @@
  #include "nsAccessNodeWrap.h"
@@ -1381,8 +1381,8 @@ diff -Naur mozilla-release/accessible/src/msaa/CAccessibleTable.cpp mozilla/acce
  }
  
  ////////////////////////////////////////////////////////////////////////////////
-diff -Naur mozilla-release/accessible/src/msaa/CAccessibleText.cpp mozilla/accessible/src/msaa/CAccessibleText.cpp
---- mozilla-release/accessible/src/msaa/CAccessibleText.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/CAccessibleText.cpp mozilla/accessible/src/msaa/CAccessibleText.cpp
+--- mozilla/accessible/src/msaa/CAccessibleText.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/CAccessibleText.cpp	2014-04-20 15:36:26.131095755 -0400
 @@ -45,6 +45,8 @@
  
@@ -1733,8 +1733,8 @@ diff -Naur mozilla-release/accessible/src/msaa/CAccessibleText.cpp mozilla/acces
  }
  
  // CAccessibleText
-diff -Naur mozilla-release/accessible/src/msaa/CAccessibleValue.cpp mozilla/accessible/src/msaa/CAccessibleValue.cpp
---- mozilla-release/accessible/src/msaa/CAccessibleValue.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/CAccessibleValue.cpp mozilla/accessible/src/msaa/CAccessibleValue.cpp
+--- mozilla/accessible/src/msaa/CAccessibleValue.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/CAccessibleValue.cpp	2014-04-20 15:43:43.695049939 -0400
 @@ -44,6 +44,8 @@
  
@@ -1818,8 +1818,8 @@ diff -Naur mozilla-release/accessible/src/msaa/CAccessibleValue.cpp mozilla/acce
 +  A11Y_TRYBLOCK_END
  }
  
-diff -Naur mozilla-release/accessible/src/msaa/Compatibility.cpp mozilla/accessible/src/msaa/Compatibility.cpp
---- mozilla-release/accessible/src/msaa/Compatibility.cpp	1969-12-31 19:00:00.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/Compatibility.cpp mozilla/accessible/src/msaa/Compatibility.cpp
+--- mozilla/accessible/src/msaa/Compatibility.cpp	1969-12-31 19:00:00.000000000 -0500
 +++ mozilla/accessible/src/msaa/Compatibility.cpp	2014-04-20 15:20:11.053197851 -0400
 @@ -0,0 +1,100 @@
 +/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
@@ -1922,8 +1922,8 @@ diff -Naur mozilla-release/accessible/src/msaa/Compatibility.cpp mozilla/accessi
 +  return (dwLeftMost < aMajor ||
 +    (dwLeftMost == aMajor && dwSecondRight < aMinor));
 +}
-diff -Naur mozilla-release/accessible/src/msaa/Compatibility.h mozilla/accessible/src/msaa/Compatibility.h
---- mozilla-release/accessible/src/msaa/Compatibility.h	1969-12-31 19:00:00.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/Compatibility.h mozilla/accessible/src/msaa/Compatibility.h
+--- mozilla/accessible/src/msaa/Compatibility.h	1969-12-31 19:00:00.000000000 -0500
 +++ mozilla/accessible/src/msaa/Compatibility.h	2014-04-20 15:23:35.744176418 -0400
 @@ -0,0 +1,116 @@
 +/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
@@ -2042,8 +2042,8 @@ diff -Naur mozilla-release/accessible/src/msaa/Compatibility.h mozilla/accessibl
 +} // mozilla namespace
 +
 +#endif
-diff -Naur mozilla-release/accessible/src/msaa/ia2AccessibleRelation.cpp mozilla/accessible/src/msaa/ia2AccessibleRelation.cpp
---- mozilla-release/accessible/src/msaa/ia2AccessibleRelation.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/ia2AccessibleRelation.cpp mozilla/accessible/src/msaa/ia2AccessibleRelation.cpp
+--- mozilla/accessible/src/msaa/ia2AccessibleRelation.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/ia2AccessibleRelation.cpp	2014-04-20 15:39:50.706074335 -0400
 @@ -47,6 +47,8 @@
  
@@ -2143,8 +2143,8 @@ diff -Naur mozilla-release/accessible/src/msaa/ia2AccessibleRelation.cpp mozilla
 +  A11Y_TRYBLOCK_END
  }
  
-diff -Naur mozilla-release/accessible/src/msaa/Makefile.in mozilla/accessible/src/msaa/Makefile.in
---- mozilla-release/accessible/src/msaa/Makefile.in	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/Makefile.in mozilla/accessible/src/msaa/Makefile.in
+--- mozilla/accessible/src/msaa/Makefile.in	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/Makefile.in	2014-04-20 14:52:11.609373697 -0400
 @@ -74,6 +74,7 @@
    CAccessibleTable.cpp \
@@ -2154,8 +2154,8 @@ diff -Naur mozilla-release/accessible/src/msaa/Makefile.in mozilla/accessible/sr
    $(NULL)
  
  EXPORTS = \
-diff -Naur mozilla-release/accessible/src/msaa/mingw-seh.h mozilla/accessible/src/msaa/mingw-seh.h
---- mozilla-release/accessible/src/msaa/mingw-seh.h	1969-12-31 19:00:00.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/mingw-seh.h mozilla/accessible/src/msaa/mingw-seh.h
+--- mozilla/accessible/src/msaa/mingw-seh.h	1969-12-31 19:00:00.000000000 -0500
 +++ mozilla/accessible/src/msaa/mingw-seh.h	2014-04-20 14:12:26.518623429 -0400
 @@ -0,0 +1,44 @@
 +
@@ -2202,8 +2202,8 @@ diff -Naur mozilla-release/accessible/src/msaa/mingw-seh.h mozilla/accessible/sr
 +  return E_FAIL;
 +
 +#endif // _MINGW_SEH_H_
-diff -Naur mozilla-release/accessible/src/msaa/nsAccessibleWrap.cpp mozilla/accessible/src/msaa/nsAccessibleWrap.cpp
---- mozilla-release/accessible/src/msaa/nsAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/nsAccessibleWrap.cpp mozilla/accessible/src/msaa/nsAccessibleWrap.cpp
+--- mozilla/accessible/src/msaa/nsAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/nsAccessibleWrap.cpp	2014-04-20 15:00:44.719319972 -0400
 @@ -38,6 +38,7 @@
  
@@ -3103,8 +3103,8 @@ diff -Naur mozilla-release/accessible/src/msaa/nsAccessibleWrap.cpp mozilla/acce
  }
  
  ////////////////////////////////////////////////////////////////////////////////
-diff -Naur mozilla-release/accessible/src/msaa/nsAccessNodeWrap.cpp mozilla/accessible/src/msaa/nsAccessNodeWrap.cpp
---- mozilla-release/accessible/src/msaa/nsAccessNodeWrap.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/nsAccessNodeWrap.cpp mozilla/accessible/src/msaa/nsAccessNodeWrap.cpp
+--- mozilla/accessible/src/msaa/nsAccessNodeWrap.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/nsAccessNodeWrap.cpp	2014-04-20 15:24:05.890173262 -0400
 @@ -41,6 +41,7 @@
  #include "AccessibleApplication.h"
@@ -3524,8 +3524,8 @@ diff -Naur mozilla-release/accessible/src/msaa/nsAccessNodeWrap.cpp mozilla/acce
  nsRefPtrHashtable<nsVoidPtrHashKey, nsDocAccessible> nsAccessNodeWrap::sHWNDCache;
  
  LRESULT CALLBACK
-diff -Naur mozilla-release/accessible/src/msaa/nsAccessNodeWrap.h mozilla/accessible/src/msaa/nsAccessNodeWrap.h
---- mozilla-release/accessible/src/msaa/nsAccessNodeWrap.h	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/nsAccessNodeWrap.h mozilla/accessible/src/msaa/nsAccessNodeWrap.h
+--- mozilla/accessible/src/msaa/nsAccessNodeWrap.h	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/nsAccessNodeWrap.h	2014-04-20 15:17:56.365211953 -0400
 @@ -58,8 +58,8 @@
  #include "nsIDOMElement.h"
@@ -3584,8 +3584,8 @@ diff -Naur mozilla-release/accessible/src/msaa/nsAccessNodeWrap.h mozilla/access
  /**
   * Converts nsresult to HRESULT.
   */
-diff -Naur mozilla-release/accessible/src/msaa/nsApplicationAccessibleWrap.cpp mozilla/accessible/src/msaa/nsApplicationAccessibleWrap.cpp
---- mozilla-release/accessible/src/msaa/nsApplicationAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/nsApplicationAccessibleWrap.cpp mozilla/accessible/src/msaa/nsApplicationAccessibleWrap.cpp
+--- mozilla/accessible/src/msaa/nsApplicationAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/nsApplicationAccessibleWrap.cpp	2014-04-20 14:39:17.526454748 -0400
 @@ -44,6 +44,8 @@
  
@@ -3670,8 +3670,8 @@ diff -Naur mozilla-release/accessible/src/msaa/nsApplicationAccessibleWrap.cpp m
  }
  
  ////////////////////////////////////////////////////////////////////////////////
-diff -Naur mozilla-release/accessible/src/msaa/nsDocAccessibleWrap.cpp mozilla/accessible/src/msaa/nsDocAccessibleWrap.cpp
---- mozilla-release/accessible/src/msaa/nsDocAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/nsDocAccessibleWrap.cpp mozilla/accessible/src/msaa/nsDocAccessibleWrap.cpp
+--- mozilla/accessible/src/msaa/nsDocAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/nsDocAccessibleWrap.cpp	2014-04-20 15:24:44.481169221 -0400
 @@ -38,6 +38,7 @@
  
@@ -3801,8 +3801,8 @@ diff -Naur mozilla-release/accessible/src/msaa/nsDocAccessibleWrap.cpp mozilla/a
          GetBounds(&x, &y, &width, &height);
          PRInt32 rootX = 0, rootY = 0, rootWidth = 0, rootHeight = 0;
          rootDocument->GetBounds(&rootX, &rootY, &rootWidth, &rootHeight);
-diff -Naur mozilla-release/accessible/src/msaa/nsHyperTextAccessibleWrap.h mozilla/accessible/src/msaa/nsHyperTextAccessibleWrap.h
---- mozilla-release/accessible/src/msaa/nsHyperTextAccessibleWrap.h	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/nsHyperTextAccessibleWrap.h mozilla/accessible/src/msaa/nsHyperTextAccessibleWrap.h
+--- mozilla/accessible/src/msaa/nsHyperTextAccessibleWrap.h	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/nsHyperTextAccessibleWrap.h	2014-04-20 13:23:08.747933123 -0400
 @@ -44,7 +44,7 @@
  #include "nsHyperTextAccessible.h"
@@ -3813,8 +3813,8 @@ diff -Naur mozilla-release/accessible/src/msaa/nsHyperTextAccessibleWrap.h mozil
  
  class nsHyperTextAccessibleWrap : public nsHyperTextAccessible,
                                    public CAccessibleHypertext,
-diff -Naur mozilla-release/accessible/src/msaa/nsRoleMap.h mozilla/accessible/src/msaa/nsRoleMap.h
---- mozilla-release/accessible/src/msaa/nsRoleMap.h	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/nsRoleMap.h mozilla/accessible/src/msaa/nsRoleMap.h
+--- mozilla/accessible/src/msaa/nsRoleMap.h	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/nsRoleMap.h	2014-04-20 14:23:21.878554809 -0400
 @@ -39,7 +39,7 @@
   *
@@ -3825,8 +3825,8 @@ diff -Naur mozilla-release/accessible/src/msaa/nsRoleMap.h mozilla/accessible/sr
  #include "AccessibleRole.h"
  
  const PRUint32 USE_ROLE_STRING = 0;
-diff -Naur mozilla-release/accessible/src/msaa/nsRootAccessibleWrap.cpp mozilla/accessible/src/msaa/nsRootAccessibleWrap.cpp
---- mozilla-release/accessible/src/msaa/nsRootAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/nsRootAccessibleWrap.cpp mozilla/accessible/src/msaa/nsRootAccessibleWrap.cpp
+--- mozilla/accessible/src/msaa/nsRootAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/nsRootAccessibleWrap.cpp	2014-04-20 15:25:45.049162879 -0400
 @@ -38,11 +38,14 @@
  
@@ -3852,8 +3852,8 @@ diff -Naur mozilla-release/accessible/src/msaa/nsRootAccessibleWrap.cpp mozilla/
        nsCoreUtils::IsTabDocument(aDocument->GetDocumentNode())) {
      PRUint32 count = mChildDocuments.Length();
      for (PRUint32 idx = 0; idx < count; idx++) {
-diff -Naur mozilla-release/accessible/src/msaa/nsRootAccessibleWrap.h mozilla/accessible/src/msaa/nsRootAccessibleWrap.h
---- mozilla-release/accessible/src/msaa/nsRootAccessibleWrap.h	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/nsRootAccessibleWrap.h mozilla/accessible/src/msaa/nsRootAccessibleWrap.h
+--- mozilla/accessible/src/msaa/nsRootAccessibleWrap.h	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/nsRootAccessibleWrap.h	2014-04-20 15:18:04.778211072 -0400
 @@ -42,6 +42,9 @@
  
@@ -3873,8 +3873,8 @@ diff -Naur mozilla-release/accessible/src/msaa/nsRootAccessibleWrap.h mozilla/ac
 +// } // namespace mozilla
 +
  #endif
-diff -Naur mozilla-release/accessible/src/msaa/nsTextAccessibleWrap.cpp mozilla/accessible/src/msaa/nsTextAccessibleWrap.cpp
---- mozilla-release/accessible/src/msaa/nsTextAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/nsTextAccessibleWrap.cpp mozilla/accessible/src/msaa/nsTextAccessibleWrap.cpp
+--- mozilla/accessible/src/msaa/nsTextAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/nsTextAccessibleWrap.cpp	2014-04-20 14:38:05.362462304 -0400
 @@ -48,6 +48,8 @@
  
@@ -3994,8 +3994,8 @@ diff -Naur mozilla-release/accessible/src/msaa/nsTextAccessibleWrap.cpp mozilla/
 +
 +  A11Y_TRYBLOCK_END
  }
-diff -Naur mozilla-release/accessible/src/msaa/nsWinUtils.cpp mozilla/accessible/src/msaa/nsWinUtils.cpp
---- mozilla-release/accessible/src/msaa/nsWinUtils.cpp	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/nsWinUtils.cpp mozilla/accessible/src/msaa/nsWinUtils.cpp
+--- mozilla/accessible/src/msaa/nsWinUtils.cpp	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/nsWinUtils.cpp	2014-04-20 15:30:50.174130931 -0400
 @@ -40,12 +40,18 @@
  
@@ -4055,8 +4055,8 @@ diff -Naur mozilla-release/accessible/src/msaa/nsWinUtils.cpp mozilla/accessible
 -    ::GetModuleHandleW(kDolphinModuleHandle);
 -#endif
 -}
-diff -Naur mozilla-release/accessible/src/msaa/nsWinUtils.h mozilla/accessible/src/msaa/nsWinUtils.h
---- mozilla-release/accessible/src/msaa/nsWinUtils.h	2011-12-20 20:06:25.000000000 -0500
+diff -Naur mozilla/accessible/src/msaa/nsWinUtils.h mozilla/accessible/src/msaa/nsWinUtils.h
+--- mozilla/accessible/src/msaa/nsWinUtils.h	2011-12-20 20:06:25.000000000 -0500
 +++ mozilla/accessible/src/msaa/nsWinUtils.h	2014-04-20 15:02:57.681306050 -0400
 @@ -49,10 +49,6 @@
  const LPCWSTR kClassNameRoot = L"MozillaUIWindowClass";
@@ -4081,8 +4081,8 @@ diff -Naur mozilla-release/accessible/src/msaa/nsWinUtils.h mozilla/accessible/s
  };
  
  #endif
-diff -Naur mozilla-release/configure.in mozilla/configure.in
---- mozilla-release/configure.in	2011-12-20 20:06:28.000000000 -0500
+diff -Naur mozilla/configure.in mozilla/configure.in
+--- mozilla/configure.in	2011-12-20 20:06:28.000000000 -0500
 +++ mozilla/configure.in	2014-04-20 13:23:08.749933123 -0400
 @@ -945,6 +945,18 @@
              AC_MSG_ERROR([windres version $WINDRES_VERSION or higher is required to build.])
@@ -4120,8 +4120,8 @@ diff -Naur mozilla-release/configure.in mozilla/configure.in
      AC_DEFINE(ACCESSIBILITY)
  fi
  
-diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-d2d-private.h mozilla/gfx/cairo/cairo/src/cairo-d2d-private.h
---- mozilla-release/gfx/cairo/cairo/src/cairo-d2d-private.h	2011-12-20 20:06:37.000000000 -0500
+diff -Naur mozilla/gfx/cairo/cairo/src/cairo-d2d-private.h mozilla/gfx/cairo/cairo/src/cairo-d2d-private.h
+--- mozilla/gfx/cairo/cairo/src/cairo-d2d-private.h	2011-12-20 20:06:37.000000000 -0500
 +++ mozilla/gfx/cairo/cairo/src/cairo-d2d-private.h	2014-04-20 13:23:08.749933123 -0400
 @@ -52,7 +52,7 @@
  #include "cairo-list-private.h"
@@ -4156,8 +4156,8 @@ diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-d2d-private.h mozilla/gfx/c
  );
  
  typedef HRESULT (WINAPI*D3D10CreateDevice1Func)(
-diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-d2d-surface.cpp mozilla/gfx/cairo/cairo/src/cairo-d2d-surface.cpp
---- mozilla-release/gfx/cairo/cairo/src/cairo-d2d-surface.cpp	2011-12-20 20:06:37.000000000 -0500
+diff -Naur mozilla/gfx/cairo/cairo/src/cairo-d2d-surface.cpp mozilla/gfx/cairo/cairo/src/cairo-d2d-surface.cpp
+--- mozilla/gfx/cairo/cairo/src/cairo-d2d-surface.cpp	2011-12-20 20:06:37.000000000 -0500
 +++ mozilla/gfx/cairo/cairo/src/cairo-d2d-surface.cpp	2014-04-20 13:23:08.750933123 -0400
 @@ -844,12 +844,12 @@
      }
@@ -4265,8 +4265,8 @@ diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-d2d-surface.cpp mozilla/gfx
      if (format == DXGI_FORMAT_B8G8R8A8_UNORM) {
  	if (content == CAIRO_CONTENT_ALPHA) {
  	    status = CAIRO_STATUS_INVALID_CONTENT;
-diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-dwrite-font.cpp mozilla/gfx/cairo/cairo/src/cairo-dwrite-font.cpp
---- mozilla-release/gfx/cairo/cairo/src/cairo-dwrite-font.cpp	2011-12-20 20:06:37.000000000 -0500
+diff -Naur mozilla/gfx/cairo/cairo/src/cairo-dwrite-font.cpp mozilla/gfx/cairo/cairo/src/cairo-dwrite-font.cpp
+--- mozilla/gfx/cairo/cairo/src/cairo-dwrite-font.cpp	2011-12-20 20:06:37.000000000 -0500
 +++ mozilla/gfx/cairo/cairo/src/cairo-dwrite-font.cpp	2014-04-20 13:23:08.751933123 -0400
 @@ -45,10 +45,10 @@
  #include <float.h>
@@ -4338,8 +4338,8 @@ diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-dwrite-font.cpp mozilla/gfx
  
      status = _dwrite_draw_glyphs_to_gdi_surface_gdi (surface, &matrix, &run,
              RGB(0,0,0), scaled_font, area);
-diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-dwrite-private.h mozilla/gfx/cairo/cairo/src/cairo-dwrite-private.h
---- mozilla-release/gfx/cairo/cairo/src/cairo-dwrite-private.h	2011-12-20 20:06:37.000000000 -0500
+diff -Naur mozilla/gfx/cairo/cairo/src/cairo-dwrite-private.h mozilla/gfx/cairo/cairo/src/cairo-dwrite-private.h
+--- mozilla/gfx/cairo/cairo/src/cairo-dwrite-private.h	2011-12-20 20:06:37.000000000 -0500
 +++ mozilla/gfx/cairo/cairo/src/cairo-dwrite-private.h	2014-04-20 13:23:08.751933123 -0400
 @@ -34,13 +34,13 @@
   *	Bas Schouten <bschouten@mozilla.com>
@@ -4359,8 +4359,8 @@ diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-dwrite-private.h mozilla/gf
  );
  
  /* cairo_scaled_font_t implementation */
-diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-win32.h mozilla/gfx/cairo/cairo/src/cairo-win32.h
---- mozilla-release/gfx/cairo/cairo/src/cairo-win32.h	2011-12-20 20:06:37.000000000 -0500
+diff -Naur mozilla/gfx/cairo/cairo/src/cairo-win32.h mozilla/gfx/cairo/cairo/src/cairo-win32.h
+--- mozilla/gfx/cairo/cairo/src/cairo-win32.h	2011-12-20 20:06:37.000000000 -0500
 +++ mozilla/gfx/cairo/cairo/src/cairo-win32.h	2014-04-20 13:23:08.751933123 -0400
 @@ -149,7 +149,6 @@
      int type;
@@ -4370,8 +4370,8 @@ diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-win32.h mozilla/gfx/cairo/c
  
  /**
   * Create a D2D device
-diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-win32-refptr.h mozilla/gfx/cairo/cairo/src/cairo-win32-refptr.h
---- mozilla-release/gfx/cairo/cairo/src/cairo-win32-refptr.h	2011-12-20 20:06:37.000000000 -0500
+diff -Naur mozilla/gfx/cairo/cairo/src/cairo-win32-refptr.h mozilla/gfx/cairo/cairo/src/cairo-win32-refptr.h
+--- mozilla/gfx/cairo/cairo/src/cairo-win32-refptr.h	2011-12-20 20:06:37.000000000 -0500
 +++ mozilla/gfx/cairo/cairo/src/cairo-win32-refptr.h	2014-04-20 13:23:08.751933123 -0400
 @@ -31,61 +31,75 @@
   * The Initial Developer of the Original Code is the Mozilla Foundation
@@ -4605,8 +4605,8 @@ diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-win32-refptr.h mozilla/gfx/
  };
  
  #endif
-diff -Naur mozilla-release/gfx/thebes/gfxWindowsPlatform.cpp mozilla/gfx/thebes/gfxWindowsPlatform.cpp
---- mozilla-release/gfx/thebes/gfxWindowsPlatform.cpp	2011-12-20 20:06:38.000000000 -0500
+diff -Naur mozilla/gfx/thebes/gfxWindowsPlatform.cpp mozilla/gfx/thebes/gfxWindowsPlatform.cpp
+--- mozilla/gfx/thebes/gfxWindowsPlatform.cpp	2011-12-20 20:06:38.000000000 -0500
 +++ mozilla/gfx/thebes/gfxWindowsPlatform.cpp	2014-04-20 13:23:08.752933123 -0400
 @@ -137,9 +137,9 @@
  // DirectWrite is not available on all platforms, we need to use the function
@@ -4621,8 +4621,8 @@ diff -Naur mozilla-release/gfx/thebes/gfxWindowsPlatform.cpp mozilla/gfx/thebes/
  );
  #endif
  
-diff -Naur mozilla-release/widget/src/windows/nsWindow.h mozilla/widget/src/windows/nsWindow.h
---- mozilla-release/widget/src/windows/nsWindow.h	2011-12-20 20:07:12.000000000 -0500
+diff -Naur mozilla/widget/src/windows/nsWindow.h mozilla/widget/src/windows/nsWindow.h
+--- mozilla/widget/src/windows/nsWindow.h	2011-12-20 20:07:12.000000000 -0500
 +++ mozilla/widget/src/windows/nsWindow.h	2014-04-20 13:23:08.752933123 -0400
 @@ -71,7 +71,7 @@
  #include "TaskbarWindowPreview.h"
@@ -4633,8 +4633,8 @@ diff -Naur mozilla-release/widget/src/windows/nsWindow.h mozilla/widget/src/wind
  #include "nsAccessible.h"
  #endif
  
-diff -Naur mozilla-release/xpcom/reflect/xptcall/src/md/unix/xptcinvoke_gcc_x86_unix.cpp mozilla/xpcom/reflect/xptcall/src/md/unix/xptcinvoke_gcc_x86_unix.cpp
---- mozilla-release/xpcom/reflect/xptcall/src/md/unix/xptcinvoke_gcc_x86_unix.cpp	2011-12-20 20:07:13.000000000 -0500
+diff -Naur mozilla/xpcom/reflect/xptcall/src/md/unix/xptcinvoke_gcc_x86_unix.cpp mozilla/xpcom/reflect/xptcall/src/md/unix/xptcinvoke_gcc_x86_unix.cpp
+--- mozilla/xpcom/reflect/xptcall/src/md/unix/xptcinvoke_gcc_x86_unix.cpp	2011-12-20 20:07:13.000000000 -0500
 +++ mozilla/xpcom/reflect/xptcall/src/md/unix/xptcinvoke_gcc_x86_unix.cpp	2014-04-20 13:23:08.752933123 -0400
 @@ -82,22 +82,6 @@
    params      = ebp + 0x14
