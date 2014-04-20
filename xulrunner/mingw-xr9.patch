@@ -4120,6 +4120,21 @@ diff -Naur mozilla/configure.in mozilla/configure.in
      AC_DEFINE(ACCESSIBILITY)
  fi
  
+diff -Naur mozilla/gfx/cairo/cairo/src/cairo.c mozilla/gfx/cairo/cairo/src/cairo.c
+--- mozilla/gfx/cairo/cairo/src/cairo.c 2011-12-20 20:06:37.000000000 -0500
++++ mozilla/gfx/cairo/cairo/src/cairo.c 2014-04-20 16:33:57.144734415 -0400
+@@ -43,6 +43,10 @@
+ #include "cairo-error-private.h"
+ #include "cairo-path-private.h"
+ 
++#if defined(_WINDOWS) && defined(CROSS_COMPILE) && !defined(HAVE_FFS)
++# define ffs __builtin_ffs
++#endif
++
+ /**
+  * SECTION:cairo
+  * @Title: cairo_t
+ 
 diff -Naur mozilla/gfx/cairo/cairo/src/cairo-d2d-private.h mozilla/gfx/cairo/cairo/src/cairo-d2d-private.h
 --- mozilla/gfx/cairo/cairo/src/cairo-d2d-private.h	2011-12-20 20:06:37.000000000 -0500
 +++ mozilla/gfx/cairo/cairo/src/cairo-d2d-private.h	2014-04-20 13:23:08.749933123 -0400
