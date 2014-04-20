@@ -94,6 +94,7 @@ ifeq (1, $(NG_VENDOR_CROSS_COMP))
     else
         # MINGW-W64
         CROSS_TRIPLET := $(CROSS)-
+        CROSS_CMAKE_TC_FILE := $(CROSS_CMAKE_TC_PATH)/$(CROSS)/share/cmake/mingw-w64-conf.cmake
     endif
   endif
 endif
