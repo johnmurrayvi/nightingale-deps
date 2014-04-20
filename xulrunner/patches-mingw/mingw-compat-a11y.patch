@@ -1,0 +1,723 @@
+--- a/accessible/src/msaa/Compatibility.cpp	
++++ a/accessible/src/msaa/Compatibility.cpp	
+@@ -0,0 +1,100 @@ 
++/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
++/* vim: set ts=2 et sw=2 tw=80: */
++/* ***** BEGIN LICENSE BLOCK *****
++ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
++ *
++ * The contents of this file are subject to the Mozilla Public License Version
++ * 1.1 (the "License"); you may not use this file except in compliance with
++ * the License. You may obtain a copy of the License at
++ * http://www.mozilla.org/MPL/
++ *
++ * Software distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
++ * for the specific language governing rights and limitations under the
++ * License.
++ *
++ * The Original Code is mozilla.org code.
++ *
++ * The Initial Developer of the Original Code is
++ * Mozilla Foundation.
++ * Portions created by the Initial Developer are Copyright (C) 2011
++ * the Initial Developer. All Rights Reserved.
++ *
++ * Contributor(s):
++ *   Alexander Surkov <surkov.alexander@gmail.com> (original author)
++ *
++ * Alternatively, the contents of this file may be used under the terms of
++ * either the GNU General Public License Version 2 or later (the "GPL"), or
++ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
++ * in which case the provisions of the GPL or the LGPL are applicable instead
++ * of those above. If you wish to allow use of your version of this file only
++ * under the terms of either the GPL or the LGPL, and not to allow others to
++ * use your version of this file under the terms of the MPL, indicate your
++ * decision by deleting the provisions above and replace them with the notice
++ * and other provisions required by the GPL or the LGPL. If you do not delete
++ * the provisions above, a recipient may use your version of this file under
++ * the terms of any one of the MPL, the GPL or the LGPL.
++ *
++ * ***** END LICENSE BLOCK ***** */
++
++#include "Compatibility.h"
++
++#include "nsWinUtils.h"
++
++#include "mozilla/Preferences.h"
++
++using namespace mozilla;
++using namespace mozilla::a11y;
++
++PRUint32 Compatibility::sMode = Compatibility::NoCompatibilityMode;
++
++void
++Compatibility::Init()
++{
++  HMODULE jawsHandle = ::GetModuleHandleW(L"jhook");
++  if (jawsHandle) {
++    sMode |= JAWSMode;
++    // IA2 off mode for JAWS versions below 8.0.2173.
++    if (IsModuleVersionLessThan(jawsHandle, 8, 2173))
++      sMode |= IA2OffMode;
++  }
++
++  if (::GetModuleHandleW(L"gwm32inc"))
++    sMode |= WEMode;
++  if (::GetModuleHandleW(L"dolwinhk"))
++    sMode |= DolphinMode;
++
++  // Turn off new tab switching for Jaws and WE.
++  if (sMode & JAWSMode || sMode & WEMode) {
++    // Check to see if the pref for disallowing CtrlTab is already set. If so,
++    // bail out (respect the user settings). If not, set it.
++    if (!Preferences::HasUserValue("browser.ctrlTab.disallowForScreenReaders"))
++      Preferences::SetBool("browser.ctrlTab.disallowForScreenReaders", true);
++  }
++}
++
++bool
++Compatibility::IsModuleVersionLessThan(HMODULE aModuleHandle,
++                                       DWORD aMajor, DWORD aMinor)
++{
++  PRUnichar fileName[MAX_PATH];
++  ::GetModuleFileNameW(aModuleHandle, fileName, MAX_PATH);
++
++  DWORD dummy = 0;
++  DWORD length = ::GetFileVersionInfoSizeW(fileName, &dummy);
++
++  LPBYTE versionInfo = new BYTE[length];
++  ::GetFileVersionInfoW(fileName, 0, length, versionInfo);
++
++  UINT uLen;
++  VS_FIXEDFILEINFO* fixedFileInfo = NULL;
++  ::VerQueryValueW(versionInfo, L"\\", (LPVOID*)&fixedFileInfo, &uLen);
++  DWORD dwFileVersionMS = fixedFileInfo->dwFileVersionMS;
++  DWORD dwFileVersionLS = fixedFileInfo->dwFileVersionLS;
++  delete [] versionInfo;
++
++  DWORD dwLeftMost = HIWORD(dwFileVersionMS);
++  DWORD dwSecondRight = HIWORD(dwFileVersionLS);
++  return (dwLeftMost < aMajor ||
++    (dwLeftMost == aMajor && dwSecondRight < aMinor));
++}
+--- a/accessible/src/msaa/Compatibility.h	
++++ a/accessible/src/msaa/Compatibility.h	
+@@ -0,0 +1,116 @@ 
++/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
++/* vim: set ts=2 et sw=2 tw=80: */
++/* ***** BEGIN LICENSE BLOCK *****
++ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
++ *
++ * The contents of this file are subject to the Mozilla Public License Version
++ * 1.1 (the "License"); you may not use this file except in compliance with
++ * the License. You may obtain a copy of the License at
++ * http://www.mozilla.org/MPL/
++ *
++ * Software distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
++ * for the specific language governing rights and limitations under the
++ * License.
++ *
++ * The Original Code is mozilla.org code.
++ *
++ * The Initial Developer of the Original Code is
++ * Mozilla Foundation.
++ * Portions created by the Initial Developer are Copyright (C) 2011
++ * the Initial Developer. All Rights Reserved.
++ *
++ * Contributor(s):
++ *   Alexander Surkov <surkov.alexander@gmail.com> (original author)
++ *
++ * Alternatively, the contents of this file may be used under the terms of
++ * either the GNU General Public License Version 2 or later (the "GPL"), or
++ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
++ * in which case the provisions of the GPL or the LGPL are applicable instead
++ * of those above. If you wish to allow use of your version of this file only
++ * under the terms of either the GPL or the LGPL, and not to allow others to
++ * use your version of this file under the terms of the MPL, indicate your
++ * decision by deleting the provisions above and replace them with the notice
++ * and other provisions required by the GPL or the LGPL. If you do not delete
++ * the provisions above, a recipient may use your version of this file under
++ * the terms of any one of the MPL, the GPL or the LGPL.
++ *
++ * ***** END LICENSE BLOCK ***** */
++
++#ifndef COMPATIBILITY_MANAGER_H
++#define COMPATIBILITY_MANAGER_H
++
++#include "prtypes.h"
++
++#include <oleacc.h>
++#include <winuser.h>
++
++class nsAccessNodeWrap;
++
++namespace mozilla {
++namespace a11y {
++
++/**
++ * Used to get compatibility modes. Note, modes are computed at accessibility
++ * start up time and aren't changed during lifetime.
++ */
++class Compatibility
++{
++public:
++  /**
++   * Return true if IAccessible2 disabled.
++   */
++  static bool IsIA2Off() { return sMode & IA2OffMode; }
++
++  /**
++   * Return true if JAWS mode is enabled.
++   */
++  static bool IsJAWS() { return sMode & JAWSMode; }
++
++  /**
++   * Return true if WE mode is enabled.
++   */
++  static bool IsWE() { return sMode & WEMode; }
++
++  /**
++   * Return true if Dolphin mode is enabled.
++   */
++  static bool IsDolphin() { return sMode & DolphinMode; }
++
++private:
++  Compatibility();
++  Compatibility(const Compatibility&);
++  Compatibility& operator = (const Compatibility&);
++
++  /**
++   * Initialize compatibility mode. Called by nsAccessNodeWrap during
++   * accessibility initialization.
++   */
++  static void Init();
++  friend class nsAccessNodeWrap;
++
++  /**
++   * List of compatibility modes.
++   */
++  enum {
++    NoCompatibilityMode = 0,
++    JAWSMode = 1 << 0,
++    WEMode = 1 << 1,
++    DolphinMode = 1 << 2,
++    IA2OffMode = 1 << 3
++  };
++
++  /**
++   * Return true if module version is lesser than the given version.
++   */
++  static bool IsModuleVersionLessThan(HMODULE aModuleHandle,
++                                      DWORD aMajor, DWORD aMinor);
++
++private:
++  static PRUint32 sMode;
++};
++
++} // a11y namespace
++} // mozilla namespace
++
++#endif
+--- a/accessible/src/msaa/Makefile.in	
++++ a/accessible/src/msaa/Makefile.in	
+@@ -69,16 +69,17 @@ CPPSRCS = \
+   CAccessibleText.cpp \
+   CAccessibleEditableText.cpp \
+   CAccessibleHyperlink.cpp \
+   CAccessibleHypertext.cpp \
+   ia2AccessibleRelation.cpp \
+   CAccessibleTable.cpp \
+   CAccessibleTableCell.cpp \
+   CAccessibleValue.cpp \
++  Compatibility.cpp \
+   $(NULL)
+ 
+ EXPORTS = \
+   nsAccessNodeWrap.h \
+   nsAccessibleWrap.h \
+   nsTextAccessibleWrap.h \
+   nsDocAccessibleWrap.h \
+   nsRootAccessibleWrap.h \
+--- a/accessible/src/msaa/nsAccessNodeWrap.cpp	
++++ a/accessible/src/msaa/nsAccessNodeWrap.cpp	
+@@ -36,16 +36,17 @@ 
+  *
+  * ***** END LICENSE BLOCK ***** */
+ 
+ #include "nsAccessNodeWrap.h"
+ 
+ #include "AccessibleApplication.h"
+ #include "ISimpleDOMNode_i.c"
+ 
++#include "Compatibility.h"
+ #include "nsAccessibilityService.h"
+ #include "nsApplicationAccessibleWrap.h"
+ #include "nsCoreUtils.h"
+ #include "nsRootAccessible.h"
+ #include "nsWinUtils.h"
+ #include "Statistics.h"
+ 
+ #include "nsAttrName.h"
+@@ -65,30 +66,18 @@ using namespace mozilla::a11y;
+ /// the accessible library and cached methods
+ HINSTANCE nsAccessNodeWrap::gmAccLib = nsnull;
+ HINSTANCE nsAccessNodeWrap::gmUserLib = nsnull;
+ LPFNACCESSIBLEOBJECTFROMWINDOW nsAccessNodeWrap::gmAccessibleObjectFromWindow = nsnull;
+ LPFNLRESULTFROMOBJECT nsAccessNodeWrap::gmLresultFromObject = NULL;
+ LPFNNOTIFYWINEVENT nsAccessNodeWrap::gmNotifyWinEvent = nsnull;
+ LPFNGETGUITHREADINFO nsAccessNodeWrap::gmGetGUIThreadInfo = nsnull;
+ 
+-// Used to determine whether an IAccessible2 compatible screen reader is loaded.
+-bool nsAccessNodeWrap::gIsIA2Disabled = false;
+-
+ AccTextChangeEvent* nsAccessNodeWrap::gTextEvent = nsnull;
+ 
+-// Pref to disallow CtrlTab preview functionality if JAWS or Window-Eyes are
+-// running.
+-#define CTRLTAB_DISALLOW_FOR_SCREEN_READERS_PREF "browser.ctrlTab.disallowForScreenReaders"
+-
+-
+-/* For documentation of the accessibility architecture, 
+- * see http://lxr.mozilla.org/seamonkey/source/accessible/accessible-docs.html
+- */
+-
+ ////////////////////////////////////////////////////////////////////////////////
+ // nsAccessNodeWrap
+ ////////////////////////////////////////////////////////////////////////////////
+ 
+ nsAccessNodeWrap::
+   nsAccessNodeWrap(nsIContent *aContent, nsIWeakReference *aShell) :
+   nsAccessNode(aContent, aShell)
+ {
+@@ -608,17 +597,17 @@ void nsAccessNodeWrap::InitAccessibility
+ 
+   if (gmUserLib) {
+     if (!gmNotifyWinEvent)
+       gmNotifyWinEvent = (LPFNNOTIFYWINEVENT)GetProcAddress(gmUserLib,"NotifyWinEvent");
+     if (!gmGetGUIThreadInfo)
+       gmGetGUIThreadInfo = (LPFNGETGUITHREADINFO)GetProcAddress(gmUserLib,"GetGUIThreadInfo");
+   }
+ 
+-  DoATSpecificProcessing();
++  Compatibility::Init();
+ 
+   nsWinUtils::MaybeStartWindowEmulation();
+ 
+   nsAccessNode::InitXPAccessibility();
+ }
+ 
+ void nsAccessNodeWrap::ShutdownAccessibility()
+ {
+@@ -666,83 +655,16 @@ GetHRESULT(nsresult aResult)
+     case NS_ERROR_NOT_IMPLEMENTED:
+       return E_NOTIMPL;
+ 
+     default:
+       return E_FAIL;
+   }
+ }
+ 
+-bool nsAccessNodeWrap::IsOnlyMsaaCompatibleJawsPresent()
+-{
+-  HMODULE jhookhandle = ::GetModuleHandleW(kJAWSModuleHandle);
+-  if (!jhookhandle)
+-    return false;  // No JAWS, or some other screen reader, use IA2
+-
+-  PRUnichar fileName[MAX_PATH];
+-  ::GetModuleFileNameW(jhookhandle, fileName, MAX_PATH);
+-
+-  DWORD dummy;
+-  DWORD length = ::GetFileVersionInfoSizeW(fileName, &dummy);
+-
+-  LPBYTE versionInfo = new BYTE[length];
+-  ::GetFileVersionInfoW(fileName, 0, length, versionInfo);
+-
+-  UINT uLen;
+-  VS_FIXEDFILEINFO *fixedFileInfo;
+-  ::VerQueryValueW(versionInfo, L"\\", (LPVOID*)&fixedFileInfo, &uLen);
+-  DWORD dwFileVersionMS = fixedFileInfo->dwFileVersionMS;
+-  DWORD dwFileVersionLS = fixedFileInfo->dwFileVersionLS;
+-  delete [] versionInfo;
+-
+-  DWORD dwLeftMost = HIWORD(dwFileVersionMS);
+-//  DWORD dwSecondLeft = LOWORD(dwFileVersionMS);
+-  DWORD dwSecondRight = HIWORD(dwFileVersionLS);
+-//  DWORD dwRightMost = LOWORD(dwFileVersionLS);
+-
+-  return (dwLeftMost < 8
+-          || (dwLeftMost == 8 && dwSecondRight < 2173));
+-}
+-
+-void nsAccessNodeWrap::TurnOffNewTabSwitchingForJawsAndWE()
+-{
+-  HMODULE srHandle = ::GetModuleHandleW(kJAWSModuleHandle);
+-  if (!srHandle) {
+-    // No JAWS, try Window-Eyes
+-    srHandle = ::GetModuleHandleW(kWEModuleHandle);
+-    if (!srHandle) {
+-      // no screen reader we're interested in. Bail out.
+-      return;
+-    }
+-  }
+-
+-  // Check to see if the pref for disallowing CtrlTab is already set.
+-  // If so, bail out.
+-  // If not, set it.
+-  if (Preferences::HasUserValue(CTRLTAB_DISALLOW_FOR_SCREEN_READERS_PREF)) {
+-    // This pref has been set before. There is no default for it.
+-    // Do nothing further, respect the setting that's there.
+-    // That way, if noone touches it, it'll stay on after toggled once.
+-    // If someone decided to turn it off, we respect that, too.
+-    return;
+-  }
+-  
+-  // Value has never been set, set it.
+-  Preferences::SetBool(CTRLTAB_DISALLOW_FOR_SCREEN_READERS_PREF, true);
+-}
+-
+-void nsAccessNodeWrap::DoATSpecificProcessing()
+-{
+-  if (IsOnlyMsaaCompatibleJawsPresent())
+-    // All versions below 8.0.2173 are not compatible
+-    gIsIA2Disabled  = true;
+-
+-  TurnOffNewTabSwitchingForJawsAndWE();
+-}
+-
+ nsRefPtrHashtable<nsVoidPtrHashKey, nsDocAccessible> nsAccessNodeWrap::sHWNDCache;
+ 
+ LRESULT CALLBACK
+ nsAccessNodeWrap::WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+ {
+   // Note, this window's message handling should not invoke any call that
+   // may result in a cross-process ipc call. Doing so may violate RPC
+   // message semantics.
+--- a/accessible/src/msaa/nsAccessNodeWrap.h	
++++ a/accessible/src/msaa/nsAccessNodeWrap.h	
+@@ -154,22 +154,16 @@ public: // construction, destruction
+     static HINSTANCE gmUserLib;
+     static LPFNACCESSIBLEOBJECTFROMWINDOW gmAccessibleObjectFromWindow;
+     static LPFNLRESULTFROMOBJECT gmLresultFromObject;
+     static LPFNNOTIFYWINEVENT gmNotifyWinEvent;
+     static LPFNGETGUITHREADINFO gmGetGUIThreadInfo;
+ 
+     static int FilterA11yExceptions(unsigned int aCode, EXCEPTION_POINTERS *aExceptionInfo);
+ 
+-    static bool IsOnlyMsaaCompatibleJawsPresent();
+-
+-    static void TurnOffNewTabSwitchingForJawsAndWE();
+-
+-    static void DoATSpecificProcessing();
+-
+   static STDMETHODIMP_(LRESULT) LresultFromObject(REFIID riid, WPARAM wParam, LPUNKNOWN pAcc);
+ 
+   static LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg,
+                                      WPARAM WParam, LPARAM lParam);
+ 
+   static nsRefPtrHashtable<nsVoidPtrHashKey, nsDocAccessible> sHWNDCache;
+ 
+ protected:
+@@ -178,22 +172,16 @@ protected:
+    * Return ISimpleDOMNode instance for existing accessible object or
+    * creates new nsAccessNode instance if the accessible doesn't exist.
+    *
+    * @note ISimpleDOMNode is returned addrefed
+    */
+   ISimpleDOMNode *MakeAccessNode(nsINode *aNode);
+ 
+     /**
+-     * Used to determine whether an IAccessible2 compatible screen reader is
+-     * loaded. Currently used for JAWS versions older than 8.0.2173.
+-     */
+-     static bool gIsIA2Disabled;
+-
+-    /**
+      * It is used in nsHyperTextAccessibleWrap for IA2::newText/oldText
+      * implementation.
+      */
+     static AccTextChangeEvent* gTextEvent;
+ };
+ 
+ /**
+  * Converts nsresult to HRESULT.
+--- a/accessible/src/msaa/nsAccessibleWrap.cpp	
++++ a/accessible/src/msaa/nsAccessibleWrap.cpp	
+@@ -33,16 +33,17 @@ 
+  * and other provisions required by the GPL or the LGPL. If you do not delete
+  * the provisions above, a recipient may use your version of this file under
+  * the terms of any one of the MPL, the GPL or the LGPL.
+  *
+  * ***** END LICENSE BLOCK ***** */
+ 
+ #include "nsAccessibleWrap.h"
+ 
++#include "Compatibility.h"
+ #include "nsAccUtils.h"
+ #include "nsCoreUtils.h"
+ #include "nsWinUtils.h"
+ #include "Relation.h"
+ #include "States.h"
+ 
+ #include "ia2AccessibleRelation.h"
+ 
+@@ -124,17 +125,17 @@ __try {
+     *ppv = static_cast<IAccessible*>(this);
+   else if (IID_IEnumVARIANT == iid) {
+     long numChildren;
+     get_accChildCount(&numChildren);
+     if (numChildren > 0)  // Don't support this interface for leaf elements
+       *ppv = static_cast<IEnumVARIANT*>(this);
+   } else if (IID_IServiceProvider == iid)
+     *ppv = static_cast<IServiceProvider*>(this);
+-  else if (IID_IAccessible2 == iid && !gIsIA2Disabled)
++  else if (IID_IAccessible2 == iid && !Compatibility::IsIA2Off())
+     *ppv = static_cast<IAccessible2*>(this);
+ 
+   if (NULL == *ppv) {
+     HRESULT hr = CAccessibleComponent::QueryInterface(iid, ppv);
+     if (SUCCEEDED(hr))
+       return hr;
+   }
+ 
+@@ -1584,21 +1585,23 @@ nsAccessibleWrap::FirePlatformEvent(AccE
+          eventType, NS_ConvertUTF16toUTF8(tag).get(), id.get(),
+          childID, hWnd);
+ #endif
+ 
+   // Fire MSAA event for client area window.
+   NotifyWinEvent(winEvent, hWnd, OBJID_CLIENT, childID);
+ 
+   // JAWS announces collapsed combobox navigation based on focus events.
+-  if (eventType == nsIAccessibleEvent::EVENT_SELECTION &&
+-      accessible->Role() == nsIAccessibleRole::ROLE_COMBOBOX_OPTION &&
+-      nsWinUtils::IsWindowEmulationFor(kJAWSModuleHandle)) {
+-    NotifyWinEvent(EVENT_OBJECT_FOCUS, hWnd, OBJID_CLIENT, childID);
++  if (Compatibility::IsJAWS()) {
++    if (eventType == nsIAccessibleEvent::EVENT_SELECTION &&
++      accessible->Role() == nsIAccessibleRole::ROLE_COMBOBOX_OPTION) {
++      NotifyWinEvent(EVENT_OBJECT_FOCUS, hWnd, OBJID_CLIENT, childID);
++    }
+   }
++
+   return NS_OK;
+ }
+ 
+ //------- Helper methods ---------
+ 
+ PRInt32 nsAccessibleWrap::GetChildIDFor(nsAccessible* aAccessible)
+ {
+   // A child ID of the window is required, when we use NotifyWinEvent,
+--- a/accessible/src/msaa/nsDocAccessibleWrap.cpp	
++++ a/accessible/src/msaa/nsDocAccessibleWrap.cpp	
+@@ -33,16 +33,17 @@ 
+  * and other provisions required by the GPL or the LGPL. If you do not delete
+  * the provisions above, a recipient may use your version of this file under
+  * the terms of any one of the MPL, the GPL or the LGPL.
+  *
+  * ***** END LICENSE BLOCK ***** */
+ 
+ #include "mozilla/dom/TabChild.h"
+ 
++#include "Compatibility.h"
+ #include "nsDocAccessibleWrap.h"
+ #include "ISimpleDOMDocument_i.c"
+ #include "nsIAccessibilityService.h"
+ #include "nsRootAccessible.h"
+ #include "nsWinUtils.h"
+ #include "Statistics.h"
+ 
+ #include "nsIDocShell.h"
+@@ -286,17 +287,17 @@ nsDocAccessibleWrap::DoInitialUpdate()
+       if (tabChild)
+         tabChild->SendGetWidgetNativeData(&nativeData);
+       else
+         nativeData = reinterpret_cast<mozilla::WindowsHandle>(
+           rootDocument->GetNativeWindow());
+ 
+       bool isActive = true;
+       PRInt32 x = CW_USEDEFAULT, y = CW_USEDEFAULT, width = 0, height = 0;
+-      if (nsWinUtils::IsWindowEmulationFor(kDolphinModuleHandle)) {
++      if (Compatibility::IsDolphin()) {
+         GetBounds(&x, &y, &width, &height);
+         PRInt32 rootX = 0, rootY = 0, rootWidth = 0, rootHeight = 0;
+         rootDocument->GetBounds(&rootX, &rootY, &rootWidth, &rootHeight);
+         x = rootX - x;
+         y -= rootY;
+ 
+         nsCOMPtr<nsISupports> container = mDocument->GetContainer();
+         nsCOMPtr<nsIDocShell> docShell = do_QueryInterface(container);
+--- a/accessible/src/msaa/nsRootAccessibleWrap.cpp	
++++ a/accessible/src/msaa/nsRootAccessibleWrap.cpp	
+@@ -33,21 +33,24 @@ 
+  * and other provisions required by the GPL or the LGPL. If you do not delete
+  * the provisions above, a recipient may use your version of this file under
+  * the terms of any one of the MPL, the GPL or the LGPL.
+  *
+  * ***** END LICENSE BLOCK ***** */
+ 
+ #include "nsRootAccessibleWrap.h"
+ 
++#include "Compatibility.h"
+ #include "nsWinUtils.h"
+ 
+ #include "nsIDOMEventTarget.h"
+ #include "nsEventListenerManager.h"
+ 
++using namespace mozilla::a11y;
++
+ ////////////////////////////////////////////////////////////////////////////////
+ // Constructor/desctructor
+ 
+ nsRootAccessibleWrap::
+   nsRootAccessibleWrap(nsIDocument* aDocument, nsIContent* aRootContent,
+                        nsIWeakReference* aShell) :
+   nsRootAccessible(aDocument, aRootContent, aShell)
+ {
+@@ -58,17 +61,17 @@ nsRootAccessibleWrap::~nsRootAccessibleW
+ }
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+ // nsRootAccessible
+ 
+ void
+ nsRootAccessibleWrap::DocumentActivated(nsDocAccessible* aDocument)
+ {
+-  if (nsWinUtils::IsWindowEmulationFor(kDolphinModuleHandle) &&
++  if (Compatibility::IsDolphin() &&
+       nsCoreUtils::IsTabDocument(aDocument->GetDocumentNode())) {
+     PRUint32 count = mChildDocuments.Length();
+     for (PRUint32 idx = 0; idx < count; idx++) {
+       nsDocAccessible* childDoc = mChildDocuments[idx];
+       HWND childDocHWND = static_cast<HWND>(childDoc->GetNativeWindow());
+       if (childDoc != aDocument)
+         nsWinUtils::HideNativeWindow(childDocHWND);
+       else
+--- a/accessible/src/msaa/nsWinUtils.cpp	
++++ a/accessible/src/msaa/nsWinUtils.cpp	
+@@ -35,24 +35,26 @@ 
+  * and other provisions required by the GPL or the LGPL. If you do not delete
+  * the provisions above, a recipient may use your version of this file under
+  * the terms of any one of the MPL, the GPL or the LGPL.
+  *
+  * ***** END LICENSE BLOCK ***** */
+ 
+ #include "nsWinUtils.h"
+ 
++#include "Compatibility.h"
+ #include "nsIWinAccessNode.h"
+ #include "nsRootAccessible.h"
+ 
+ #include "mozilla/Preferences.h"
+ #include "nsArrayUtils.h"
+ #include "nsIDocShellTreeItem.h"
+ 
+ using namespace mozilla;
++using namespace mozilla::a11y;
+ 
+ // Window property used by ipc related code in identifying accessible
+ // tab windows.
+ const PRUnichar* kPropNameTabContent = L"AccessibleTabWindow";
+ 
+ HRESULT
+ nsWinUtils::ConvertToIA2Array(nsIArray *aGeckoArray, IUnknown ***aIA2Array,
+                               long *aIA2ArrayLen)
+@@ -106,30 +108,32 @@ nsWinUtils::ConvertToIA2Array(nsIArray *
+   return S_OK;
+ }
+ 
+ bool
+ nsWinUtils::MaybeStartWindowEmulation()
+ {
+   // Register window class that'll be used for document accessibles associated
+   // with tabs.
+-  if (IsWindowEmulationFor(0)) {
++  if (Preferences::GetBool("browser.tabs.remote") ||
++      Compatibility::IsJAWS() || Compatibility::IsWE() ||
++      Compatibility::IsDolphin()) {
+     RegisterNativeWindow(kClassNameTabContent);
+     nsAccessNodeWrap::sHWNDCache.Init(4);
+     return true;
+   }
+   return false;
+ }
+ 
+ void
+ nsWinUtils::ShutdownWindowEmulation()
+ {
+   // Unregister window call that's used for document accessibles associated
+   // with tabs.
+-  if (IsWindowEmulationFor(0))
++  if (IsWindowEmulationStarted())
+     ::UnregisterClassW(kClassNameTabContent, GetModuleHandle(NULL));
+ }
+ 
+ bool
+ nsWinUtils::IsWindowEmulationStarted()
+ {
+   return nsAccessNodeWrap::sHWNDCache.IsInitialized();
+ }
+@@ -179,21 +183,8 @@ nsWinUtils::ShowNativeWindow(HWND aWnd)
+ 
+ void
+ nsWinUtils::HideNativeWindow(HWND aWnd)
+ {
+   ::SetWindowPos(aWnd, NULL, 0, 0, 0, 0,
+                  SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE |
+                  SWP_NOZORDER | SWP_NOACTIVATE);
+ }
+-
+-bool
+-nsWinUtils::IsWindowEmulationFor(LPCWSTR kModuleHandle)
+-{
+-  // Window emulation is always enabled in multiprocess Firefox.
+-  if (Preferences::GetBool("browser.tabs.remote"))
+-    return kModuleHandle ? ::GetModuleHandleW(kModuleHandle) : true;
+-
+-  return kModuleHandle ? ::GetModuleHandleW(kModuleHandle) :
+-    ::GetModuleHandleW(kJAWSModuleHandle) ||
+-    ::GetModuleHandleW(kWEModuleHandle)  ||
+-    ::GetModuleHandleW(kDolphinModuleHandle);
+-}
+--- a/accessible/src/msaa/nsWinUtils.h	
++++ a/accessible/src/msaa/nsWinUtils.h	
+@@ -44,20 +44,16 @@ 
+ #include "Accessible2.h"
+ 
+ #include "nsIArray.h"
+ #include "nsIDocument.h"
+ 
+ const LPCWSTR kClassNameRoot = L"MozillaUIWindowClass";
+ const LPCWSTR kClassNameTabContent = L"MozillaContentWindowClass";
+ 
+-const LPCWSTR kJAWSModuleHandle = L"jhook";
+-const LPCWSTR kWEModuleHandle = L"gwm32inc";
+-const LPCWSTR kDolphinModuleHandle = L"dolwinhk";
+-
+ class nsWinUtils
+ {
+ public:
+   /**
+    * Convert nsIArray array of accessible objects to an array of IUnknown*
+    * objects used in IA2 methods.
+    */
+   static HRESULT ConvertToIA2Array(nsIArray *aCollection,
+@@ -94,17 +90,12 @@ public:
+    * Helper to show window.
+    */
+   static void ShowNativeWindow(HWND aWnd);
+ 
+   /**
+    * Helper to hide window.
+    */
+   static void HideNativeWindow(HWND aWnd);
+-
+-  /**
+-   * Return true if window emulation is enabled.
+-   */
+-  static bool IsWindowEmulationFor(LPCWSTR kModuleHandle);
+ };
+ 
+ #endif
+ 

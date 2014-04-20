@@ -1,0 +1,435 @@
+--- a/gfx/cairo/cairo/src/cairo-d2d-private.h	
++++ a/gfx/cairo/cairo/src/cairo-d2d-private.h	
+@@ -47,17 +47,17 @@ 
+ #include "cairo-surface-clipper-private.h"
+ 
+ #include "cairo-win32-refptr.h"
+ #include "cairo-d2d-private-fx.h"
+ #include "cairo-win32.h"
+ #include "cairo-list-private.h"
+ 
+ /* describes the type of the currently applied clip so that we can pop it */
+-struct d2d_clip;
++struct d2d_clip_t;
+ 
+ #define MAX_OPERATORS CAIRO_OPERATOR_HSL_LUMINOSITY + 1
+ 
+ struct _cairo_d2d_device
+ {
+     cairo_device_t base;
+ 
+     HMODULE mD3D10_1;
+@@ -109,17 +109,17 @@ struct _cairo_d2d_surface {
+     /** Swap chain holding our backbuffer (NULL if not a window surface) */
+     RefPtr<IDXGISwapChain> dxgiChain;
+     /** Window handle of the window we belong to */
+     HWND hwnd;
+     /** Format of the surface */
+     cairo_format_t format;
+ 
+     cairo_clip_t clip;
+-    d2d_clip *d2d_clip;
++    d2d_clip_t *d2d_clip;
+ 
+ 
+     /** Mask layer used by surface_mask to push opacity masks */
+     RefPtr<ID2D1Layer> maskLayer;
+     /**
+      * Layer used for clipping when tiling, and also for clearing out geometries
+      * - lazily initialized 
+      */
+@@ -157,20 +157,20 @@ typedef struct _cairo_d2d_surface cairo_d2d_surface_t;
+ 
+ struct _cairo_d2d_surface_entry
+ {
+     cairo_list_t link;
+     cairo_d2d_surface_t *surface;
+ };
+ 
+ typedef HRESULT (WINAPI*D2D1CreateFactoryFunc)(
+-    __in D2D1_FACTORY_TYPE factoryType,
+-    __in REFIID iid,
+-    __in_opt CONST D2D1_FACTORY_OPTIONS *pFactoryOptions,
+-    __out void **factory
++    D2D1_FACTORY_TYPE factoryType,
++    REFIID iid,
++    CONST D2D1_FACTORY_OPTIONS *pFactoryOptions,
++    void **factory
+ );
+ 
+ typedef HRESULT (WINAPI*D3D10CreateDevice1Func)(
+   IDXGIAdapter *pAdapter,
+   D3D10_DRIVER_TYPE DriverType,
+   HMODULE Software,
+   UINT Flags,
+   D3D10_FEATURE_LEVEL1 HardwareLevel,
+--- a/gfx/cairo/cairo/src/cairo-d2d-surface.cpp	
++++ a/gfx/cairo/cairo/src/cairo-d2d-surface.cpp	
+@@ -839,22 +839,22 @@ void cairo_d2d_present_backbuffer(cairo_surface_t *surface)
+     cairo_d2d_surface_t *d2dsurf = reinterpret_cast<cairo_d2d_surface_t*>(surface);
+     _cairo_d2d_flush(d2dsurf);
+     if (d2dsurf->dxgiChain) {
+ 	d2dsurf->dxgiChain->Present(0, 0);
+ 	d2dsurf->device->mD3D10Device->Flush();
+     }
+ }
+ 
+-struct d2d_clip
++struct d2d_clip_t
+ {
+     enum clip_type {LAYER, AXIS_ALIGNED_CLIP};
+-    d2d_clip * const prev;
++    d2d_clip_t * const prev;
+     const enum clip_type type;
+-    d2d_clip(d2d_clip *prev, clip_type type) : prev(prev), type(type) { }
++    d2d_clip_t(d2d_clip_t *prev, clip_type type) : prev(prev), type(type) { }
+ };
+ 
+ static RefPtr<ID2D1PathGeometry>
+ _cairo_d2d_create_path_geometry_for_path(cairo_path_fixed_t *path,
+ 					 cairo_fill_rule_t fill_rule,
+ 					 D2D1_FIGURE_BEGIN type);
+ 
+ 
+@@ -884,17 +884,17 @@ push_clip (cairo_d2d_surface_t *d2dsurf, cairo_clip_path_t *clip_path)
+ 	d2dsurf->rt->PushAxisAlignedClip (
+ 		D2D1::RectF(
+ 		    _cairo_fixed_to_float(box.p1.x),
+ 		    _cairo_fixed_to_float(box.p1.y),
+ 		    _cairo_fixed_to_float(box.p2.x),
+ 		    _cairo_fixed_to_float(box.p2.y)),
+ 		mode);
+ 
+-	d2dsurf->d2d_clip = new d2d_clip (d2dsurf->d2d_clip, d2d_clip::AXIS_ALIGNED_CLIP);
++	d2dsurf->d2d_clip = new d2d_clip_t (d2dsurf->d2d_clip, d2d_clip_t::AXIS_ALIGNED_CLIP);
+     } else {
+ 	HRESULT hr;
+ 	RefPtr<ID2D1PathGeometry> geom = _cairo_d2d_create_path_geometry_for_path (&clip_path->path,
+ 							clip_path->fill_rule,
+ 							D2D1_FIGURE_BEGIN_FILLED);
+ 	RefPtr<ID2D1Layer> layer;
+ 
+ 	hr = d2dsurf->rt->CreateLayer (&layer);
+@@ -909,32 +909,32 @@ push_clip (cairo_d2d_surface_t *d2dsurf, cairo_clip_path_t *clip_path)
+ 		    geom,
+ 		    D2D1_ANTIALIAS_MODE_PER_PRIMITIVE,
+ 		    D2D1::IdentityMatrix(),
+ 		    1.0,
+ 		    0,
+ 		    options),
+ 		layer);
+ 
+-	d2dsurf->d2d_clip = new d2d_clip(d2dsurf->d2d_clip, d2d_clip::LAYER);
++	d2dsurf->d2d_clip = new d2d_clip_t(d2dsurf->d2d_clip, d2d_clip_t::LAYER);
+    }
+     if (!d2dsurf->d2d_clip)
+ 	return _cairo_error(CAIRO_STATUS_NO_MEMORY);
+     return CAIRO_STATUS_SUCCESS;
+ }
+ 
+ static void
+ pop_clip (cairo_d2d_surface_t *d2dsurf)
+ {
+-    d2d_clip *current_clip = d2dsurf->d2d_clip;
++    d2d_clip_t *current_clip = d2dsurf->d2d_clip;
+ 
+     /* pop the clip from the render target */
+-    if (current_clip->type == d2d_clip::LAYER) {
++    if (current_clip->type == d2d_clip_t::LAYER) {
+ 	d2dsurf->rt->PopLayer();
+-    } else if (current_clip->type == d2d_clip::AXIS_ALIGNED_CLIP) {
++    } else if (current_clip->type == d2d_clip_t::AXIS_ALIGNED_CLIP) {
+ 	d2dsurf->rt->PopAxisAlignedClip();
+     }
+ 
+     /* pop it from our own stack */
+     d2dsurf->d2d_clip = current_clip->prev;
+     delete current_clip;
+ }
+ 
+@@ -2427,33 +2427,33 @@ _cairo_d2d_create_similar(void			*surface,
+     
+     /* CreateTexture2D does not support D3D10_RESOURCE_MISC_GDI_COMPATIBLE with DXGI_FORMAT_A8_UNORM */
+     if (desc.Format != DXGI_FORMAT_A8_UNORM)
+ 	desc.MiscFlags = D3D10_RESOURCE_MISC_GDI_COMPATIBLE;
+ 
+     RefPtr<ID3D10Texture2D> texture;
+     RefPtr<IDXGISurface> dxgiSurface;
+ 
++    D2D1_RENDER_TARGET_USAGE usage = (desc.MiscFlags & D3D10_RESOURCE_MISC_GDI_COMPATIBLE) ?
++					  D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE
++					: D2D1_RENDER_TARGET_USAGE_NONE;
++
+     hr = d2dsurf->device->mD3D10Device->CreateTexture2D(&desc, NULL, &texture);
+     if (FAILED(hr)) {
+ 	goto FAIL_CREATESIMILAR;
+     }
+ 
+     newSurf->surface = texture;
+ 
+     // Create the DXGI surface.
+     hr = newSurf->surface->QueryInterface(IID_IDXGISurface, (void**)&dxgiSurface);
+     if (FAILED(hr)) {
+ 	goto FAIL_CREATESIMILAR;
+     }
+ 
+-    D2D1_RENDER_TARGET_USAGE usage = (desc.MiscFlags & D3D10_RESOURCE_MISC_GDI_COMPATIBLE) ?
+-					  D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE
+-					: D2D1_RENDER_TARGET_USAGE_NONE;
+-
+     hr = sD2DFactory->CreateDxgiSurfaceRenderTarget(dxgiSurface,
+ 						    D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT,
+ 										 D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN,
+ 												   alpha),
+ 										 dpiX,
+ 										 dpiY,
+ 										 usage),
+ 						    &newSurf->rt);
+@@ -4437,16 +4437,17 @@ cairo_d2d_surface_create_for_handle(cairo_device_t *device, HANDLE handle, cairo
+     cairo_status_t status = CAIRO_STATUS_NO_MEMORY;
+     HRESULT hr;
+     RefPtr<ID3D10Texture2D> texture;
+     RefPtr<IDXGISurface> dxgiSurface;
+     D2D1_BITMAP_PROPERTIES bitProps;
+     D2D1_RENDER_TARGET_PROPERTIES props;
+     DXGI_FORMAT format;
+     DXGI_SURFACE_DESC desc;
++    D2D1_ALPHA_MODE alpha = D2D1_ALPHA_MODE_PREMULTIPLIED;
+ 
+     hr = d2d_device->mD3D10Device->OpenSharedResource(handle,
+ 						      __uuidof(ID3D10Resource),
+ 						      (void**)&newSurf->surface);
+ 
+     if (FAILED(hr)) {
+ 	goto FAIL_CREATEHANDLE;
+     }
+@@ -4455,17 +4456,16 @@ cairo_d2d_surface_create_for_handle(cairo_device_t *device, HANDLE handle, cairo
+ 
+     if (FAILED(hr)) {
+ 	goto FAIL_CREATEHANDLE;
+     }
+ 
+     dxgiSurface->GetDesc(&desc);
+     format = desc.Format;
+     
+-    D2D1_ALPHA_MODE alpha = D2D1_ALPHA_MODE_PREMULTIPLIED;
+     if (format == DXGI_FORMAT_B8G8R8A8_UNORM) {
+ 	if (content == CAIRO_CONTENT_ALPHA) {
+ 	    status = CAIRO_STATUS_INVALID_CONTENT;
+ 	    goto FAIL_CREATEHANDLE;
+ 	}
+ 	_cairo_surface_init(&newSurf->base, &cairo_d2d_surface_backend, NULL, content);
+ 	if (content == CAIRO_CONTENT_COLOR) {
+ 	    alpha = D2D1_ALPHA_MODE_IGNORE;
+--- a/gfx/cairo/cairo/src/cairo-dwrite-font.cpp	
++++ a/gfx/cairo/cairo/src/cairo-dwrite-font.cpp	
+@@ -40,20 +40,20 @@ 
+ #include "cairo-surface-private.h"
+ #include "cairo-clip-private.h"
+ 
+ #include "cairo-d2d-private.h"
+ #include "cairo-dwrite-private.h"
+ #include <float.h>
+ 
+ typedef HRESULT (WINAPI*D2D1CreateFactoryFunc)(
+-    __in D2D1_FACTORY_TYPE factoryType,
+-    __in REFIID iid,
+-    __in_opt CONST D2D1_FACTORY_OPTIONS *pFactoryOptions,
+-    __out void **factory
++    D2D1_FACTORY_TYPE factoryType,
++    REFIID iid,
++    CONST D2D1_FACTORY_OPTIONS *pFactoryOptions,
++    void **factory
+ );
+ 
+ #define CAIRO_INT_STATUS_SUCCESS (cairo_int_status_t)CAIRO_STATUS_SUCCESS
+ 
+ // Forward declarations
+ cairo_int_status_t
+ _dwrite_draw_glyphs_to_gdi_surface_d2d(cairo_win32_surface_t *surface,
+ 				       DWRITE_MATRIX *transform,
+@@ -151,17 +151,17 @@ const cairo_font_face_backend_t _cairo_dwrite_font_face_backend = {
+     _cairo_dwrite_font_face_destroy,
+     _cairo_dwrite_font_face_scaled_font_create
+ };
+ 
+ /* Functions cairo_scaled_font_backend_t */
+ 
+ void _cairo_dwrite_scaled_font_fini(void *scaled_font);
+ 
+-cairo_warn cairo_int_status_t
++static cairo_warn cairo_int_status_t
+ _cairo_dwrite_scaled_glyph_init(void			     *scaled_font,
+ 				cairo_scaled_glyph_t	     *scaled_glyph,
+ 				cairo_scaled_glyph_info_t    info);
+ 
+ cairo_warn cairo_int_status_t
+ _cairo_dwrite_scaled_show_glyphs(void			*scaled_font,
+ 				 cairo_operator_t	 op,
+ 				 const cairo_pattern_t	*pattern,
+@@ -946,61 +946,63 @@ _cairo_dwrite_scaled_font_init_glyph_surface(cairo_dwrite_scaled_font_t *scaled_
+     y2 = _cairo_fixed_integer_ceil (scaled_glyph->bbox.p2.y);
+     width = (int)(x2 - x1);
+     height = (int)(y2 - y1);
+ 
+     glyph.index = _cairo_scaled_glyph_index (scaled_glyph);
+     glyph.x = -x1;
+     glyph.y = -y1;
+ 
++    DWRITE_GLYPH_RUN run;
++    FLOAT advance = 0;
++    UINT16 index = (UINT16)glyph.index;
++    DWRITE_GLYPH_OFFSET offset;
++    double x = glyph.x;
++    double y = glyph.y;
++    RECT area;
++    DWRITE_MATRIX matrix;
++
+     surface = (cairo_win32_surface_t *)
+ 	cairo_win32_surface_create_with_dib (CAIRO_FORMAT_RGB24, width, height);
+ 
+     cr = cairo_create (&surface->base);
+     cairo_set_source_rgb (cr, 1, 1, 1);
+     cairo_paint (cr);
+     status = (cairo_int_status_t)cairo_status (cr);
+     cairo_destroy(cr);
+     if (status)
+ 	goto FAIL;
+ 
+-    DWRITE_GLYPH_RUN run;
+-    FLOAT advance = 0;
+-    UINT16 index = (UINT16)glyph.index;
+-    DWRITE_GLYPH_OFFSET offset;
+-    double x = glyph.x;
+-    double y = glyph.y;
+     /**
+      * We transform by the inverse transformation here. This will put our glyph
+      * locations in the space in which we draw. Which is later transformed by
+      * the transformation matrix that we use. This will transform the
+      * glyph positions back to where they were before when drawing, but the
+      * glyph shapes will be transformed by the transformation matrix.
+      */
+     cairo_matrix_transform_point(&scaled_font->mat_inverse, &x, &y);
+     offset.advanceOffset = (FLOAT)x;
+     /** Y-axis is inverted */
+     offset.ascenderOffset = -(FLOAT)y;
+ 
+-    RECT area;
+     area.top = 0;
+     area.bottom = height;
+     area.left = 0;
+     area.right = width;
+ 
+     run.glyphCount = 1;
+     run.glyphAdvances = &advance;
+     run.fontFace = ((cairo_dwrite_font_face_t*)scaled_font->base.font_face)->dwriteface;
+     run.fontEmSize = 1.0f;
+     run.bidiLevel = 0;
+     run.glyphIndices = &index;
+     run.isSideways = FALSE;
+     run.glyphOffsets = &offset;
+ 
+-    DWRITE_MATRIX matrix = _cairo_dwrite_matrix_from_matrix(&scaled_font->mat);
++    matrix = _cairo_dwrite_matrix_from_matrix(&scaled_font->mat);
+ 
+     status = _dwrite_draw_glyphs_to_gdi_surface_gdi (surface, &matrix, &run,
+             RGB(0,0,0), scaled_font, area);
+     if (status)
+ 	goto FAIL;
+ 
+     GdiFlush();
+ 
+--- a/gfx/cairo/cairo/src/cairo-dwrite-private.h	
++++ a/gfx/cairo/cairo/src/cairo-dwrite-private.h	
+@@ -29,23 +29,23 @@ 
+  * The Original Code is the cairo graphics library.
+  *
+  * The Initial Developer of the Original Code is the Mozilla Foundation
+  *
+  * Contributor(s):
+  *	Bas Schouten <bschouten@mozilla.com>
+  */
+ #include <dwrite.h>
+-#include <D2d1.h>
++#include <d2d1.h>
+ 
+ // DirectWrite is not available on all platforms.
+ typedef HRESULT (WINAPI*DWriteCreateFactoryFunc)(
+-  __in   DWRITE_FACTORY_TYPE factoryType,
+-  __in   REFIID iid,
+-  __out  IUnknown **factory
++  DWRITE_FACTORY_TYPE factoryType,
++  REFIID iid,
++  IUnknown **factory
+ );
+ 
+ /* cairo_scaled_font_t implementation */
+ struct _cairo_dwrite_scaled_font {
+     cairo_scaled_font_t base;
+     cairo_matrix_t mat;
+     cairo_matrix_t mat_inverse;
+     cairo_antialias_t antialias_mode;
+--- a/gfx/cairo/cairo/src/cairo-win32-refptr.h	
++++ a/gfx/cairo/cairo/src/cairo-win32-refptr.h	
+@@ -69,19 +69,20 @@ public:
+ 
+     ~RefPtr()
+     {
+ 	if (mPtr) {
+ 	    mPtr->Release();
+ 	}
+     }
+ 
+-    RefPtr<T> &operator =(const RefPtr<T> aPtr)
++    template<typename U>
++    RefPtr<T> &operator =(const RefPtr<U> aPtr)
+     {
+-	assignPtr(aPtr.mPtr);
++	assignPtr(aPtr);
+ 	return *this;
+     }
+     
+     RefPtr<T> &operator =(T* aPtr)
+     {
+ 	assignPtr(aPtr);
+ 	return *this;
+     }
+@@ -112,17 +113,17 @@ public:
+ 	return mPtr;
+     }
+ 
+     operator bool()
+     {
+ 	return (mPtr ? true : false);
+     }
+ 
+-    operator T*()
++    operator T*() const
+     {
+ 	return mPtr;
+     }
+ 
+     template <class newType>
+     operator RefPtr<newType>()
+     {
+ 	RefPtr<newType> newPtr;
+--- a/gfx/cairo/cairo/src/cairo-win32.h	
++++ a/gfx/cairo/cairo/src/cairo-win32.h	
+@@ -144,17 +144,16 @@ cairo_dwrite_get_cleartype_rendering_mode();
+ 
+ #if CAIRO_HAS_D2D_SURFACE
+ 
+ struct _cairo_device
+ {
+     int type;
+     int refcount;
+ };
+-typedef struct _cairo_device cairo_device_t;
+ 
+ /**
+  * Create a D2D device
+  *
+  * \return New D2D device, NULL if creation failed.
+  */
+ cairo_device_t *
+ cairo_d2d_create_device();
