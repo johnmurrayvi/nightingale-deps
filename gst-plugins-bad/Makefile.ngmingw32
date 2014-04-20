@@ -112,10 +112,13 @@ ifeq (1, $(NG_VENDOR_CROSS_COMP))
     NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
                                        --disable-static
   endif
+  ifeq (, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-wasapi
+  endif
 endif
 
 NG_VENDOR_TARGET_DYLIB_FIXUPS = $(addprefix libgst, \
-  $(addsuffix -0.10, $(sort $(GST_BASE_DYLIBS))))
+  $(addsuffix -1.0, $(sort $(GST_BASE_DYLIBS))))
 
 include $(CURDIR)/../vendor-rules.mk
 
