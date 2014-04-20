@@ -583,8 +583,9 @@ ifneq (,$(call enable-ng-lib, jpeg))
       endif
       ifeq (1, $(NG_VENDOR_CROSS_COMP))
           # NG_JPEG_LIBS := -L$(NG_LIBJPEG_DIR)/lib -ljpeg
-          NG_JPEG_LIBS += -ljpeg
-          NG_PATH += $(NG_LIBJPEG_DIR)/bin    
+          NG_LDFLAGS += -ljpeg      
+          NG_CFLAGS += -I$(NG_LIBJPEG_DIR)/include
+          NG_PATH += $(NG_LIBJPEG_DIR)/bin
       endif
    endif
 endif
