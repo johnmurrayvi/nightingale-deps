@@ -129,10 +129,10 @@ ifeq (macosx-i686,$(NG_XR_PLATFORM)-$(NG_XR_ARCH))
 endif
 	@echo Setting up xulrunner $*-mode build...
 	$(CP) $(CURDIR)/mozconfigs/$(MOZCONFIG) $(CURDIR)/mozilla/.mozconfig
+	$(MKDIR) $(CURDIR)/mozilla/compiled/xulrunner-$*
 	$(MAKE) -C $(CURDIR)/mozilla -f client.mk build
 
 	# $(RM) -r $(CURDIR)/mozilla/compiled/xulrunner-$*
-	# $(MKDIR) $(CURDIR)/mozilla/compiled/xulrunner-$*
 
 .PHONY: xr-% FORCE
 
