@@ -112,13 +112,13 @@ xr-packaging-%:
       fi; \
     fi
 	@if $(HAVE_XR_$*_BUILD); then \
-      $(call sh_make,$(XR_PACKAGE_DEPS) $(NG_XR_PLATFORM)-$(NG_XR_ARCH) $(NG_BRANCH) $*); \
+      $(call sh_make,$(XR_PACKAGE_DEPS) $(NG_XR_PLATFORM)-$(NG_XR_ARCH) $*); \
       $(call sh_make,$(RM) -r $(NG_VENDOR_BINARIES_DIR)/mozilla-${XUL}/$*); \
       $(call sh_make,$(MKDIR) -p $(NG_VENDOR_BINARIES_DIR)/mozilla-${XUL}); \
-      $(call sh_make,$(MV) $(CURDIR)/nightingale/$(NG_BRANCH)/dependencies/$(NG_XR_PLATFORM)-$(NG_XR_ARCH)/mozilla/$* $(NG_VENDOR_BINARIES_DIR)/mozilla-${XUL}/); \
+      $(call sh_make,$(MV) $(CURDIR)/nightingale/dependencies/$(NG_XR_PLATFORM)-$(NG_XR_ARCH)/mozilla/$* $(NG_VENDOR_BINARIES_DIR)/mozilla-${XUL}/); \
       $(call sh_make,$(RM) -r $(NG_VENDOR_BINARIES_DIR)/xulrunner-${XUL}/$*); \
       $(call sh_make,$(MKDIR) -p $(NG_VENDOR_BINARIES_DIR)/xulrunner-${XUL}); \
-      $(call sh_make,$(MV) $(CURDIR)/nightingale/$(NG_BRANCH)/dependencies/$(NG_XR_PLATFORM)-$(NG_XR_ARCH)/xulrunner/$* $(NG_VENDOR_BINARIES_DIR)/xulrunner-${XUL}/); \
+      $(call sh_make,$(MV) $(CURDIR)/nightingale/dependencies/$(NG_XR_PLATFORM)-$(NG_XR_ARCH)/xulrunner/$* $(NG_VENDOR_BINARIES_DIR)/xulrunner-${XUL}/); \
     fi
 
 xr-build-%: setup_environment

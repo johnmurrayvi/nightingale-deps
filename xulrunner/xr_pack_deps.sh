@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+# #!/usr/bin/env bash
 
 set -e
 
@@ -9,32 +11,31 @@ shellExec() {
   eval $*;
 }
 
-if [ $# != 3 ]; then
+if [ $# != 2 ]; then
   echo "usage: xr_pack_deps.sh <linux-x86_64|linux-i686>"
-  echo "                       <trunk|SONGBIRD_0_2|SONGBIRD_0_3|SONGBIRD_0_4>"
   echo "                       <release|debug>"
   exit
 fi
 
 plat=$1
-tree=$2
-buildMode=$3
+buildMode=$2
 
-if [ "$3" != "debug" ] && [ "$3" != "release" ]; then
+if [ "$2" != "debug" ] && [ "$2" != "release" ]; then
   echo "Invalid build mode; must be 'debug' or 'release'."
   exit -1
 fi
 
 # create destination directories
-$MKDIR -p songbird/$tree/dependencies/$plat/mozilla/$buildMode/
-$MKDIR -p songbird/$tree/dependencies/$plat/xulrunner/$buildMode/
+$MKDIR -p nightingale/dependencies/$plat/mozilla/$buildMode/
+$MKDIR -p nightingale/dependencies/$plat/xulrunner/$buildMode/
 
 # make mozilla sdk
 shellExec ./make-mozilla-sdk.sh mozilla/ \
-                      mozilla/compiled/xulrunner-$buildMode/ \
-                      songbird/$tree/dependencies/$plat/mozilla/$buildMode/
+              mozilla/compiled/xulrunner-$buildMode/ \
+              nightingale/dependencies/$plat/mozilla/$buildMode/
 
 # make xulrunner tarball
-shellExec ./make-xulrunner-tarball.sh mozilla/compiled/xulrunner-$buildMode/dist/bin/ \
-                            songbird/$tree/dependencies/$plat/xulrunner/$buildMode/ \
-                            xulrunner.tar.bz2
+shellExec ./make-xulrunner-tarball.sh \
+              mozilla/compiled/xulrunner-$buildMode/dist/bin/ \
+              nightingale/dependencies/$plat/xulrunner/$buildMode/ \
+              xulrunner.tar.bz2
