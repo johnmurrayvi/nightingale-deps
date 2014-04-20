@@ -1,0 +1,4674 @@
+diff -Naur mozilla-release/accessible/public/ia2/Makefile.in mozilla/accessible/public/ia2/Makefile.in
+--- mozilla-release/accessible/public/ia2/Makefile.in	2011-12-20 20:06:24.000000000 -0500
++++ mozilla/accessible/public/ia2/Makefile.in	2014-04-20 13:23:08.747933123 -0400
+@@ -105,13 +105,7 @@
+ 
+ include $(topsrcdir)/config/rules.mk
+ 
+-OS_LIBS = \
+-  kernel32.lib \
+-  rpcns4.lib \
+-  rpcrt4.lib \
+-  ole32.lib \
+-  oleaut32.lib \
+-  $(NULL)
++OS_LIBS = $(call EXPAND_LIBNAME,uuid kernel32 rpcns4 rpcrt4 ole32 oleaut32)
+ 
+ # generate list of to-be-generated files that are missing
+ # but ignore special file dlldata.c
+diff -Naur mozilla-release/accessible/public/msaa/Makefile.in mozilla/accessible/public/msaa/Makefile.in
+--- mozilla-release/accessible/public/msaa/Makefile.in	2011-12-20 20:06:24.000000000 -0500
++++ mozilla/accessible/public/msaa/Makefile.in	2014-04-20 13:23:08.747933123 -0400
+@@ -85,12 +85,7 @@
+ 
+ SRCDIR_CSRCS	= $(addprefix $(srcdir)/,$(CSRCS))
+ 
+-OS_LIBS = \
+-	kernel32.lib \
+-	rpcns4.lib \
+-	rpcrt4.lib \
+-	oleaut32.lib \
+-	$(NULL)
++OS_LIBS = $(call EXPAND_LIBNAME,kernel32 rpcns4 rpcrt4 oleaut32)
+ 
+ $(MIDL_GENERATED_FILES): done_gen
+ 
+diff -Naur mozilla-release/accessible/public/msaa/nsIWinAccessNode.idl mozilla/accessible/public/msaa/nsIWinAccessNode.idl
+--- mozilla-release/accessible/public/msaa/nsIWinAccessNode.idl	2011-12-20 20:06:24.000000000 -0500
++++ mozilla/accessible/public/msaa/nsIWinAccessNode.idl	2014-04-20 13:23:08.747933123 -0400
+@@ -40,7 +40,7 @@
+ #include "nsISupports.idl"
+ 
+ %{C++
+-#include "Guiddef.h"
++#include "guiddef.h"
+ %}
+ 
+ [ref] native MSCOMIIDRef(IID);
+diff -Naur mozilla-release/accessible/src/msaa/CAccessibleAction.cpp mozilla/accessible/src/msaa/CAccessibleAction.cpp
+--- mozilla-release/accessible/src/msaa/CAccessibleAction.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/CAccessibleAction.cpp	2014-04-20 15:32:57.801117568 -0400
+@@ -44,6 +44,8 @@
+ 
+ #include "nsAccessible.h"
+ 
++#include "mingw-seh.h"
++
+ // IUnknown
+ 
+ STDMETHODIMP
+@@ -65,7 +67,8 @@
+ STDMETHODIMP
+ CAccessibleAction::nActions(long* aActionCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aActionCount)
+     return E_INVALIDARG;
+ 
+@@ -78,14 +81,14 @@
+   *aActionCount = acc->ActionCount();
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleAction::doAction(long aActionIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessible> acc(do_QueryObject(this));
+   if (!acc)
+     return E_FAIL;
+@@ -94,14 +97,14 @@
+   nsresult rv = acc->DoAction(index);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleAction::get_description(long aActionIndex, BSTR *aDescription)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aDescription = NULL;
+ 
+   nsCOMPtr<nsIAccessible> acc(do_QueryObject(this));
+@@ -121,8 +124,7 @@
+                                       description.Length());
+   return *aDescription ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -130,7 +132,8 @@
+                                   BSTR **aKeyBinding,
+                                   long *aNumBinding)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aKeyBinding)
+     return E_INVALIDARG;
+   *aKeyBinding = NULL;
+@@ -171,14 +174,14 @@
+   *aNumBinding = 1;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleAction::get_name(long aActionIndex, BSTR *aName)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aName = NULL;
+ 
+   nsCOMPtr<nsIAccessible> acc(do_QueryObject(this));
+@@ -197,17 +200,18 @@
+   *aName = ::SysAllocStringLen(name.get(), name.Length());
+   return *aName ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleAction::get_localizedName(long aActionIndex, BSTR *aLocalizedName)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aLocalizedName = NULL;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+diff -Naur mozilla-release/accessible/src/msaa/CAccessibleComponent.cpp mozilla/accessible/src/msaa/CAccessibleComponent.cpp
+--- mozilla-release/accessible/src/msaa/CAccessibleComponent.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/CAccessibleComponent.cpp	2014-04-20 15:35:18.158102872 -0400
+@@ -50,6 +50,8 @@
+ #include "nsIDOMCSSPrimitiveValue.h"
+ #include "nsIDOMNSRGBAColor.h"
+ 
++#include "mingw-seh.h"
++
+ using namespace mozilla::a11y;
+ 
+ enum {
+@@ -80,7 +82,8 @@
+ STDMETHODIMP
+ CAccessibleComponent::get_locationInParent(long *aX, long *aY)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aX = 0;
+   *aY = 0;
+ 
+@@ -123,36 +126,36 @@
+   *aY = y - parenty;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleComponent::get_foreground(IA2Color *aForeground)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetARGBValueFromCSSProperty(NS_LITERAL_STRING("color"), aForeground);
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleComponent::get_background(IA2Color *aBackground)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetARGBValueFromCSSProperty(NS_LITERAL_STRING("background-color"),
+                                      aBackground);
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ HRESULT
+ CAccessibleComponent::GetARGBValueFromCSSProperty(const nsAString& aPropName,
+                                                   IA2Color *aColorValue)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aColorValue = 0;
+ 
+   nsCOMPtr<nsIAccessNode> acc(do_QueryObject(this));
+@@ -225,7 +228,6 @@
+                  (((IA2Color) (alpha * 0xff)) << IA2AlphaShift);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+diff -Naur mozilla-release/accessible/src/msaa/CAccessibleEditableText.cpp mozilla/accessible/src/msaa/CAccessibleEditableText.cpp
+--- mozilla-release/accessible/src/msaa/CAccessibleEditableText.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/CAccessibleEditableText.cpp	2014-04-20 15:37:31.109088951 -0400
+@@ -44,6 +44,8 @@
+ #include "AccessibleEditableText_i.c"
+ #include "nsAccessNodeWrap.h"
+ 
++#include "mingw-seh.h"
++
+ #include "nsCOMPtr.h"
+ #include "nsString.h"
+ 
+@@ -78,33 +80,34 @@
+ STDMETHODIMP
+ CAccessibleEditableText::copyText(long aStartOffset, long aEndOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   GET_NSIACCESSIBLEEDITABLETEXT
+ 
+   nsresult rv = textAcc->CopyText(aStartOffset, aEndOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleEditableText::deleteText(long aStartOffset, long aEndOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   GET_NSIACCESSIBLEEDITABLETEXT
+ 
+   nsresult rv = textAcc->DeleteText(aStartOffset, aEndOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleEditableText::insertText(long aOffset, BSTR *aText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   GET_NSIACCESSIBLEEDITABLETEXT
+ 
+   PRUint32 length = ::SysStringLen(*aText);
+@@ -113,41 +116,41 @@
+   nsresult rv = textAcc->InsertText(text, aOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleEditableText::cutText(long aStartOffset, long aEndOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   GET_NSIACCESSIBLEEDITABLETEXT
+ 
+   nsresult rv = textAcc->CutText(aStartOffset, aEndOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleEditableText::pasteText(long aOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   GET_NSIACCESSIBLEEDITABLETEXT
+ 
+   nsresult rv = textAcc->PasteText(aOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleEditableText::replaceText(long aStartOffset, long aEndOffset,
+                                      BSTR *aText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   GET_NSIACCESSIBLEEDITABLETEXT
+ 
+   nsresult rv = textAcc->DeleteText(aStartOffset, aEndOffset);
+@@ -160,16 +163,16 @@
+   rv = textAcc->InsertText(text, aStartOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleEditableText::setAttributes(long aStartOffset, long aEndOffset,
+                                        BSTR *aAttributes)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+diff -Naur mozilla-release/accessible/src/msaa/CAccessibleHyperlink.cpp mozilla/accessible/src/msaa/CAccessibleHyperlink.cpp
+--- mozilla-release/accessible/src/msaa/CAccessibleHyperlink.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/CAccessibleHyperlink.cpp	2014-04-20 15:38:10.269084851 -0400
+@@ -47,6 +47,8 @@
+ #include "nsAccessible.h"
+ #include "nsIWinAccessNode.h"
+ 
++#include "mingw-seh.h"
++
+ // IUnknown
+ 
+ STDMETHODIMP
+@@ -72,7 +74,8 @@
+ STDMETHODIMP
+ CAccessibleHyperlink::get_anchor(long aIndex, VARIANT *aAnchor)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(aAnchor);
+ 
+   nsRefPtr<nsAccessible> thisObj = do_QueryObject(this);
+@@ -100,14 +103,14 @@
+   aAnchor->vt = VT_UNKNOWN;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleHyperlink::get_anchorTarget(long aIndex, VARIANT *aAnchorTarget)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(aAnchorTarget);
+ 
+   nsRefPtr<nsAccessible> thisObj = do_QueryObject(this);
+@@ -140,14 +143,14 @@
+                                                stringURI.Length());
+   return aAnchorTarget->bstrVal ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleHyperlink::get_startIndex(long *aIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aIndex = 0;
+ 
+   nsRefPtr<nsAccessible> thisObj = do_QueryObject(this);
+@@ -157,14 +160,14 @@
+   *aIndex = thisObj->StartOffset();
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleHyperlink::get_endIndex(long *aIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aIndex = 0;
+ 
+   nsRefPtr<nsAccessible> thisObj = do_QueryObject(this);
+@@ -174,14 +177,14 @@
+   *aIndex = thisObj->EndOffset();
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleHyperlink::get_valid(boolean *aValid)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aValid = false;
+ 
+   nsRefPtr<nsAccessible> thisObj = do_QueryObject(this);
+@@ -191,7 +194,6 @@
+   *aValid = thisObj->IsLinkValid();
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+diff -Naur mozilla-release/accessible/src/msaa/CAccessibleHypertext.cpp mozilla/accessible/src/msaa/CAccessibleHypertext.cpp
+--- mozilla-release/accessible/src/msaa/CAccessibleHypertext.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/CAccessibleHypertext.cpp	2014-04-20 15:38:44.555081261 -0400
+@@ -44,6 +44,8 @@
+ 
+ #include "nsHyperTextAccessible.h"
+ 
++#include "mingw-seh.h"
++
+ // IUnknown
+ 
+ STDMETHODIMP
+@@ -68,7 +70,8 @@
+ STDMETHODIMP
+ CAccessibleHypertext::get_nHyperlinks(long *aHyperlinkCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aHyperlinkCount = 0;
+ 
+   nsRefPtr<nsHyperTextAccessible> hyperText = do_QueryObject(this);
+@@ -78,15 +81,15 @@
+   *aHyperlinkCount = hyperText->GetLinkCount();
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleHypertext::get_hyperlink(long aLinkIndex,
+                                     IAccessibleHyperlink **aHyperlink)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aHyperlink = NULL;
+ 
+   nsRefPtr<nsHyperTextAccessible> hyperText = do_QueryObject(this);
+@@ -107,14 +110,14 @@
+   *aHyperlink = static_cast<IAccessibleHyperlink*>(instancePtr);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleHypertext::get_hyperlinkIndex(long aCharIndex, long *aHyperlinkIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aHyperlinkIndex = 0;
+ 
+   nsRefPtr<nsHyperTextAccessible> hyperAcc(do_QueryObject(this));
+@@ -124,7 +127,6 @@
+   *aHyperlinkIndex = hyperAcc->GetLinkIndexAtOffset(aCharIndex);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+diff -Naur mozilla-release/accessible/src/msaa/CAccessibleImage.cpp mozilla/accessible/src/msaa/CAccessibleImage.cpp
+--- mozilla-release/accessible/src/msaa/CAccessibleImage.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/CAccessibleImage.cpp	2014-04-20 15:33:39.502113202 -0400
+@@ -50,6 +50,8 @@
+ #include "nsCOMPtr.h"
+ #include "nsString.h"
+ 
++#include "mingw-seh.h"
++
+ // IUnknown
+ 
+ STDMETHODIMP
+@@ -75,7 +77,8 @@
+ STDMETHODIMP
+ CAccessibleImage::get_description(BSTR *aDescription)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aDescription = NULL;
+ 
+   nsCOMPtr<nsIAccessible> acc(do_QueryObject(this));
+@@ -93,8 +96,7 @@
+   *aDescription = ::SysAllocStringLen(description.get(), description.Length());
+   return *aDescription ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -102,7 +104,8 @@
+                                     long *aX,
+                                     long *aY)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aX = 0;
+   *aY = 0;
+ 
+@@ -123,15 +126,14 @@
+   *aY = y;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleImage::get_imageSize(long *aHeight, long *aWidth)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aHeight = 0;
+   *aWidth = 0;
+ 
+@@ -148,7 +150,6 @@
+   *aWidth = height;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+diff -Naur mozilla-release/accessible/src/msaa/CAccessibleTableCell.cpp mozilla/accessible/src/msaa/CAccessibleTableCell.cpp
+--- mozilla-release/accessible/src/msaa/CAccessibleTableCell.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/CAccessibleTableCell.cpp	2014-04-20 15:43:02.437054259 -0400
+@@ -50,6 +50,8 @@
+ #include "nsAccessNodeWrap.h"
+ #include "nsWinUtils.h"
+ 
++#include "mingw-seh.h"
++
+ #include "nsCOMPtr.h"
+ #include "nsString.h"
+ 
+@@ -78,7 +80,8 @@
+ STDMETHODIMP
+ CAccessibleTableCell::get_table(IUnknown **table)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+   NS_ASSERTION(tableCell, TABLECELL_INTERFACE_UNSUPPORTED_MSG);
+   if (!tableCell)
+@@ -101,16 +104,14 @@
+   *table = static_cast<IUnknown*>(instancePtr);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTableCell::get_columnExtent(long *nColumnsSpanned)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *nColumnsSpanned = 0;
+ 
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+@@ -127,17 +128,15 @@
+ 
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTableCell::get_columnHeaderCells(IUnknown ***cellAccessibles,
+                                             long *nColumnHeaderCells)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+   NS_ASSERTION(tableCell, TABLECELL_INTERFACE_UNSUPPORTED_MSG);
+   if (!tableCell)
+@@ -151,16 +150,14 @@
+   return nsWinUtils::ConvertToIA2Array(headerCells, cellAccessibles,
+                                        nColumnHeaderCells);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTableCell::get_columnIndex(long *columnIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *columnIndex = -1;
+ 
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+@@ -177,16 +174,14 @@
+ 
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTableCell::get_rowExtent(long *nRowsSpanned)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *nRowsSpanned = 0;
+ 
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+@@ -203,17 +198,15 @@
+ 
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTableCell::get_rowHeaderCells(IUnknown ***cellAccessibles,
+                                          long *nRowHeaderCells)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+   NS_ASSERTION(tableCell, TABLECELL_INTERFACE_UNSUPPORTED_MSG);
+   if (!tableCell)
+@@ -227,16 +220,14 @@
+   return nsWinUtils::ConvertToIA2Array(headerCells, cellAccessibles,
+                                        nRowHeaderCells);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTableCell::get_rowIndex(long *rowIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *rowIndex = -1;
+ 
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+@@ -253,10 +244,7 @@
+ 
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -265,7 +253,8 @@
+                                            long *columnExtents,
+                                            boolean *isSelected)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *row = 0;
+   *column = 0;
+   *rowExtents = 0;
+@@ -309,15 +298,14 @@
+   *isSelected = isSel;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTableCell::get_isSelected(boolean *isSelected)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *isSelected = false;
+ 
+   nsCOMPtr<nsIAccessibleTableCell> tableCell(do_QueryObject(this));
+@@ -334,8 +322,5 @@
+ 
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+diff -Naur mozilla-release/accessible/src/msaa/CAccessibleTable.cpp mozilla/accessible/src/msaa/CAccessibleTable.cpp
+--- mozilla-release/accessible/src/msaa/CAccessibleTable.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/CAccessibleTable.cpp	2014-04-20 15:41:59.065060895 -0400
+@@ -50,6 +50,8 @@
+ #include "nsAccessNodeWrap.h"
+ #include "nsWinUtils.h"
+ 
++#include "mingw-seh.h"
++
+ #include "nsCOMPtr.h"
+ #include "nsString.h"
+ 
+@@ -85,7 +87,8 @@
+ CAccessibleTable::get_accessibleAt(long aRow, long aColumn,
+                                    IUnknown **aAccessible)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aAccessible = NULL;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -110,14 +113,14 @@
+   *aAccessible = static_cast<IUnknown*>(instancePtr);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_caption(IUnknown **aAccessible)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aAccessible = NULL;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -145,15 +148,15 @@
+   *aAccessible = static_cast<IUnknown*>(instancePtr);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_childIndex(long aRowIndex, long aColumnIndex,
+                                  long *aChildIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aChildIndex = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -169,15 +172,14 @@
+   *aChildIndex = childIndex;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_columnDescription(long aColumn, BSTR *aDescription)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aDescription = NULL;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -196,15 +198,15 @@
+   *aDescription = ::SysAllocStringLen(descr.get(), descr.Length());
+   return *aDescription ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_columnExtentAt(long aRow, long aColumn,
+                                      long *nColumnsSpanned)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *nColumnsSpanned = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -220,27 +222,28 @@
+   *nColumnsSpanned = columnsSpanned;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_columnHeader(IAccessibleTable **aAccessibleTable,
+                                    long *aStartingRowIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aAccessibleTable = NULL;
+   *aStartingRowIndex = -1;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_columnIndex(long aChildIndex, long *aColumnIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aColumnIndex = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -256,15 +259,14 @@
+   *aColumnIndex = columnIndex;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_nColumns(long *aColumnCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aColumnCount = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -280,15 +282,14 @@
+   *aColumnCount = columnCount;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_nRows(long *aRowCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aRowCount = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -304,15 +305,14 @@
+   *aRowCount = rowCount;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_nSelectedChildren(long *aChildCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aChildCount = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -328,14 +328,14 @@
+   *aChildCount = count;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_nSelectedColumns(long *aColumnCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aColumnCount = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -351,14 +351,14 @@
+   *aColumnCount = count;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_nSelectedRows(long *aRowCount)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aRowCount = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -374,14 +374,14 @@
+   *aRowCount = count;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_rowDescription(long aRow, BSTR *aDescription)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aDescription = NULL;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -400,14 +400,14 @@
+   *aDescription = ::SysAllocStringLen(descr.get(), descr.Length());
+   return *aDescription ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_rowExtentAt(long aRow, long aColumn, long *aNRowsSpanned)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNRowsSpanned = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -423,27 +423,28 @@
+   *aNRowsSpanned = rowsSpanned;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_rowHeader(IAccessibleTable **aAccessibleTable,
+                                 long *aStartingColumnIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aAccessibleTable = NULL;
+   *aStartingColumnIndex = -1;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_rowIndex(long aChildIndex, long *aRowIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aRowIndex = 0;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -459,50 +460,46 @@
+   *aRowIndex = rowIndex;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_selectedChildren(long aMaxChildren, long **aChildren,
+                                        long *aNChildren)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetSelectedItems(aChildren, aNChildren, ITEMSTYPE_CELLS);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_selectedColumns(long aMaxColumns, long **aColumns,
+                                       long *aNColumns)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetSelectedItems(aColumns, aNColumns, ITEMSTYPE_COLUMNS);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_selectedRows(long aMaxRows, long **aRows, long *aNRows)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetSelectedItems(aRows, aNRows, ITEMSTYPE_ROWS);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_summary(IUnknown **aAccessible)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aAccessible = NULL;
+ 
+   // Neither html:table nor xul:tree nor ARIA grid/tree have an ability to
+@@ -510,14 +507,16 @@
+   // in nsIAccessibleTable::summary to get a summary as a string which is not
+   // mapped directly to IAccessible2.
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return S_FALSE;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_isColumnSelected(long aColumn, boolean *aIsSelected)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aIsSelected = false;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -533,14 +532,14 @@
+   *aIsSelected = isSelected;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_isRowSelected(long aRow, boolean *aIsSelected)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aIsSelected = false;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -556,14 +555,14 @@
+   *aIsSelected = isSelected;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_isSelected(long aRow, long aColumn, boolean *aIsSelected)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aIsSelected = false;
+ 
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+@@ -579,14 +578,14 @@
+   *aIsSelected = isSelected;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::selectRow(long aRow)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+   NS_ASSERTION(tableAcc, CANT_QUERY_ASSERTION_MSG);
+   if (!tableAcc)
+@@ -595,14 +594,14 @@
+   nsresult rv = tableAcc->SelectRow(aRow);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::selectColumn(long aColumn)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+   NS_ASSERTION(tableAcc, CANT_QUERY_ASSERTION_MSG);
+   if (!tableAcc)
+@@ -611,14 +610,14 @@
+   nsresult rv = tableAcc->SelectColumn(aColumn);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::unselectRow(long aRow)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+   NS_ASSERTION(tableAcc, CANT_QUERY_ASSERTION_MSG);
+   if (!tableAcc)
+@@ -627,14 +626,14 @@
+   nsresult rv = tableAcc->UnselectRow(aRow);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::unselectColumn(long aColumn)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+   NS_ASSERTION(tableAcc, CANT_QUERY_ASSERTION_MSG);
+   if (!tableAcc)
+@@ -643,8 +642,7 @@
+   nsresult rv = tableAcc->UnselectColumn(aColumn);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -654,7 +652,8 @@
+                                               long *aColumnExtents,
+                                               boolean *aIsSelected)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aRow = 0;
+   *aColumn = 0;
+   *aRowExtents = 0;
+@@ -693,17 +692,17 @@
+   *aIsSelected = isSelected;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_modelChange(IA2TableModelChange *aModelChange)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+@@ -724,7 +723,8 @@
+ STDMETHODIMP
+ CAccessibleTable::get_selectedCells(IUnknown ***cells, long *nSelectedCells)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleTable> tableAcc(do_QueryObject(this));
+   NS_ASSERTION(tableAcc, CANT_QUERY_ASSERTION_MSG);
+   if (!tableAcc)
+@@ -737,32 +737,27 @@
+ 
+   return nsWinUtils::ConvertToIA2Array(geckoCells, cells, nSelectedCells);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_selectedColumns(long **aColumns, long *aNColumns)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetSelectedItems(aColumns, aNColumns, ITEMSTYPE_COLUMNS);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleTable::get_selectedRows(long **aRows, long *aNRows)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetSelectedItems(aRows, aNRows, ITEMSTYPE_ROWS);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),
+-                                                  GetExceptionInformation())) {}
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+diff -Naur mozilla-release/accessible/src/msaa/CAccessibleText.cpp mozilla/accessible/src/msaa/CAccessibleText.cpp
+--- mozilla-release/accessible/src/msaa/CAccessibleText.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/CAccessibleText.cpp	2014-04-20 15:36:26.131095755 -0400
+@@ -45,6 +45,8 @@
+ 
+ #include "nsHyperTextAccessible.h"
+ 
++#include "mingw-seh.h"
++
+ // IUnknown
+ 
+ STDMETHODIMP
+@@ -70,20 +72,21 @@
+ STDMETHODIMP
+ CAccessibleText::addSelection(long aStartOffset, long aEndOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsRefPtr<nsHyperTextAccessible> textAcc(do_QueryObject(this));
+   nsresult rv = textAcc->AddSelection(aStartOffset, aEndOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleText::get_attributes(long aOffset, long *aStartOffset,
+                                 long *aEndOffset, BSTR *aTextAttributes)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aStartOffset || !aEndOffset || !aTextAttributes)
+     return E_INVALIDARG;
+ 
+@@ -111,14 +114,14 @@
+ 
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleText::get_caretOffset(long *aOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aOffset = -1;
+ 
+   nsRefPtr<nsHyperTextAccessible> textAcc(do_QueryObject(this));
+@@ -131,8 +134,7 @@
+   *aOffset = offset;
+   return offset != -1 ? S_OK : S_FALSE;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -141,7 +143,8 @@
+                                       long *aX, long *aY,
+                                       long *aWidth, long *aHeight)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aX = 0;
+   *aY = 0;
+   *aWidth = 0;
+@@ -165,14 +168,14 @@
+   *aHeight = height;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleText::get_nSelections(long *aNSelections)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNSelections = 0;
+ 
+   nsRefPtr<nsHyperTextAccessible> textAcc(do_QueryObject(this));
+@@ -185,8 +188,7 @@
+   *aNSelections = selCount;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -194,7 +196,8 @@
+                                    enum IA2CoordinateType aCoordType,
+                                    long *aOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aOffset = 0;
+ 
+   nsRefPtr<nsHyperTextAccessible> textAcc(do_QueryObject(this));
+@@ -211,15 +214,15 @@
+   *aOffset = offset;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleText::get_selection(long aSelectionIndex, long *aStartOffset,
+                                long *aEndOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aStartOffset = 0;
+   *aEndOffset = 0;
+ 
+@@ -235,14 +238,14 @@
+   *aEndOffset = endOffset;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleText::get_text(long aStartOffset, long aEndOffset, BSTR *aText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aText = NULL;
+ 
+   nsRefPtr<nsHyperTextAccessible> textAcc(do_QueryObject(this));
+@@ -258,8 +261,7 @@
+   *aText = ::SysAllocStringLen(text.get(), text.Length());
+   return *aText ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -268,7 +270,8 @@
+                                       long *aStartOffset, long *aEndOffset,
+                                       BSTR *aText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aStartOffset = 0;
+   *aEndOffset = 0;
+   *aText = NULL;
+@@ -305,8 +308,7 @@
+   *aText = ::SysAllocStringLen(text.get(), text.Length());
+   return *aText ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -315,7 +317,8 @@
+                                      long *aStartOffset, long *aEndOffset,
+                                      BSTR *aText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aStartOffset = 0;
+   *aEndOffset = 0;
+   *aText = NULL;
+@@ -352,8 +355,7 @@
+   *aText = ::SysAllocStringLen(text.get(), text.Length());
+   return *aText ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -362,7 +364,8 @@
+                                   long *aStartOffset, long *aEndOffset,
+                                   BSTR *aText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aStartOffset = 0;
+   *aEndOffset = 0;
+   *aText = NULL;
+@@ -399,55 +402,55 @@
+   *aText = ::SysAllocStringLen(text.get(), text.Length());
+   return *aText ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleText::removeSelection(long aSelectionIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsRefPtr<nsHyperTextAccessible> textAcc(do_QueryObject(this));
+ 
+   nsresult rv = textAcc->RemoveSelection(aSelectionIndex);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleText::setCaretOffset(long aOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsRefPtr<nsHyperTextAccessible> textAcc(do_QueryObject(this));
+ 
+   nsresult rv = textAcc->SetCaretOffset(aOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleText::setSelection(long aSelectionIndex, long aStartOffset,
+                               long aEndOffset)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsRefPtr<nsHyperTextAccessible> textAcc(do_QueryObject(this));
+ 
+   nsresult rv = textAcc->SetSelectionBounds(aSelectionIndex,
+                                             aStartOffset, aEndOffset);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleText::get_nCharacters(long *aNCharacters)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNCharacters = 0;
+ 
+   nsRefPtr<nsHyperTextAccessible> textAcc(do_QueryObject(this));
+@@ -457,22 +460,21 @@
+   *aNCharacters  = textAcc->CharacterCount();
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleText::scrollSubstringTo(long aStartIndex, long aEndIndex,
+                                    enum IA2ScrollType aScrollType)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsRefPtr<nsHyperTextAccessible> textAcc(do_QueryObject(this));
+ 
+   nsresult rv = textAcc->ScrollSubstringTo(aStartIndex, aEndIndex, aScrollType);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -480,7 +482,8 @@
+                                         enum IA2CoordinateType aCoordType,
+                                         long aX, long aY)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsRefPtr<nsHyperTextAccessible> textAcc(do_QueryObject(this));
+ 
+   PRUint32 geckoCoordType = (aCoordType == IA2_COORDTYPE_SCREEN_RELATIVE) ?
+@@ -491,28 +494,27 @@
+                                                 geckoCoordType, aX, aY);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleText::get_newText(IA2TextSegment *aNewText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetModifiedText(PR_TRUE, aNewText);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleText::get_oldText(IA2TextSegment *aOldText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   return GetModifiedText(PR_FALSE, aOldText);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ // CAccessibleText
+diff -Naur mozilla-release/accessible/src/msaa/CAccessibleValue.cpp mozilla/accessible/src/msaa/CAccessibleValue.cpp
+--- mozilla-release/accessible/src/msaa/CAccessibleValue.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/CAccessibleValue.cpp	2014-04-20 15:43:43.695049939 -0400
+@@ -44,6 +44,8 @@
+ 
+ #include "nsIAccessibleValue.h"
+ 
++#include "mingw-seh.h"
++
+ #include "nsCOMPtr.h"
+ 
+ #include "nsAccessNodeWrap.h"
+@@ -73,7 +75,8 @@
+ STDMETHODIMP
+ CAccessibleValue::get_currentValue(VARIANT *aCurrentValue)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(aCurrentValue);
+ 
+   nsCOMPtr<nsIAccessibleValue> valueAcc(do_QueryObject(this));
+@@ -89,14 +92,14 @@
+   aCurrentValue->dblVal = currentValue;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleValue::setCurrentValue(VARIANT aValue)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsCOMPtr<nsIAccessibleValue> valueAcc(do_QueryObject(this));
+   if (!valueAcc)
+     return E_FAIL;
+@@ -107,14 +110,14 @@
+   nsresult rv = valueAcc->SetCurrentValue(aValue.dblVal);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleValue::get_maximumValue(VARIANT *aMaximumValue)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(aMaximumValue);
+ 
+   nsCOMPtr<nsIAccessibleValue> valueAcc(do_QueryObject(this));
+@@ -130,14 +133,14 @@
+   aMaximumValue->dblVal = maximumValue;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ CAccessibleValue::get_minimumValue(VARIANT *aMinimumValue)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(aMinimumValue);
+ 
+   nsCOMPtr<nsIAccessibleValue> valueAcc(do_QueryObject(this));
+@@ -153,7 +156,6 @@
+   aMinimumValue->dblVal = minimumValue;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+diff -Naur mozilla-release/accessible/src/msaa/Compatibility.cpp mozilla/accessible/src/msaa/Compatibility.cpp
+--- mozilla-release/accessible/src/msaa/Compatibility.cpp	1969-12-31 19:00:00.000000000 -0500
++++ mozilla/accessible/src/msaa/Compatibility.cpp	2014-04-20 15:20:11.053197851 -0400
+@@ -0,0 +1,100 @@
++/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
++/* vim: set ts=2 et sw=2 tw=80: */
++/* ***** BEGIN LICENSE BLOCK *****
++ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
++ *
++ * The contents of this file are subject to the Mozilla Public License Version
++ * 1.1 (the "License"); you may not use this file except in compliance with
++ * the License. You may obtain a copy of the License at
++ * http://www.mozilla.org/MPL/
++ *
++ * Software distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
++ * for the specific language governing rights and limitations under the
++ * License.
++ *
++ * The Original Code is mozilla.org code.
++ *
++ * The Initial Developer of the Original Code is
++ * Mozilla Foundation.
++ * Portions created by the Initial Developer are Copyright (C) 2011
++ * the Initial Developer. All Rights Reserved.
++ *
++ * Contributor(s):
++ *   Alexander Surkov <surkov.alexander@gmail.com> (original author)
++ *
++ * Alternatively, the contents of this file may be used under the terms of
++ * either the GNU General Public License Version 2 or later (the "GPL"), or
++ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
++ * in which case the provisions of the GPL or the LGPL are applicable instead
++ * of those above. If you wish to allow use of your version of this file only
++ * under the terms of either the GPL or the LGPL, and not to allow others to
++ * use your version of this file under the terms of the MPL, indicate your
++ * decision by deleting the provisions above and replace them with the notice
++ * and other provisions required by the GPL or the LGPL. If you do not delete
++ * the provisions above, a recipient may use your version of this file under
++ * the terms of any one of the MPL, the GPL or the LGPL.
++ *
++ * ***** END LICENSE BLOCK ***** */
++
++#include "Compatibility.h"
++
++#include "nsWinUtils.h"
++
++#include "mozilla/Preferences.h"
++
++using namespace mozilla;
++using namespace mozilla::a11y;
++
++PRUint32 Compatibility::sMode = Compatibility::NoCompatibilityMode;
++
++void
++Compatibility::Init()
++{
++  HMODULE jawsHandle = ::GetModuleHandleW(L"jhook");
++  if (jawsHandle) {
++    sMode |= JAWSMode;
++    // IA2 off mode for JAWS versions below 8.0.2173.
++    if (IsModuleVersionLessThan(jawsHandle, 8, 2173))
++      sMode |= IA2OffMode;
++  }
++
++  if (::GetModuleHandleW(L"gwm32inc"))
++    sMode |= WEMode;
++  if (::GetModuleHandleW(L"dolwinhk"))
++    sMode |= DolphinMode;
++
++  // Turn off new tab switching for Jaws and WE.
++  if (sMode & JAWSMode || sMode & WEMode) {
++    // Check to see if the pref for disallowing CtrlTab is already set. If so,
++    // bail out (respect the user settings). If not, set it.
++    if (!Preferences::HasUserValue("browser.ctrlTab.disallowForScreenReaders"))
++      Preferences::SetBool("browser.ctrlTab.disallowForScreenReaders", true);
++  }
++}
++
++bool
++Compatibility::IsModuleVersionLessThan(HMODULE aModuleHandle,
++                                       DWORD aMajor, DWORD aMinor)
++{
++  PRUnichar fileName[MAX_PATH];
++  ::GetModuleFileNameW(aModuleHandle, fileName, MAX_PATH);
++
++  DWORD dummy = 0;
++  DWORD length = ::GetFileVersionInfoSizeW(fileName, &dummy);
++
++  LPBYTE versionInfo = new BYTE[length];
++  ::GetFileVersionInfoW(fileName, 0, length, versionInfo);
++
++  UINT uLen;
++  VS_FIXEDFILEINFO* fixedFileInfo = NULL;
++  ::VerQueryValueW(versionInfo, L"\\", (LPVOID*)&fixedFileInfo, &uLen);
++  DWORD dwFileVersionMS = fixedFileInfo->dwFileVersionMS;
++  DWORD dwFileVersionLS = fixedFileInfo->dwFileVersionLS;
++  delete [] versionInfo;
++
++  DWORD dwLeftMost = HIWORD(dwFileVersionMS);
++  DWORD dwSecondRight = HIWORD(dwFileVersionLS);
++  return (dwLeftMost < aMajor ||
++    (dwLeftMost == aMajor && dwSecondRight < aMinor));
++}
+diff -Naur mozilla-release/accessible/src/msaa/Compatibility.h mozilla/accessible/src/msaa/Compatibility.h
+--- mozilla-release/accessible/src/msaa/Compatibility.h	1969-12-31 19:00:00.000000000 -0500
++++ mozilla/accessible/src/msaa/Compatibility.h	2014-04-20 15:23:35.744176418 -0400
+@@ -0,0 +1,116 @@
++/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
++/* vim: set ts=2 et sw=2 tw=80: */
++/* ***** BEGIN LICENSE BLOCK *****
++ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
++ *
++ * The contents of this file are subject to the Mozilla Public License Version
++ * 1.1 (the "License"); you may not use this file except in compliance with
++ * the License. You may obtain a copy of the License at
++ * http://www.mozilla.org/MPL/
++ *
++ * Software distributed under the License is distributed on an "AS IS" basis,
++ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
++ * for the specific language governing rights and limitations under the
++ * License.
++ *
++ * The Original Code is mozilla.org code.
++ *
++ * The Initial Developer of the Original Code is
++ * Mozilla Foundation.
++ * Portions created by the Initial Developer are Copyright (C) 2011
++ * the Initial Developer. All Rights Reserved.
++ *
++ * Contributor(s):
++ *   Alexander Surkov <surkov.alexander@gmail.com> (original author)
++ *
++ * Alternatively, the contents of this file may be used under the terms of
++ * either the GNU General Public License Version 2 or later (the "GPL"), or
++ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
++ * in which case the provisions of the GPL or the LGPL are applicable instead
++ * of those above. If you wish to allow use of your version of this file only
++ * under the terms of either the GPL or the LGPL, and not to allow others to
++ * use your version of this file under the terms of the MPL, indicate your
++ * decision by deleting the provisions above and replace them with the notice
++ * and other provisions required by the GPL or the LGPL. If you do not delete
++ * the provisions above, a recipient may use your version of this file under
++ * the terms of any one of the MPL, the GPL or the LGPL.
++ *
++ * ***** END LICENSE BLOCK ***** */
++
++#ifndef COMPATIBILITY_MANAGER_H
++#define COMPATIBILITY_MANAGER_H
++
++#include "prtypes.h"
++
++#include <oleacc.h>
++#include <winuser.h>
++
++class nsAccessNodeWrap;
++
++namespace mozilla {
++namespace a11y {
++
++/**
++ * Used to get compatibility modes. Note, modes are computed at accessibility
++ * start up time and aren't changed during lifetime.
++ */
++class Compatibility
++{
++public:
++  /**
++   * Return true if IAccessible2 disabled.
++   */
++  static bool IsIA2Off() { return sMode & IA2OffMode; }
++
++  /**
++   * Return true if JAWS mode is enabled.
++   */
++  static bool IsJAWS() { return sMode & JAWSMode; }
++
++  /**
++   * Return true if WE mode is enabled.
++   */
++  static bool IsWE() { return sMode & WEMode; }
++
++  /**
++   * Return true if Dolphin mode is enabled.
++   */
++  static bool IsDolphin() { return sMode & DolphinMode; }
++
++private:
++  Compatibility();
++  Compatibility(const Compatibility&);
++  Compatibility& operator = (const Compatibility&);
++
++  /**
++   * Initialize compatibility mode. Called by nsAccessNodeWrap during
++   * accessibility initialization.
++   */
++  static void Init();
++  friend class ::nsAccessNodeWrap;
++
++  /**
++   * List of compatibility modes.
++   */
++  enum {
++    NoCompatibilityMode = 0,
++    JAWSMode = 1 << 0,
++    WEMode = 1 << 1,
++    DolphinMode = 1 << 2,
++    IA2OffMode = 1 << 3
++  };
++
++  /**
++   * Return true if module version is lesser than the given version.
++   */
++  static bool IsModuleVersionLessThan(HMODULE aModuleHandle,
++                                      DWORD aMajor, DWORD aMinor);
++
++private:
++  static PRUint32 sMode;
++};
++
++} // a11y namespace
++} // mozilla namespace
++
++#endif
+diff -Naur mozilla-release/accessible/src/msaa/ia2AccessibleRelation.cpp mozilla/accessible/src/msaa/ia2AccessibleRelation.cpp
+--- mozilla-release/accessible/src/msaa/ia2AccessibleRelation.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/ia2AccessibleRelation.cpp	2014-04-20 15:39:50.706074335 -0400
+@@ -47,6 +47,8 @@
+ 
+ #include "AccessibleRelation_i.c"
+ 
++#include "mingw-seh.h"
++
+ ia2AccessibleRelation::ia2AccessibleRelation(PRUint32 aType, Relation* aRel) :
+   mType(aType), mReferences(0)
+ {
+@@ -96,7 +98,8 @@
+ STDMETHODIMP
+ ia2AccessibleRelation::get_relationType(BSTR *aRelationType)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aRelationType)
+     return E_INVALIDARG;
+ 
+@@ -154,55 +157,58 @@
+ 
+   return *aRelationType ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleRelation::get_localizedRelationType(BSTR *aLocalizedRelationType)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aLocalizedRelationType)
+     return E_INVALIDARG;
+ 
+   *aLocalizedRelationType = NULL;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleRelation::get_nTargets(long *aNTargets)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+  if (!aNTargets)
+    return E_INVALIDARG;
+ 
+  *aNTargets = mTargets.Length();
+   return S_OK;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleRelation::get_target(long aTargetIndex, IUnknown **aTarget)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (aTargetIndex < 0 || aTargetIndex >= mTargets.Length() || !aTarget)
+     return E_INVALIDARG;
+ 
+   mTargets[aTargetIndex]->QueryNativeInterface(IID_IUnknown, (void**) aTarget);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ ia2AccessibleRelation::get_targets(long aMaxTargets, IUnknown **aTargets,
+                                    long *aNTargets)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aNTargets || !aTargets)
+     return E_INVALIDARG;
+ 
+@@ -217,7 +223,6 @@
+   *aNTargets = maxTargets;
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+diff -Naur mozilla-release/accessible/src/msaa/Makefile.in mozilla/accessible/src/msaa/Makefile.in
+--- mozilla-release/accessible/src/msaa/Makefile.in	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/Makefile.in	2014-04-20 14:52:11.609373697 -0400
+@@ -74,6 +74,7 @@
+   CAccessibleTable.cpp \
+   CAccessibleTableCell.cpp \
+   CAccessibleValue.cpp \
++  Compatibility.cpp \
+   $(NULL)
+ 
+ EXPORTS = \
+diff -Naur mozilla-release/accessible/src/msaa/mingw-seh.h mozilla/accessible/src/msaa/mingw-seh.h
+--- mozilla-release/accessible/src/msaa/mingw-seh.h	1969-12-31 19:00:00.000000000 -0500
++++ mozilla/accessible/src/msaa/mingw-seh.h	2014-04-20 14:12:26.518623429 -0400
+@@ -0,0 +1,44 @@
++
++#ifndef _MINGW_SEH_H_
++#define _MINGW_SEH_H_
++
++// Note the unmatched braces in these macros.  These are to allow one to use
++// the same variable name more than once (new scope).
++#define __seh_try                                                             \
++{                                                                             \
++    __SEH_EXCEPTION_REGISTRATION _lseh_er;                                    \
++    __SEH_HANDLER _lseh_handler;                                              \
++                                                                              \
++    _lseh_er.handler =                                                        \
++        reinterpret_cast<PEXCEPTION_HANDLER>(__SEH_HANDLER::ExceptionRouter); \
++    _lseh_er.exthandler = &_lseh_handler;                                     \
++    asm volatile ("movl %%fs:0, %0" : "=r" (_lseh_er.prev));                  \
++    asm volatile ("movl %0, %%fs:0" : : "r" (&_lseh_er));                     \
++    int _lseh_setjmp_res = setjmp(_lseh_handler.context);                     \
++    while(true) {                                                             \
++        if(_lseh_setjmp_res != 0) {                                           \
++            break;                                                            \
++        }                                                                     \
++
++
++#define __seh_except(rec, ctx)                                                \
++        break;                                                                \
++    }                                                                         \
++    PEXCEPTION_RECORD rec = &_lseh_handler.excRecord;                         \
++    PCONTEXT ctx = &_lseh_handler.excContext;                                 \
++                                                                              \
++    asm volatile ("movl %0, %%fs:0" : : "r" (_lseh_er.prev));                 \
++    if(_lseh_setjmp_res != 0)
++    
++#define __seh_end }
++
++#define A11Y_TRYBLOCK_BEGIN                                                    \
++  MOZ_SEH_TRY {
++ 
++#define A11Y_TRYBLOCK_END                                                             \
++  } MOZ_SEH_EXCEPT(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(),       \
++                                                          GetExceptionInformation())) \
++  { }                                                                                 \
++  return E_FAIL;
++
++#endif // _MINGW_SEH_H_
+diff -Naur mozilla-release/accessible/src/msaa/nsAccessibleWrap.cpp mozilla/accessible/src/msaa/nsAccessibleWrap.cpp
+--- mozilla-release/accessible/src/msaa/nsAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/nsAccessibleWrap.cpp	2014-04-20 15:00:44.719319972 -0400
+@@ -38,6 +38,7 @@
+ 
+ #include "nsAccessibleWrap.h"
+ 
++#include "Compatibility.h"
+ #include "nsAccUtils.h"
+ #include "nsCoreUtils.h"
+ #include "nsWinUtils.h"
+@@ -69,6 +70,8 @@
+ #include "nsEventMap.h"
+ #include "nsArrayUtils.h"
+ 
++#include "mingw-seh.h"
++
+ using namespace mozilla::a11y;
+ 
+ /* For documentation of the accessibility architecture,
+@@ -117,7 +120,8 @@
+ // Microsoft COM QueryInterface
+ STDMETHODIMP nsAccessibleWrap::QueryInterface(REFIID iid, void** ppv)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *ppv = NULL;
+ 
+   if (IID_IUnknown == iid || IID_IDispatch == iid || IID_IAccessible == iid)
+@@ -129,7 +133,7 @@
+       *ppv = static_cast<IEnumVARIANT*>(this);
+   } else if (IID_IServiceProvider == iid)
+     *ppv = static_cast<IServiceProvider*>(this);
+-  else if (IID_IAccessible2 == iid && !gIsIA2Disabled)
++  else if (IID_IAccessible2 == iid && !Compatibility::IsIA2Off())
+     *ppv = static_cast<IAccessible2*>(this);
+ 
+   if (NULL == *ppv) {
+@@ -154,8 +158,10 @@
+     return nsAccessNodeWrap::QueryInterface(iid, ppv);
+ 
+   (reinterpret_cast<IUnknown*>(*ppv))->AddRef();
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ //-----------------------------------------------------
+@@ -196,7 +202,8 @@
+ 
+ STDMETHODIMP nsAccessibleWrap::get_accParent( IDispatch __RPC_FAR *__RPC_FAR *ppdispParent)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *ppdispParent = NULL;
+ 
+   if (IsDefunct())
+@@ -229,13 +236,16 @@
+ 
+   *ppdispParent = NativeAccessible(xpParentAcc);
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::get_accChildCount( long __RPC_FAR *pcountChildren)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!pcountChildren)
+     return E_INVALIDARG;
+ 
+@@ -248,16 +258,18 @@
+     return S_OK;
+ 
+   *pcountChildren = GetChildCount();
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::get_accChild(
+       /* [in] */ VARIANT varChild,
+       /* [retval][out] */ IDispatch __RPC_FAR *__RPC_FAR *ppdispChild)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *ppdispChild = NULL;
+   if (IsDefunct())
+     return E_FAIL;
+@@ -271,16 +283,17 @@
+   if (child)
+     *ppdispChild = NativeAccessible(child);
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return (*ppdispChild)? S_OK: E_INVALIDARG;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::get_accName(
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ BSTR __RPC_FAR *pszName)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *pszName = NULL;
+   nsAccessible *xpAccessible = GetXPAccessibleFor(varChild);
+   if (!xpAccessible)
+@@ -303,9 +316,9 @@
+   if (!*pszName)
+     return E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ 
+@@ -313,7 +326,8 @@
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ BSTR __RPC_FAR *pszValue)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *pszValue = NULL;
+   nsAccessible *xpAccessible = GetXPAccessibleFor(varChild);
+   if (xpAccessible) {
+@@ -331,15 +345,18 @@
+     if (!*pszValue)
+       return E_OUTOFMEMORY;
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::get_accDescription(VARIANT varChild,
+                                      BSTR __RPC_FAR *pszDescription)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *pszDescription = NULL;
+ 
+   nsAccessible *xpAccessible = GetXPAccessibleFor(varChild);
+@@ -353,15 +370,15 @@
+                                         description.Length());
+   return *pszDescription ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::get_accRole(
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ VARIANT __RPC_FAR *pvarRole)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(pvarRole);
+ 
+   if (IsDefunct())
+@@ -429,15 +446,16 @@
+       return S_OK;
+     }
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::get_accState(
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ VARIANT __RPC_FAR *pvarState)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(pvarState);
+   pvarState->vt = VT_I4;
+   pvarState->lVal = 0;
+@@ -457,8 +475,10 @@
+   PRUint32 msaaState = 0;
+   nsAccUtils::To32States(xpAccessible->State(), &msaaState, nsnull);
+   pvarState->lVal = msaaState;
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ 
+@@ -466,13 +486,12 @@
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ BSTR __RPC_FAR *pszHelp)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *pszHelp = NULL;
+   return S_FALSE;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(),
+-                                GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::get_accHelpTopic(
+@@ -480,21 +499,21 @@
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ long __RPC_FAR *pidTopic)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *pszHelpFile = NULL;
+   *pidTopic = 0;
+   return S_FALSE;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(),
+-                                GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::get_accKeyboardShortcut(
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ BSTR __RPC_FAR *pszKeyboardShortcut)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!pszKeyboardShortcut)
+     return E_INVALIDARG;
+   *pszKeyboardShortcut = NULL;
+@@ -513,8 +532,8 @@
+   *pszKeyboardShortcut = ::SysAllocStringLen(shortcut.get(),
+                                              shortcut.Length());
+   return *pszKeyboardShortcut ? S_OK : E_OUTOFMEMORY;
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::get_accFocus(
+@@ -526,7 +545,8 @@
+   // VT_I4:       lVal contains the child ID of the child element with the keyboard focus.
+   // VT_DISPATCH: pdispVal member is the address of the IDispatch interface
+   //              for the child object with the keyboard focus.
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return E_FAIL;
+ 
+@@ -546,8 +566,10 @@
+     pvarChild->vt = VT_EMPTY;   // No focus or focus is not a child
+   }
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ // This helper class implements IEnumVARIANT for a nsIArray containing nsIAccessible objects.
+@@ -584,7 +606,8 @@
+ HRESULT
+ AccessibleEnumerator::QueryInterface(REFIID iid, void ** ppvObject)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (iid == IID_IEnumVARIANT) {
+     *ppvObject = static_cast<IEnumVARIANT*>(this);
+     AddRef();
+@@ -597,8 +620,10 @@
+   }
+ 
+   *ppvObject = NULL;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return E_NOINTERFACE;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP_(ULONG)
+@@ -619,7 +644,8 @@
+ STDMETHODIMP
+ AccessibleEnumerator::Next(unsigned long celt, VARIANT FAR* rgvar, unsigned long FAR* pceltFetched)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   PRUint32 length = 0;
+   mArray->GetLength(&length);
+ 
+@@ -646,27 +672,30 @@
+     *pceltFetched = celt;
+ 
+   return hr;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+-  return S_OK;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleEnumerator::Clone(IEnumVARIANT FAR* FAR* ppenum)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *ppenum = new AccessibleEnumerator(*this);
+   if (!*ppenum)
+     return E_OUTOFMEMORY;
+   NS_ADDREF(*ppenum);
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ AccessibleEnumerator::Skip(unsigned long celt)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   PRUint32 length = 0;
+   mArray->GetLength(&length);
+   // Check if we can skip the requested number of elements
+@@ -675,8 +704,10 @@
+     return S_FALSE;
+   }
+   mCurIndex += celt;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ /**
+@@ -698,7 +729,8 @@
+   */
+ STDMETHODIMP nsAccessibleWrap::get_accSelection(VARIANT __RPC_FAR *pvarChildren)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(pvarChildren);
+   pvarChildren->vt = VT_EMPTY;
+ 
+@@ -716,15 +748,18 @@
+       NS_ADDREF(pvarChildren->punkVal = pEnum);
+     }
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::get_accDefaultAction(
+       /* [optional][in] */ VARIANT varChild,
+       /* [retval][out] */ BSTR __RPC_FAR *pszDefaultAction)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *pszDefaultAction = NULL;
+   nsAccessible *xpAccessible = GetXPAccessibleFor(varChild);
+   if (xpAccessible) {
+@@ -737,15 +772,15 @@
+     return *pszDefaultAction ? S_OK : E_OUTOFMEMORY;
+   }
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::accSelect(
+       /* [in] */ long flagsSelect,
+       /* [optional][in] */ VARIANT varChild)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   // currently only handle focus and selection
+   nsAccessible *xpAccessible = GetXPAccessibleFor(varChild);
+   NS_ENSURE_TRUE(xpAccessible, E_FAIL);
+@@ -770,8 +805,7 @@
+     return S_OK;
+   }
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::accLocation(
+@@ -781,7 +815,8 @@
+       /* [out] */ long __RPC_FAR *pcyHeight,
+       /* [optional][in] */ VARIANT varChild)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsAccessible *xpAccessible = GetXPAccessibleFor(varChild);
+ 
+   if (xpAccessible) {
+@@ -795,9 +830,8 @@
+     *pcyHeight = height;
+     return S_OK;
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::accNavigate(
+@@ -805,7 +839,8 @@
+       /* [optional][in] */ VARIANT varStart,
+       /* [retval][out] */ VARIANT __RPC_FAR *pvarEndUpAt)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!pvarEndUpAt)
+     return E_INVALIDARG;
+ 
+@@ -900,13 +935,14 @@
+     navAccessible = rel.Next();
+   }
+ 
+-  if (navAccessible) {
+-    pvarEndUpAt->pdispVal = NativeAccessible(navAccessible);
+-    pvarEndUpAt->vt = VT_DISPATCH;
+-    return S_OK;
+-  }
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  if (!navAccessible)
++    return E_FAIL;
++
++  pvarEndUpAt->pdispVal = NativeAccessible(navAccessible);
++  pvarEndUpAt->vt = VT_DISPATCH;
++  return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::accHitTest(
+@@ -914,7 +950,8 @@
+       /* [in] */ long yTop,
+       /* [retval][out] */ VARIANT __RPC_FAR *pvarChild)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   VariantInit(pvarChild);
+   if (IsDefunct())
+     return E_FAIL;
+@@ -936,21 +973,25 @@
+     pvarChild->vt = VT_EMPTY;
+     return S_FALSE;
+   }
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::accDoDefaultAction(
+       /* [optional][in] */ VARIANT varChild)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsAccessible *xpAccessible = GetXPAccessibleFor(varChild);
+   if (!xpAccessible || FAILED(xpAccessible->DoAction(0))) {
+     return E_FAIL;
+   }
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessibleWrap::put_accName(
+@@ -977,7 +1018,8 @@
+                        ULONG FAR* aNumElementsFetched)
+ {
+   // Children already cached via QI to IEnumVARIANT
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNumElementsFetched = 0;
+ 
+   if (aNumElementsRequested <= 0 || !aPVar)
+@@ -1004,14 +1046,14 @@
+ 
+   return numElementsFetched < aNumElementsRequested ? S_FALSE : S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::Skip(ULONG aNumElements)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (mEnumVARIANTPosition == kIEnumVariantDisconnected)
+     return CO_E_OBJNOTCONNECTED;
+ 
+@@ -1023,8 +1065,10 @@
+     mEnumVARIANTPosition = numChildren;
+     return S_FALSE;
+   }
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return NOERROR;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -1037,7 +1081,8 @@
+ STDMETHODIMP
+ nsAccessibleWrap::Clone(IEnumVARIANT FAR* FAR* ppenum)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *ppenum = nsnull;
+   
+   nsCOMPtr<nsIArray> childArray;
+@@ -1048,8 +1093,9 @@
+     return E_OUTOFMEMORY;
+   NS_ADDREF(*ppenum);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return NOERROR;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+@@ -1058,7 +1104,8 @@
+ STDMETHODIMP
+ nsAccessibleWrap::get_nRelations(long *aNRelations)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aNRelations)
+     return E_INVALIDARG;
+ 
+@@ -1074,15 +1121,16 @@
+       (*aNRelations)++;
+   }
+   return S_OK;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::get_relation(long aRelationIndex,
+                                IAccessibleRelation **aRelation)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aRelation)
+     return E_INVALIDARG;
+ 
+@@ -1108,8 +1156,8 @@
+   }
+ 
+   return E_INVALIDARG;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -1117,7 +1165,8 @@
+                                 IAccessibleRelation **aRelation,
+                                 long *aNRelations)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aRelation || !aNRelations)
+     return E_INVALIDARG;
+ 
+@@ -1139,14 +1188,14 @@
+   }
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::role(long *aRole)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aRole = 0;
+ 
+   if (IsDefunct())
+@@ -1168,26 +1217,26 @@
+ 
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::scrollTo(enum IA2ScrollType aScrollType)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsresult rv = ScrollTo(aScrollType);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::scrollToPoint(enum IA2CoordinateType aCoordType,
+                                 long aX, long aY)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   PRUint32 geckoCoordType = (aCoordType == IA2_COORDTYPE_SCREEN_RELATIVE) ?
+     nsIAccessibleCoordinateType::COORDTYPE_SCREEN_RELATIVE :
+     nsIAccessibleCoordinateType::COORDTYPE_PARENT_RELATIVE;
+@@ -1195,8 +1244,7 @@
+   nsresult rv = ScrollToPoint(geckoCoordType, aX, aY);
+   return GetHRESULT(rv);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -1204,7 +1252,8 @@
+                                     long *aSimilarItemsInGroup,
+                                     long *aPositionInGroup)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   PRInt32 groupLevel = 0;
+   PRInt32 similarItemsInGroup = 0;
+   PRInt32 positionInGroup = 0;
+@@ -1226,14 +1275,14 @@
+ 
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::get_states(AccessibleStates *aStates)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aStates = 0;
+ 
+   // XXX: bug 344674 should come with better approach that we have here.
+@@ -1280,38 +1329,43 @@
+ 
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::get_extendedRole(BSTR *aExtendedRole)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aExtendedRole = NULL;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::get_localizedExtendedRole(BSTR *aLocalizedExtendedRole)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aLocalizedExtendedRole = NULL;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::get_nExtendedStates(long *aNExtendedStates)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNExtendedStates = 0;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -1319,12 +1373,14 @@
+                                      BSTR **aExtendedStates,
+                                      long *aNExtendedStates)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aExtendedStates = NULL;
+   *aNExtendedStates = 0;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -1332,29 +1388,32 @@
+                                               BSTR **aLocalizedExtendedStates,
+                                               long *aNLocalizedExtendedStates)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aLocalizedExtendedStates = NULL;
+   *aNLocalizedExtendedStates = 0;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+   return E_NOTIMPL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::get_uniqueID(long *uniqueID)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *uniqueID = - reinterpret_cast<long>(UniqueID());
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::get_windowHandle(HWND *aWindowHandle)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aWindowHandle = 0;
+ 
+   if (IsDefunct())
+@@ -1363,14 +1422,14 @@
+   *aWindowHandle = GetHWNDFor(this);
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::get_indexInParent(long *aIndexInParent)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (!aIndexInParent)
+     return E_INVALIDARG;
+ 
+@@ -1383,14 +1442,15 @@
+     return S_FALSE;
+ 
+   return S_OK;
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsAccessibleWrap::get_locale(IA2Locale *aLocale)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   // Language codes consist of a primary code and a possibly empty series of
+   // subcodes: language-code = primary-code ( "-" subcode )*
+   // Two-letter primary codes are reserved for [ISO639] language abbreviations.
+@@ -1429,8 +1489,7 @@
+   aLocale->variant = ::SysAllocString(lang.get());
+   return S_OK;
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+@@ -1438,7 +1497,8 @@
+ {
+   // The format is name:value;name:value; with \ for escaping these
+   // characters ":;=,\".
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aAttributes = NULL;
+ 
+   nsCOMPtr<nsIPersistentProperties> attributes;
+@@ -1448,8 +1508,7 @@
+ 
+   return ConvertToIA2Attributes(attributes, aAttributes);
+ 
+-} __except(nsAccessNodeWrap::FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+diff -Naur mozilla-release/accessible/src/msaa/nsAccessNodeWrap.cpp mozilla/accessible/src/msaa/nsAccessNodeWrap.cpp
+--- mozilla-release/accessible/src/msaa/nsAccessNodeWrap.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/nsAccessNodeWrap.cpp	2014-04-20 15:24:05.890173262 -0400
+@@ -41,6 +41,7 @@
+ #include "AccessibleApplication.h"
+ #include "ISimpleDOMNode_i.c"
+ 
++#include "Compatibility.h"
+ #include "nsAccessibilityService.h"
+ #include "nsApplicationAccessibleWrap.h"
+ #include "nsCoreUtils.h"
+@@ -58,7 +59,10 @@
+ 
+ #include "mozilla/Preferences.h"
+ 
+-using namespace mozilla;
++#include "mingw-seh.h"
++
++// using namespace mozilla;
++// using namespace mozilla::a11y;
+ 
+ /// the accessible library and cached methods
+ HINSTANCE nsAccessNodeWrap::gmAccLib = nsnull;
+@@ -68,20 +72,8 @@
+ LPFNNOTIFYWINEVENT nsAccessNodeWrap::gmNotifyWinEvent = nsnull;
+ LPFNGETGUITHREADINFO nsAccessNodeWrap::gmGetGUIThreadInfo = nsnull;
+ 
+-// Used to determine whether an IAccessible2 compatible screen reader is loaded.
+-PRBool nsAccessNodeWrap::gIsIA2Disabled = PR_FALSE;
+-
+ AccTextChangeEvent* nsAccessNodeWrap::gTextEvent = nsnull;
+ 
+-// Pref to disallow CtrlTab preview functionality if JAWS or Window-Eyes are
+-// running.
+-#define CTRLTAB_DISALLOW_FOR_SCREEN_READERS_PREF "browser.ctrlTab.disallowForScreenReaders"
+-
+-
+-/* For documentation of the accessibility architecture, 
+- * see http://lxr.mozilla.org/seamonkey/source/accessible/accessible-docs.html
+- */
+-
+ ////////////////////////////////////////////////////////////////////////////////
+ // nsAccessNodeWrap
+ ////////////////////////////////////////////////////////////////////////////////
+@@ -225,7 +217,8 @@
+     /* [out] */ unsigned int __RPC_FAR *aUniqueID,
+     /* [out] */ unsigned short __RPC_FAR *aNodeType)
+ {
+-__try{
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNodeName = nsnull;
+   *aNodeValue = nsnull;
+ 
+@@ -260,8 +253,9 @@
+ 
+   *aNumChildren = GetNode()->GetChildCount();
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ 
+@@ -273,7 +267,8 @@
+     /* [length_is][size_is][out] */ BSTR __RPC_FAR *aAttribValues,
+     /* [out] */ unsigned short __RPC_FAR *aNumAttribs)
+ {
+-__try{
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNumAttribs = 0;
+ 
+   if (IsDefunct() || IsDocumentNode())
+@@ -294,9 +289,10 @@
+     mContent->GetAttr(name->NamespaceID(), name->LocalName(), attributeValue);
+     aAttribValues[index] = ::SysAllocString(attributeValue.get());
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+-  return S_OK; 
++  return S_OK;
++
++  A11Y_TRYBLOCK_END 
+ }
+         
+ 
+@@ -306,7 +302,8 @@
+     /* [length_is][size_is][in] */ short __RPC_FAR *aNameSpaceID,
+     /* [length_is][size_is][retval] */ BSTR __RPC_FAR *aAttribValues)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct() || !IsElement())
+     return E_FAIL;
+ 
+@@ -333,9 +330,10 @@
+         aAttribValues[index] = ::SysAllocString(attributeValue.get());
+     }
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+-  return S_OK; 
++  return S_OK;
++
++  A11Y_TRYBLOCK_END 
+ }
+ 
+ /* To do: use media type if not null */
+@@ -346,7 +344,8 @@
+     /* [length_is][size_is][out] */ BSTR __RPC_FAR *aStyleValues,
+     /* [out] */ unsigned short __RPC_FAR *aNumStyleProperties)
+ {
+-__try{
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNumStyleProperties = 0;
+ 
+   if (IsDefunct() || IsDocumentNode())
+@@ -371,9 +370,10 @@
+     }
+   }
+   *aNumStyleProperties = static_cast<unsigned short>(realIndex);
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ 
+@@ -383,7 +383,8 @@
+     /* [length_is][size_is][in] */ BSTR __RPC_FAR *aStyleProperties,
+     /* [length_is][size_is][out] */ BSTR __RPC_FAR *aStyleValues)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct() || IsDocumentNode())
+     return E_FAIL;
+  
+@@ -398,14 +399,16 @@
+       cssDecl->GetPropertyValue(nsDependentString(static_cast<PRUnichar*>(aStyleProperties[index])), value);  // Get property value
+     aStyleValues[index] = ::SysAllocString(value.get());
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessNodeWrap::scrollTo(/* [in] */ boolean aScrollTopLeft)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   PRUint32 scrollType =
+     aScrollTopLeft ? nsIAccessibleScrollType::SCROLL_TYPE_TOP_LEFT :
+                      nsIAccessibleScrollType::SCROLL_TYPE_BOTTOM_RIGHT;
+@@ -413,9 +416,8 @@
+   nsresult rv = ScrollTo(scrollType);
+   if (NS_SUCCEEDED(rv))
+     return S_OK;
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ ISimpleDOMNode*
+@@ -457,74 +459,80 @@
+ 
+ STDMETHODIMP nsAccessNodeWrap::get_parentNode(ISimpleDOMNode __RPC_FAR *__RPC_FAR *aNode)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return E_FAIL;
+ 
+   *aNode = MakeAccessNode(GetNode()->GetNodeParent());
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessNodeWrap::get_firstChild(ISimpleDOMNode __RPC_FAR *__RPC_FAR *aNode)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return E_FAIL;
+ 
+   *aNode = MakeAccessNode(GetNode()->GetFirstChild());
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessNodeWrap::get_lastChild(ISimpleDOMNode __RPC_FAR *__RPC_FAR *aNode)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return E_FAIL;
+ 
+   *aNode = MakeAccessNode(GetNode()->GetLastChild());
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessNodeWrap::get_previousSibling(ISimpleDOMNode __RPC_FAR *__RPC_FAR *aNode)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return E_FAIL;
+ 
+   *aNode = MakeAccessNode(GetNode()->GetPreviousSibling());
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsAccessNodeWrap::get_nextSibling(ISimpleDOMNode __RPC_FAR *__RPC_FAR *aNode)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return E_FAIL;
+ 
+   *aNode = MakeAccessNode(GetNode()->GetNextSibling());
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP 
+ nsAccessNodeWrap::get_childAt(unsigned aChildIndex,
+                               ISimpleDOMNode __RPC_FAR *__RPC_FAR *aNode)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNode = nsnull;
+ 
+   if (IsDefunct())
+@@ -532,15 +540,16 @@
+ 
+   *aNode = MakeAccessNode(GetNode()->GetChildAt(aChildIndex));
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP 
+ nsAccessNodeWrap::get_innerHTML(BSTR __RPC_FAR *aInnerHTML)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aInnerHTML = nsnull;
+ 
+   nsCOMPtr<nsIDOMNSHTMLElement> domNSElement(do_QueryInterface(GetNode()));
+@@ -556,15 +565,16 @@
+   if (!*aInnerHTML)
+     return E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP 
+ nsAccessNodeWrap::get_language(BSTR __RPC_FAR *aLanguage)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aLanguage = NULL;
+ 
+   nsAutoString language;
+@@ -579,20 +589,23 @@
+   if (!*aLanguage)
+     return E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP 
+ nsAccessNodeWrap::get_localInterface( 
+     /* [out] */ void __RPC_FAR *__RPC_FAR *localInterface)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *localInterface = static_cast<nsIAccessNode*>(this);
+   NS_ADDREF_THIS();
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+  
+ void nsAccessNodeWrap::InitAccessibility()
+@@ -608,7 +621,7 @@
+       gmGetGUIThreadInfo = (LPFNGETGUITHREADINFO)GetProcAddress(gmUserLib,"GetGUIThreadInfo");
+   }
+ 
+-  DoATSpecificProcessing();
++  mozilla::a11y::Compatibility::Init();
+ 
+   nsWinUtils::MaybeStartWindowEmulation();
+ 
+@@ -666,73 +679,6 @@
+   }
+ }
+ 
+-PRBool nsAccessNodeWrap::IsOnlyMsaaCompatibleJawsPresent()
+-{
+-  HMODULE jhookhandle = ::GetModuleHandleW(kJAWSModuleHandle);
+-  if (!jhookhandle)
+-    return PR_FALSE;  // No JAWS, or some other screen reader, use IA2
+-
+-  PRUnichar fileName[MAX_PATH];
+-  ::GetModuleFileNameW(jhookhandle, fileName, MAX_PATH);
+-
+-  DWORD dummy;
+-  DWORD length = ::GetFileVersionInfoSizeW(fileName, &dummy);
+-
+-  LPBYTE versionInfo = new BYTE[length];
+-  ::GetFileVersionInfoW(fileName, 0, length, versionInfo);
+-
+-  UINT uLen;
+-  VS_FIXEDFILEINFO *fixedFileInfo;
+-  ::VerQueryValueW(versionInfo, L"\\", (LPVOID*)&fixedFileInfo, &uLen);
+-  DWORD dwFileVersionMS = fixedFileInfo->dwFileVersionMS;
+-  DWORD dwFileVersionLS = fixedFileInfo->dwFileVersionLS;
+-  delete [] versionInfo;
+-
+-  DWORD dwLeftMost = HIWORD(dwFileVersionMS);
+-//  DWORD dwSecondLeft = LOWORD(dwFileVersionMS);
+-  DWORD dwSecondRight = HIWORD(dwFileVersionLS);
+-//  DWORD dwRightMost = LOWORD(dwFileVersionLS);
+-
+-  return (dwLeftMost < 8
+-          || (dwLeftMost == 8 && dwSecondRight < 2173));
+-}
+-
+-void nsAccessNodeWrap::TurnOffNewTabSwitchingForJawsAndWE()
+-{
+-  HMODULE srHandle = ::GetModuleHandleW(kJAWSModuleHandle);
+-  if (!srHandle) {
+-    // No JAWS, try Window-Eyes
+-    srHandle = ::GetModuleHandleW(kWEModuleHandle);
+-    if (!srHandle) {
+-      // no screen reader we're interested in. Bail out.
+-      return;
+-    }
+-  }
+-
+-  // Check to see if the pref for disallowing CtrlTab is already set.
+-  // If so, bail out.
+-  // If not, set it.
+-  if (Preferences::HasUserValue(CTRLTAB_DISALLOW_FOR_SCREEN_READERS_PREF)) {
+-    // This pref has been set before. There is no default for it.
+-    // Do nothing further, respect the setting that's there.
+-    // That way, if noone touches it, it'll stay on after toggled once.
+-    // If someone decided to turn it off, we respect that, too.
+-    return;
+-  }
+-  
+-  // Value has never been set, set it.
+-  Preferences::SetBool(CTRLTAB_DISALLOW_FOR_SCREEN_READERS_PREF, PR_TRUE);
+-}
+-
+-void nsAccessNodeWrap::DoATSpecificProcessing()
+-{
+-  if (IsOnlyMsaaCompatibleJawsPresent())
+-    // All versions below 8.0.2173 are not compatible
+-    gIsIA2Disabled  = PR_TRUE;
+-
+-  TurnOffNewTabSwitchingForJawsAndWE();
+-}
+-
+ nsRefPtrHashtable<nsVoidPtrHashKey, nsDocAccessible> nsAccessNodeWrap::sHWNDCache;
+ 
+ LRESULT CALLBACK
+diff -Naur mozilla-release/accessible/src/msaa/nsAccessNodeWrap.h mozilla/accessible/src/msaa/nsAccessNodeWrap.h
+--- mozilla-release/accessible/src/msaa/nsAccessNodeWrap.h	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/nsAccessNodeWrap.h	2014-04-20 15:17:56.365211953 -0400
+@@ -58,8 +58,8 @@
+ #include "nsIDOMElement.h"
+ #include "nsIContent.h"
+ #include "nsAccessNode.h"
+-#include "OLEIDL.H"
+-#include "OLEACC.H"
++#include "oleidl.h"
++#include "oleacc.h"
+ #include <winuser.h>
+ #ifdef MOZ_CRASHREPORTER
+ #include "nsICrashReporter.h"
+@@ -70,6 +70,10 @@
+ typedef LRESULT (STDAPICALLTYPE *LPFNNOTIFYWINEVENT)(DWORD event,HWND hwnd,LONG idObjectType,LONG idObject);
+ typedef LRESULT (STDAPICALLTYPE *LPFNGETGUITHREADINFO)(DWORD idThread, GUITHREADINFO* pgui);
+ 
++// namespace mozilla {
++// namespace a11y {
++
++
+ class AccTextChangeEvent;
+ 
+ class nsAccessNodeWrap :  public nsAccessNode,
+@@ -159,12 +163,6 @@
+ 
+     static int FilterA11yExceptions(unsigned int aCode, EXCEPTION_POINTERS *aExceptionInfo);
+ 
+-    static PRBool IsOnlyMsaaCompatibleJawsPresent();
+-
+-    static void TurnOffNewTabSwitchingForJawsAndWE();
+-
+-    static void DoATSpecificProcessing();
+-
+   static STDMETHODIMP_(LRESULT) LresultFromObject(REFIID riid, WPARAM wParam, LPUNKNOWN pAcc);
+ 
+   static LRESULT CALLBACK WindowProc(HWND hWnd, UINT Msg,
+@@ -183,18 +181,15 @@
+   ISimpleDOMNode *MakeAccessNode(nsINode *aNode);
+ 
+     /**
+-     * Used to determine whether an IAccessible2 compatible screen reader is
+-     * loaded. Currently used for JAWS versions older than 8.0.2173.
+-     */
+-     static PRBool gIsIA2Disabled;
+-
+-    /**
+      * It is used in nsHyperTextAccessibleWrap for IA2::newText/oldText
+      * implementation.
+      */
+     static AccTextChangeEvent* gTextEvent;
+ };
+ 
++// } // namespace a11y
++// } // namespace mozilla
++
+ /**
+  * Converts nsresult to HRESULT.
+  */
+diff -Naur mozilla-release/accessible/src/msaa/nsApplicationAccessibleWrap.cpp mozilla/accessible/src/msaa/nsApplicationAccessibleWrap.cpp
+--- mozilla-release/accessible/src/msaa/nsApplicationAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/nsApplicationAccessibleWrap.cpp	2014-04-20 14:39:17.526454748 -0400
+@@ -44,6 +44,8 @@
+ 
+ #include "nsServiceManagerUtils.h"
+ 
++#include "mingw-seh.h"
++
+ ////////////////////////////////////////////////////////////////////////////////
+ // nsISupports
+ NS_IMPL_ISUPPORTS_INHERITED0(nsApplicationAccessibleWrap,
+@@ -72,7 +74,8 @@
+ STDMETHODIMP
+ nsApplicationAccessibleWrap::get_appName(BSTR *aName)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aName = NULL;
+ 
+   nsAutoString name;
+@@ -86,14 +89,14 @@
+   *aName = ::SysAllocStringLen(name.get(), name.Length());
+   return *aName ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsApplicationAccessibleWrap::get_appVersion(BSTR *aVersion)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aVersion = NULL;
+ 
+   nsAutoString version;
+@@ -107,14 +110,14 @@
+   *aVersion = ::SysAllocStringLen(version.get(), version.Length());
+   return *aVersion ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsApplicationAccessibleWrap::get_toolkitName(BSTR *aName)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   nsAutoString name;
+   nsresult rv = GetPlatformName(name);
+   if (NS_FAILED(rv))
+@@ -126,14 +129,14 @@
+   *aName = ::SysAllocStringLen(name.get(), name.Length());
+   return *aName ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsApplicationAccessibleWrap::get_toolkitVersion(BSTR *aVersion)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aVersion = NULL;
+ 
+   nsAutoString version;
+@@ -147,8 +150,7 @@
+   *aVersion = ::SysAllocStringLen(version.get(), version.Length());
+   return *aVersion ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+diff -Naur mozilla-release/accessible/src/msaa/nsDocAccessibleWrap.cpp mozilla/accessible/src/msaa/nsDocAccessibleWrap.cpp
+--- mozilla-release/accessible/src/msaa/nsDocAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/nsDocAccessibleWrap.cpp	2014-04-20 15:24:44.481169221 -0400
+@@ -38,6 +38,7 @@
+ 
+ #include "mozilla/dom/TabChild.h"
+ 
++#include "Compatibility.h"
+ #include "nsDocAccessibleWrap.h"
+ #include "ISimpleDOMDocument_i.c"
+ #include "nsIAccessibilityService.h"
+@@ -54,6 +55,8 @@
+ #include "nsIViewManager.h"
+ #include "nsIWebNavigation.h"
+ 
++#include "mingw-seh.h"
++
+ /* For documentation of the accessibility architecture, 
+  * see http://lxr.mozilla.org/seamonkey/source/accessible/accessible-docs.html
+  */
+@@ -103,7 +106,8 @@
+ 
+ STDMETHODIMP nsDocAccessibleWrap::get_URL(/* [out] */ BSTR __RPC_FAR *aURL)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aURL = NULL;
+ 
+   nsAutoString URL;
+@@ -117,13 +121,13 @@
+   *aURL = ::SysAllocStringLen(URL.get(), URL.Length());
+   return *aURL ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsDocAccessibleWrap::get_title( /* [out] */ BSTR __RPC_FAR *aTitle)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aTitle = NULL;
+ 
+   nsAutoString title;
+@@ -134,13 +138,13 @@
+   *aTitle = ::SysAllocStringLen(title.get(), title.Length());
+   return *aTitle ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsDocAccessibleWrap::get_mimeType(/* [out] */ BSTR __RPC_FAR *aMimeType)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aMimeType = NULL;
+ 
+   nsAutoString mimeType;
+@@ -154,13 +158,13 @@
+   *aMimeType = ::SysAllocStringLen(mimeType.get(), mimeType.Length());
+   return *aMimeType ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsDocAccessibleWrap::get_docType(/* [out] */ BSTR __RPC_FAR *aDocType)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aDocType = NULL;
+ 
+   nsAutoString docType;
+@@ -174,14 +178,14 @@
+   *aDocType = ::SysAllocStringLen(docType.get(), docType.Length());
+   return *aDocType ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsDocAccessibleWrap::get_nameSpaceURIForID(/* [in] */  short aNameSpaceID,
+   /* [out] */ BSTR __RPC_FAR *aNameSpaceURI)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aNameSpaceURI = NULL;
+ 
+   if (aNameSpaceID < 0)
+@@ -200,18 +204,17 @@
+ 
+   return *aNameSpaceURI ? S_OK : E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-  return E_FAIL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP
+ nsDocAccessibleWrap::put_alternateViewMediaTypes( /* [in] */ BSTR __RPC_FAR *aCommaSeparatedMediaTypes)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aCommaSeparatedMediaTypes = NULL;
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+-  return E_NOTIMPL;
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsDocAccessibleWrap::get_accValue(
+@@ -289,7 +292,7 @@
+ 
+       PRBool isActive = PR_TRUE;
+       PRInt32 x = CW_USEDEFAULT, y = CW_USEDEFAULT, width = 0, height = 0;
+-      if (nsWinUtils::IsWindowEmulationFor(kDolphinModuleHandle)) {
++      if (mozilla::a11y::Compatibility::IsDolphin()) {
+         GetBounds(&x, &y, &width, &height);
+         PRInt32 rootX = 0, rootY = 0, rootWidth = 0, rootHeight = 0;
+         rootDocument->GetBounds(&rootX, &rootY, &rootWidth, &rootHeight);
+diff -Naur mozilla-release/accessible/src/msaa/nsHyperTextAccessibleWrap.h mozilla/accessible/src/msaa/nsHyperTextAccessibleWrap.h
+--- mozilla-release/accessible/src/msaa/nsHyperTextAccessibleWrap.h	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/nsHyperTextAccessibleWrap.h	2014-04-20 13:23:08.747933123 -0400
+@@ -44,7 +44,7 @@
+ #include "nsHyperTextAccessible.h"
+ #include "CAccessibleText.h"
+ #include "CAccessibleEditableText.h"
+-#include "CAccessibleHyperText.h"
++#include "CAccessibleHypertext.h"
+ 
+ class nsHyperTextAccessibleWrap : public nsHyperTextAccessible,
+                                   public CAccessibleHypertext,
+diff -Naur mozilla-release/accessible/src/msaa/nsRoleMap.h mozilla/accessible/src/msaa/nsRoleMap.h
+--- mozilla-release/accessible/src/msaa/nsRoleMap.h	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/nsRoleMap.h	2014-04-20 14:23:21.878554809 -0400
+@@ -39,7 +39,7 @@
+  *
+  * ***** END LICENSE BLOCK ***** */
+ 
+-#include "OLEACC.H"
++#include "oleacc.h"
+ #include "AccessibleRole.h"
+ 
+ const PRUint32 USE_ROLE_STRING = 0;
+diff -Naur mozilla-release/accessible/src/msaa/nsRootAccessibleWrap.cpp mozilla/accessible/src/msaa/nsRootAccessibleWrap.cpp
+--- mozilla-release/accessible/src/msaa/nsRootAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/nsRootAccessibleWrap.cpp	2014-04-20 15:25:45.049162879 -0400
+@@ -38,11 +38,14 @@
+ 
+ #include "nsRootAccessibleWrap.h"
+ 
++#include "Compatibility.h"
+ #include "nsWinUtils.h"
+ 
+ #include "nsIDOMEventTarget.h"
+ #include "nsEventListenerManager.h"
+ 
++// using namespace mozilla::a11y;
++
+ ////////////////////////////////////////////////////////////////////////////////
+ // Constructor/desctructor
+ 
+@@ -63,7 +66,7 @@
+ void
+ nsRootAccessibleWrap::DocumentActivated(nsDocAccessible* aDocument)
+ {
+-  if (nsWinUtils::IsWindowEmulationFor(kDolphinModuleHandle) &&
++  if (mozilla::a11y::Compatibility::IsDolphin() &&
+       nsCoreUtils::IsTabDocument(aDocument->GetDocumentNode())) {
+     PRUint32 count = mChildDocuments.Length();
+     for (PRUint32 idx = 0; idx < count; idx++) {
+diff -Naur mozilla-release/accessible/src/msaa/nsRootAccessibleWrap.h mozilla/accessible/src/msaa/nsRootAccessibleWrap.h
+--- mozilla-release/accessible/src/msaa/nsRootAccessibleWrap.h	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/nsRootAccessibleWrap.h	2014-04-20 15:18:04.778211072 -0400
+@@ -42,6 +42,9 @@
+ 
+ #include "nsRootAccessible.h"
+ 
++// namespace mozilla {
++// namespace a11y {
++
+ class nsRootAccessibleWrap : public nsRootAccessible
+ {
+ public:
+@@ -53,4 +56,7 @@
+   virtual void DocumentActivated(nsDocAccessible* aDocument);
+ };
+ 
++// } // namespace a11y
++// } // namespace mozilla
++
+ #endif
+diff -Naur mozilla-release/accessible/src/msaa/nsTextAccessibleWrap.cpp mozilla/accessible/src/msaa/nsTextAccessibleWrap.cpp
+--- mozilla-release/accessible/src/msaa/nsTextAccessibleWrap.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/nsTextAccessibleWrap.cpp	2014-04-20 14:38:05.362462304 -0400
+@@ -48,6 +48,8 @@
+ 
+ #include "gfxFont.h"
+ 
++#include "mingw-seh.h"
++
+ ////////////////////////////////////////////////////////////////////////////////
+ // nsTextAccessibleWrap Accessible
+ ////////////////////////////////////////////////////////////////////////////////
+@@ -85,7 +87,8 @@
+ STDMETHODIMP nsTextAccessibleWrap::get_domText( 
+     /* [retval][out] */ BSTR __RPC_FAR *aDomText)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aDomText = NULL;
+ 
+   if (IsDefunct())
+@@ -102,9 +105,9 @@
+   if (!*aDomText)
+     return E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsTextAccessibleWrap::get_clippedSubstringBounds( 
+@@ -115,7 +118,8 @@
+     /* [out] */ int __RPC_FAR *aWidth,
+     /* [out] */ int __RPC_FAR *aHeight)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aX = *aY = *aWidth = *aHeight = 0;
+   nscoord x, y, width, height, docX, docY, docWidth, docHeight;
+   HRESULT rv = get_unclippedSubstringBounds(aStartIndex, aEndIndex, &x, &y, &width, &height);
+@@ -139,9 +143,10 @@
+   *aY = clippedRect.y;
+   *aWidth = clippedRect.width;
+   *aHeight = clippedRect.height;
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ STDMETHODIMP nsTextAccessibleWrap::get_unclippedSubstringBounds( 
+@@ -152,7 +157,8 @@
+     /* [out] */ int __RPC_FAR *aWidth,
+     /* [out] */ int __RPC_FAR *aHeight)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aX = *aY = *aWidth = *aHeight = 0;
+ 
+   if (IsDefunct())
+@@ -162,9 +168,10 @@
+                                     aX, aY, aWidth, aHeight))) {
+     return NS_ERROR_FAILURE;
+   }
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
+ 
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ 
+@@ -172,7 +179,8 @@
+     /* [in] */ unsigned int aStartIndex,
+     /* [in] */ unsigned int aEndIndex)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   if (IsDefunct())
+     return E_FAIL;
+ 
+@@ -183,8 +191,10 @@
+                                    nsIAccessibleScrollType::SCROLL_TYPE_ANYWHERE);
+   if (NS_FAILED(rv))
+     return E_FAIL;
+-} __except(FilterA11yExceptions(::GetExceptionCode(), GetExceptionInformation())) { }
++
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+ 
+ nsIFrame* nsTextAccessibleWrap::GetPointFromOffset(nsIFrame *aContainingFrame, 
+@@ -248,7 +258,8 @@
+ STDMETHODIMP nsTextAccessibleWrap::get_fontFamily(
+     /* [retval][out] */ BSTR __RPC_FAR *aFontFamily)
+ {
+-__try {
++  A11Y_TRYBLOCK_BEGIN
++
+   *aFontFamily = NULL;
+ 
+   nsIFrame* frame = GetFrame();
+@@ -267,8 +278,7 @@
+   if (!*aFontFamily)
+     return E_OUTOFMEMORY;
+ 
+-} __except(FilterA11yExceptions(::GetExceptionCode(),
+-                                GetExceptionInformation())) { }
+-
+   return S_OK;
++
++  A11Y_TRYBLOCK_END
+ }
+diff -Naur mozilla-release/accessible/src/msaa/nsWinUtils.cpp mozilla/accessible/src/msaa/nsWinUtils.cpp
+--- mozilla-release/accessible/src/msaa/nsWinUtils.cpp	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/nsWinUtils.cpp	2014-04-20 15:30:50.174130931 -0400
+@@ -40,12 +40,18 @@
+ 
+ #include "nsWinUtils.h"
+ 
++#include "Compatibility.h"
+ #include "nsIWinAccessNode.h"
+ #include "nsRootAccessible.h"
+ 
++#include "mozilla/Preferences.h"
+ #include "nsArrayUtils.h"
+ #include "nsIDocShellTreeItem.h"
+ 
++// using namespace mozilla;
++// using namespace mozilla::a11y;
++
++
+ HRESULT
+ nsWinUtils::ConvertToIA2Array(nsIArray *aGeckoArray, IUnknown ***aIA2Array,
+                               long *aIA2ArrayLen)
+@@ -104,7 +110,10 @@
+ {
+   // Register window class that'll be used for document accessibles associated
+   // with tabs.
+-  if (IsWindowEmulationFor(0)) {
++  if (mozilla::Preferences::GetBool("browser.tabs.remote") ||
++      mozilla::a11y::Compatibility::IsJAWS() ||
++      mozilla::a11y::Compatibility::IsWE() ||
++      mozilla::a11y::Compatibility::IsDolphin()) {
+     RegisterNativeWindow(kClassNameTabContent);
+     nsAccessNodeWrap::sHWNDCache.Init(4);
+     return true;
+@@ -117,7 +126,7 @@
+ {
+   // Unregister window call that's used for document accessibles associated
+   // with tabs.
+-  if (IsWindowEmulationFor(0))
++  if (IsWindowEmulationStarted())
+     ::UnregisterClassW(kClassNameTabContent, GetModuleHandle(NULL));
+ }
+ 
+@@ -172,17 +181,3 @@
+                  SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE |
+                  SWP_NOZORDER | SWP_NOACTIVATE);
+ }
+-
+-bool
+-nsWinUtils::IsWindowEmulationFor(LPCWSTR kModuleHandle)
+-{
+-#ifdef MOZ_E10S_COMPAT
+-  // Window emulation is always enabled in multiprocess Firefox.
+-  return kModuleHandle ? ::GetModuleHandleW(kModuleHandle) : true;
+-#else
+-  return kModuleHandle ? ::GetModuleHandleW(kModuleHandle) :
+-    ::GetModuleHandleW(kJAWSModuleHandle) ||
+-    ::GetModuleHandleW(kWEModuleHandle)  ||
+-    ::GetModuleHandleW(kDolphinModuleHandle);
+-#endif
+-}
+diff -Naur mozilla-release/accessible/src/msaa/nsWinUtils.h mozilla/accessible/src/msaa/nsWinUtils.h
+--- mozilla-release/accessible/src/msaa/nsWinUtils.h	2011-12-20 20:06:25.000000000 -0500
++++ mozilla/accessible/src/msaa/nsWinUtils.h	2014-04-20 15:02:57.681306050 -0400
+@@ -49,10 +49,6 @@
+ const LPCWSTR kClassNameRoot = L"MozillaUIWindowClass";
+ const LPCWSTR kClassNameTabContent = L"MozillaContentWindowClass";
+ 
+-const LPCWSTR kJAWSModuleHandle = L"jhook";
+-const LPCWSTR kWEModuleHandle = L"gwm32inc";
+-const LPCWSTR kDolphinModuleHandle = L"dolwinhk";
+-
+ class nsWinUtils
+ {
+ public:
+@@ -99,11 +95,6 @@
+    * Helper to hide window.
+    */
+   static void HideNativeWindow(HWND aWnd);
+-
+-  /**
+-   * Return true if window emulation is enabled.
+-   */
+-  static bool IsWindowEmulationFor(LPCWSTR kModuleHandle);
+ };
+ 
+ #endif
+diff -Naur mozilla-release/configure.in mozilla/configure.in
+--- mozilla-release/configure.in	2011-12-20 20:06:28.000000000 -0500
++++ mozilla/configure.in	2014-04-20 13:23:08.749933123 -0400
+@@ -945,6 +945,18 @@
+             AC_MSG_ERROR([windres version $WINDRES_VERSION or higher is required to build.])
+         fi
+ 
++        AC_CHECK_PROGS(MIDL, $target-widl widl)
++        if test -n "$MIDL"; then
++            case "$target" in
++            i*86-*)
++                MIDL_FLAGS="$MIDL_FLAGS --win32 -m32"
++                ;;
++            x86_64-*)
++                MIDL_FLAGS="$MIDL_FLAGS --win64 -m64"
++                ;;
++            esac
++        fi
++
+         MOZ_WINSDK_MAXVER=0x06010000
+     fi # !GNU_CC
+ 
+@@ -5248,6 +5260,16 @@
+     ACCESSIBILITY=,
+     ACCESSIBILITY=1 )
+ if test "$ACCESSIBILITY"; then
++    case "$target" in
++    *-mingw*)
++        if test -z "$MIDL"; then
++            if test "$GCC" != "yes"; then
++                AC_MSG_ERROR([MIDL could not be found. Building accessibility without MIDL is not supported.])
++            else
++                AC_MSG_ERROR([You have accessibility enabled, but widl could not be found. Add --disable-accessibility to your mozconfig or install widl. See https://developer.mozilla.org/en-US/docs/Cross_Compile_Mozilla_for_Mingw32 for details.])
++            fi
++        fi
++    esac
+     AC_DEFINE(ACCESSIBILITY)
+ fi
+ 
+diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-d2d-private.h mozilla/gfx/cairo/cairo/src/cairo-d2d-private.h
+--- mozilla-release/gfx/cairo/cairo/src/cairo-d2d-private.h	2011-12-20 20:06:37.000000000 -0500
++++ mozilla/gfx/cairo/cairo/src/cairo-d2d-private.h	2014-04-20 13:23:08.749933123 -0400
+@@ -52,7 +52,7 @@
+ #include "cairo-list-private.h"
+ 
+ /* describes the type of the currently applied clip so that we can pop it */
+-struct d2d_clip;
++struct d2d_clip_t;
+ 
+ #define MAX_OPERATORS CAIRO_OPERATOR_HSL_LUMINOSITY + 1
+ 
+@@ -114,7 +114,7 @@
+     cairo_format_t format;
+ 
+     cairo_clip_t clip;
+-    d2d_clip *d2d_clip;
++    d2d_clip_t *d2d_clip;
+ 
+ 
+     /** Mask layer used by surface_mask to push opacity masks */
+@@ -162,10 +162,10 @@
+ };
+ 
+ typedef HRESULT (WINAPI*D2D1CreateFactoryFunc)(
+-    __in D2D1_FACTORY_TYPE factoryType,
+-    __in REFIID iid,
+-    __in_opt CONST D2D1_FACTORY_OPTIONS *pFactoryOptions,
+-    __out void **factory
++    D2D1_FACTORY_TYPE factoryType,
++    REFIID iid,
++    CONST D2D1_FACTORY_OPTIONS *pFactoryOptions,
++    void **factory
+ );
+ 
+ typedef HRESULT (WINAPI*D3D10CreateDevice1Func)(
+diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-d2d-surface.cpp mozilla/gfx/cairo/cairo/src/cairo-d2d-surface.cpp
+--- mozilla-release/gfx/cairo/cairo/src/cairo-d2d-surface.cpp	2011-12-20 20:06:37.000000000 -0500
++++ mozilla/gfx/cairo/cairo/src/cairo-d2d-surface.cpp	2014-04-20 13:23:08.750933123 -0400
+@@ -844,12 +844,12 @@
+     }
+ }
+ 
+-struct d2d_clip
++struct d2d_clip_t
+ {
+     enum clip_type {LAYER, AXIS_ALIGNED_CLIP};
+-    d2d_clip * const prev;
++    d2d_clip_t * const prev;
+     const enum clip_type type;
+-    d2d_clip(d2d_clip *prev, clip_type type) : prev(prev), type(type) { }
++    d2d_clip_t(d2d_clip_t *prev, clip_type type) : prev(prev), type(type) { }
+ };
+ 
+ static RefPtr<ID2D1PathGeometry>
+@@ -889,7 +889,7 @@
+ 		    _cairo_fixed_to_float(box.p2.y)),
+ 		mode);
+ 
+-	d2dsurf->d2d_clip = new d2d_clip (d2dsurf->d2d_clip, d2d_clip::AXIS_ALIGNED_CLIP);
++	d2dsurf->d2d_clip = new d2d_clip_t (d2dsurf->d2d_clip, d2d_clip_t::AXIS_ALIGNED_CLIP);
+     } else {
+ 	HRESULT hr;
+ 	RefPtr<ID2D1PathGeometry> geom = _cairo_d2d_create_path_geometry_for_path (&clip_path->path,
+@@ -914,7 +914,7 @@
+ 		    options),
+ 		layer);
+ 
+-	d2dsurf->d2d_clip = new d2d_clip(d2dsurf->d2d_clip, d2d_clip::LAYER);
++	d2dsurf->d2d_clip = new d2d_clip_t(d2dsurf->d2d_clip, d2d_clip_t::LAYER);
+    }
+     if (!d2dsurf->d2d_clip)
+ 	return _cairo_error(CAIRO_STATUS_NO_MEMORY);
+@@ -924,12 +924,12 @@
+ static void
+ pop_clip (cairo_d2d_surface_t *d2dsurf)
+ {
+-    d2d_clip *current_clip = d2dsurf->d2d_clip;
++    d2d_clip_t *current_clip = d2dsurf->d2d_clip;
+ 
+     /* pop the clip from the render target */
+-    if (current_clip->type == d2d_clip::LAYER) {
++    if (current_clip->type == d2d_clip_t::LAYER) {
+ 	d2dsurf->rt->PopLayer();
+-    } else if (current_clip->type == d2d_clip::AXIS_ALIGNED_CLIP) {
++    } else if (current_clip->type == d2d_clip_t::AXIS_ALIGNED_CLIP) {
+ 	d2dsurf->rt->PopAxisAlignedClip();
+     }
+ 
+@@ -2432,6 +2432,10 @@
+     RefPtr<ID3D10Texture2D> texture;
+     RefPtr<IDXGISurface> dxgiSurface;
+ 
++    D2D1_RENDER_TARGET_USAGE usage = (desc.MiscFlags & D3D10_RESOURCE_MISC_GDI_COMPATIBLE) ?
++					  D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE
++					: D2D1_RENDER_TARGET_USAGE_NONE;
++
+     hr = d2dsurf->device->mD3D10Device->CreateTexture2D(&desc, NULL, &texture);
+     if (FAILED(hr)) {
+ 	goto FAIL_CREATESIMILAR;
+@@ -2445,10 +2449,6 @@
+ 	goto FAIL_CREATESIMILAR;
+     }
+ 
+-    D2D1_RENDER_TARGET_USAGE usage = (desc.MiscFlags & D3D10_RESOURCE_MISC_GDI_COMPATIBLE) ?
+-					  D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE
+-					: D2D1_RENDER_TARGET_USAGE_NONE;
+-
+     hr = sD2DFactory->CreateDxgiSurfaceRenderTarget(dxgiSurface,
+ 						    D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT,
+ 										 D2D1::PixelFormat(DXGI_FORMAT_UNKNOWN,
+@@ -2595,7 +2595,7 @@
+     assert(cairo_surface_status(image_out) == CAIRO_STATUS_SUCCESS ||
+ 	   cairo_surface_status(image_out) == CAIRO_STATUS_NO_MEMORY);
+ 
+-    *image_extra = softTexture.forget();
++    *image_extra = softTexture.forget().drop();
+     *image_out_ret = (cairo_image_surface_t*)image_out;
+ 
+     return cairo_surface_status(image_out);
+@@ -2668,7 +2668,7 @@
+ 										  size.width,
+ 										  size.height,
+ 										  data.RowPitch);
+-    *image_extra = softTexture.forget();
++    *image_extra = softTexture.forget().drop();
+ 
+     return CAIRO_STATUS_SUCCESS;
+ }
+@@ -4480,6 +4480,7 @@
+     D2D1_RENDER_TARGET_PROPERTIES props;
+     DXGI_FORMAT format;
+     DXGI_SURFACE_DESC desc;
++    D2D1_ALPHA_MODE alpha = D2D1_ALPHA_MODE_PREMULTIPLIED;
+ 
+     hr = d2d_device->mD3D10Device->OpenSharedResource(handle,
+ 						      __uuidof(ID3D10Resource),
+@@ -4498,7 +4499,6 @@
+     dxgiSurface->GetDesc(&desc);
+     format = desc.Format;
+     
+-    D2D1_ALPHA_MODE alpha = D2D1_ALPHA_MODE_PREMULTIPLIED;
+     if (format == DXGI_FORMAT_B8G8R8A8_UNORM) {
+ 	if (content == CAIRO_CONTENT_ALPHA) {
+ 	    status = CAIRO_STATUS_INVALID_CONTENT;
+diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-dwrite-font.cpp mozilla/gfx/cairo/cairo/src/cairo-dwrite-font.cpp
+--- mozilla-release/gfx/cairo/cairo/src/cairo-dwrite-font.cpp	2011-12-20 20:06:37.000000000 -0500
++++ mozilla/gfx/cairo/cairo/src/cairo-dwrite-font.cpp	2014-04-20 13:23:08.751933123 -0400
+@@ -45,10 +45,10 @@
+ #include <float.h>
+ 
+ typedef HRESULT (WINAPI*D2D1CreateFactoryFunc)(
+-    __in D2D1_FACTORY_TYPE factoryType,
+-    __in REFIID iid,
+-    __in_opt CONST D2D1_FACTORY_OPTIONS *pFactoryOptions,
+-    __out void **factory
++    D2D1_FACTORY_TYPE factoryType,
++    REFIID iid,
++    CONST D2D1_FACTORY_OPTIONS *pFactoryOptions,
++    void **factory
+ );
+ 
+ #define CAIRO_INT_STATUS_SUCCESS (cairo_int_status_t)CAIRO_STATUS_SUCCESS
+@@ -156,7 +156,7 @@
+ 
+ void _cairo_dwrite_scaled_font_fini(void *scaled_font);
+ 
+-cairo_warn cairo_int_status_t
++static cairo_warn cairo_int_status_t
+ _cairo_dwrite_scaled_glyph_init(void			     *scaled_font,
+ 				cairo_scaled_glyph_t	     *scaled_glyph,
+ 				cairo_scaled_glyph_info_t    info);
+@@ -962,6 +962,15 @@
+     glyph.x = -x1;
+     glyph.y = -y1;
+ 
++    DWRITE_GLYPH_RUN run;
++    FLOAT advance = 0;
++    UINT16 index = (UINT16)glyph.index;
++    DWRITE_GLYPH_OFFSET offset;
++    double x = glyph.x;
++    double y = glyph.y;
++    RECT area;
++    DWRITE_MATRIX matrix;
++
+     surface = (cairo_win32_surface_t *)
+ 	cairo_win32_surface_create_with_dib (CAIRO_FORMAT_RGB24, width, height);
+ 
+@@ -973,12 +982,6 @@
+     if (status)
+ 	goto FAIL;
+ 
+-    DWRITE_GLYPH_RUN run;
+-    FLOAT advance = 0;
+-    UINT16 index = (UINT16)glyph.index;
+-    DWRITE_GLYPH_OFFSET offset;
+-    double x = glyph.x;
+-    double y = glyph.y;
+     /**
+      * We transform by the inverse transformation here. This will put our glyph
+      * locations in the space in which we draw. Which is later transformed by
+@@ -991,7 +994,6 @@
+     /** Y-axis is inverted */
+     offset.ascenderOffset = -(FLOAT)y;
+ 
+-    RECT area;
+     area.top = 0;
+     area.bottom = height;
+     area.left = 0;
+@@ -1006,7 +1008,7 @@
+     run.isSideways = FALSE;
+     run.glyphOffsets = &offset;
+ 
+-    DWRITE_MATRIX matrix = _cairo_dwrite_matrix_from_matrix(&scaled_font->mat);
++    matrix = _cairo_dwrite_matrix_from_matrix(&scaled_font->mat);
+ 
+     status = _dwrite_draw_glyphs_to_gdi_surface_gdi (surface, &matrix, &run,
+             RGB(0,0,0), scaled_font, area);
+diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-dwrite-private.h mozilla/gfx/cairo/cairo/src/cairo-dwrite-private.h
+--- mozilla-release/gfx/cairo/cairo/src/cairo-dwrite-private.h	2011-12-20 20:06:37.000000000 -0500
++++ mozilla/gfx/cairo/cairo/src/cairo-dwrite-private.h	2014-04-20 13:23:08.751933123 -0400
+@@ -34,13 +34,13 @@
+  *	Bas Schouten <bschouten@mozilla.com>
+  */
+ #include <dwrite.h>
+-#include <D2d1.h>
++#include <d2d1.h>
+ 
+ // DirectWrite is not available on all platforms.
+ typedef HRESULT (WINAPI*DWriteCreateFactoryFunc)(
+-  __in   DWRITE_FACTORY_TYPE factoryType,
+-  __in   REFIID iid,
+-  __out  IUnknown **factory
++  DWRITE_FACTORY_TYPE factoryType,
++  REFIID iid,
++  IUnknown **factory
+ );
+ 
+ /* cairo_scaled_font_t implementation */
+diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-win32.h mozilla/gfx/cairo/cairo/src/cairo-win32.h
+--- mozilla-release/gfx/cairo/cairo/src/cairo-win32.h	2011-12-20 20:06:37.000000000 -0500
++++ mozilla/gfx/cairo/cairo/src/cairo-win32.h	2014-04-20 13:23:08.751933123 -0400
+@@ -149,7 +149,6 @@
+     int type;
+     int refcount;
+ };
+-typedef struct _cairo_device cairo_device_t;
+ 
+ /**
+  * Create a D2D device
+diff -Naur mozilla-release/gfx/cairo/cairo/src/cairo-win32-refptr.h mozilla/gfx/cairo/cairo/src/cairo-win32-refptr.h
+--- mozilla-release/gfx/cairo/cairo/src/cairo-win32-refptr.h	2011-12-20 20:06:37.000000000 -0500
++++ mozilla/gfx/cairo/cairo/src/cairo-win32-refptr.h	2014-04-20 13:23:08.751933123 -0400
+@@ -31,61 +31,75 @@
+  * The Initial Developer of the Original Code is the Mozilla Foundation
+  *
+  * Contributor(s):
+- *	Bas Schouten <bschouten@mozilla.com>
++ *  Bas Schouten <bschouten@mozilla.com>
+  */
+ #ifndef CAIRO_WIN32_REFPTR_H
+ #define CAIRO_WIN32_REFPTR_H
+ 
+-template<class T>
++template<typename T> class TemporaryRef;
++
++/**
++ * RefPtr points to a refcounted thing that has AddRef and Release
++ * methods to increase/decrease the refcount, respectively.  After a
++ * RefPtr<T> is assigned a T*, the T* can be used through the RefPtr
++ * as if it were a T*.
++ *
++ * A RefPtr can forget its underlying T*, which results in the T*
++ * being wrapped in a temporary object until the T* is either
++ * re-adopted from or released by the temporary.
++ */
++template<typename T>
+ class RefPtr
+ {
++    // To allow them to use unref()
++    friend class TemporaryRef<T>;
++
++    struct dontRef {};
++
+ public:
+-    RefPtr() : mPtr(NULL)
+-    { }
++    RefPtr() : ptr(0) { }
++    RefPtr(const RefPtr& o) : ptr(ref(o.ptr)) {}
++    RefPtr(const TemporaryRef<T>& o) : ptr(o.drop()) {}
++    RefPtr(T* t) : ptr(ref(t)) {}
+ 
+-    RefPtr(T *aPtr) : mPtr(aPtr)
+-    {
+-	if (mPtr) {
+-	    mPtr->AddRef();
+-	}
+-    }
++    template<typename U>
++    RefPtr(const RefPtr<U>& o) : ptr(ref(o.get())) {}
+ 
+-    RefPtr(const RefPtr<T> &aRefPtr)
+-    {
+-	mPtr = aRefPtr.mPtr;
+-	if (mPtr) {
+-	    mPtr->AddRef();
+-	}
+-    }
++    ~RefPtr() { unref(ptr); }
+ 
+-    template <class newType>
+-    explicit RefPtr(const RefPtr<newType> &aRefPtr)
+-    {
+-	mPtr = aRefPtr.get();
+-	if (mPtr) {
+-	    mPtr->AddRef();
+-	}
++    RefPtr& operator=(const RefPtr& o) {
++        assign(ref(o.ptr));
++        return *this;
+     }
+ 
+-    ~RefPtr()
+-    {
+-	if (mPtr) {
+-	    mPtr->Release();
+-	}
++    RefPtr& operator=(const TemporaryRef<T>& o) {
++        assign(o.drop());
++        return *this;
++    }
++    RefPtr& operator=(T* t) {
++        assign(ref(t));
++        return *this;
+     }
+ 
+-    RefPtr<T> &operator =(const RefPtr<T> aPtr)
+-    {
+-	assignPtr(aPtr.mPtr);
+-	return *this;
++    template<typename U>
++    RefPtr& operator=(const RefPtr<U>& o) {
++        assign(ref(o.get()));
++        return *this;
+     }
+-    
+-    RefPtr<T> &operator =(T* aPtr)
+-    {
+-	assignPtr(aPtr);
+-	return *this;
++
++    TemporaryRef<T> forget() {
++        T* tmp = ptr;
++        ptr = 0;
++        return TemporaryRef<T>(tmp, dontRef());
+     }
+ 
++    T* get() const { return ptr; }
++    operator T*() const { return ptr; }
++    T* operator->() const { return ptr; }
++    T& operator*() const { return *ptr; }
++    template<typename U>
++    operator TemporaryRef<U>() { return TemporaryRef<U>(ptr); }
++
+     /** 
+      * WARNING for ease of use, passing a reference will release/clear out ptr!
+      * We null out the ptr before returning its address so people passing byref
+@@ -95,67 +109,71 @@
+      */
+     T** operator&()
+     {
+-	if (mPtr) {
+-	    mPtr->Release();
+-	    mPtr = NULL;
+-	}
+-	return &mPtr;
++       if (ptr) {
++           ptr->Release();
++           ptr = NULL;
++       }
++       return &ptr;
+     }
+ 
+-    T* operator->()
+-    {
+-	return mPtr;
++private:
++    void assign(T* t) {
++        unref(ptr);
++        ptr = t;
+     }
+ 
+-    T* operator->() const
+-    {
+-	return mPtr;
+-    }
++    T* ptr;
+ 
+-    operator bool()
+-    {
+-	return (mPtr ? true : false);
++    static inline T* ref(T* t) {
++        if (t) {
++            t->AddRef();
++        }
++        return t;
+     }
+ 
+-    operator T*()
+-    {
+-	return mPtr;
++    static inline void unref(T* t) {
++        if (t) {
++            t->Release();
++        }
+     }
++};
+ 
+-    template <class newType>
+-    operator RefPtr<newType>()
+-    {
+-	RefPtr<newType> newPtr;
+-	newPtr = mPtr;
+-	return newPtr;
+-    }
++/**
++ * TemporaryRef<T> represents an object that holds a temporary
++ * reference to a T.  TemporaryRef objects can't be manually ref'd or
++ * unref'd (being temporaries, not lvalues), so can only relinquish
++ * references to other objects, or unref on destruction.
++ */
++template<typename T>
++class TemporaryRef
++{
++    // To allow it to construct TemporaryRef from a bare T*
++    friend class RefPtr<T>;
+ 
+-    T* get() const
+-    {
+-	return mPtr;
+-    }
++    typedef typename RefPtr<T>::dontRef dontRef;
+ 
+-    T* forget()
+-    {
+-	T* ptr = mPtr;
+-	mPtr = NULL;
+-	return ptr;
++public:
++    TemporaryRef(T* t) : ptr(RefPtr<T>::ref(t)) {}
++    TemporaryRef(const TemporaryRef& o) : ptr(o.drop()) {}
++
++    template<typename U>
++    TemporaryRef(const TemporaryRef<U>& o) : ptr(o.drop()) {}
++
++    ~TemporaryRef() { RefPtr<T>::unref(ptr); }
++
++    T* drop() const {
++        T* tmp = ptr;
++        ptr = 0;
++        return tmp;
+     }
+ 
+ private:
+-    void assignPtr(T* aPtr)
+-    {
+-	T *oldPtr = mPtr;
+-	mPtr = aPtr;
+-	if (mPtr) {
+-	    mPtr->AddRef();
+-	}
+-	if (oldPtr) {
+-	    oldPtr->Release();
+-	}
+-    }
++    TemporaryRef(T* t, const dontRef&) : ptr(t) {}
++
++    mutable T* ptr;
+ 
+-    T *mPtr;
++    TemporaryRef();
++    TemporaryRef& operator=(const TemporaryRef&);
+ };
+ 
+ #endif
+diff -Naur mozilla-release/gfx/thebes/gfxWindowsPlatform.cpp mozilla/gfx/thebes/gfxWindowsPlatform.cpp
+--- mozilla-release/gfx/thebes/gfxWindowsPlatform.cpp	2011-12-20 20:06:38.000000000 -0500
++++ mozilla/gfx/thebes/gfxWindowsPlatform.cpp	2014-04-20 13:23:08.752933123 -0400
+@@ -137,9 +137,9 @@
+ // DirectWrite is not available on all platforms, we need to use the function
+ // pointer.
+ typedef HRESULT (WINAPI*DWriteCreateFactoryFunc)(
+-  __in   DWRITE_FACTORY_TYPE factoryType,
+-  __in   REFIID iid,
+-  __out  IUnknown **factory
++  DWRITE_FACTORY_TYPE factoryType,
++  REFIID iid,
++  IUnknown **factory
+ );
+ #endif
+ 
+diff -Naur mozilla-release/widget/src/windows/nsWindow.h mozilla/widget/src/windows/nsWindow.h
+--- mozilla-release/widget/src/windows/nsWindow.h	2011-12-20 20:07:12.000000000 -0500
++++ mozilla/widget/src/windows/nsWindow.h	2014-04-20 13:23:08.752933123 -0400
+@@ -71,7 +71,7 @@
+ #include "TaskbarWindowPreview.h"
+ 
+ #ifdef ACCESSIBILITY
+-#include "OLEACC.H"
++#include "oleacc.h"
+ #include "nsAccessible.h"
+ #endif
+ 
+diff -Naur mozilla-release/xpcom/reflect/xptcall/src/md/unix/xptcinvoke_gcc_x86_unix.cpp mozilla/xpcom/reflect/xptcall/src/md/unix/xptcinvoke_gcc_x86_unix.cpp
+--- mozilla-release/xpcom/reflect/xptcall/src/md/unix/xptcinvoke_gcc_x86_unix.cpp	2011-12-20 20:07:13.000000000 -0500
++++ mozilla/xpcom/reflect/xptcall/src/md/unix/xptcinvoke_gcc_x86_unix.cpp	2014-04-20 13:23:08.752933123 -0400
+@@ -82,22 +82,6 @@
+   params      = ebp + 0x14
+ 
+ */
+-/*
+- * Hack for gcc for win32 and os2.  Functions used externally must be
+- * explicitly dllexported.
+- * Bug 226609
+- */
+-#if defined(XP_WIN32) || defined(XP_OS2)
+-extern "C" {
+-    nsresult _NS_InvokeByIndex_P(nsISupports* that, PRUint32 methodIndex,
+-                               PRUint32 paramCount, nsXPTCVariant* params);
+-    EXPORT_XPCOM_API(nsresult)
+-    NS_InvokeByIndex_P(nsISupports* that, PRUint32 methodIndex,
+-                     PRUint32 paramCount, nsXPTCVariant* params) { 
+-        return _NS_InvokeByIndex_P(that, methodIndex, paramCount, params);
+-    }
+-}
+-#endif
+ 
+ __asm__ (
+ 	".text\n\t"
+@@ -143,7 +127,11 @@
+ 	"movl  %ebp, %esp\n\t"
+ 	"popl  %ebp\n\t"
+ 	"ret\n"
+-#if !defined(XP_WIN32) && !defined(XP_OS2) && !defined(XP_MACOSX)
++#if defined(XP_WIN32) || defined(XP_OS2)
++  ".section .drectve\n\t"
++  ".ascii \" -export:NS_InvokeByIndex_P\"\n\t"
++  ".text\n\t"
++#elif !defined(XP_MACOSX)
+ 	".size " SYMBOL_UNDERSCORE "NS_InvokeByIndex_P, . -" SYMBOL_UNDERSCORE "NS_InvokeByIndex_P\n\t"
+ #endif
+ );
