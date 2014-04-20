@@ -3,6 +3,12 @@ COMMA := ,
 EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
 
+# This is a weird function that will merely echos a command and then calls it; it's
+# useful for bash shell loops that we don't want to echo the entire loop for, but 
+# we still want make-like behavior (print the command, then run it)
+define sh_make
+echo $1; $1
+endef
 
 NG_CONFIGURE_OPTS :=
 NG_USE_SYSTEM_LIBS ?=
