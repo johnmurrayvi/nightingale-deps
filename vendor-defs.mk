@@ -377,7 +377,7 @@ endif
 ifeq (Msys,$(NG_VENDOR_ARCH))
   ifneq (,$(call enable-ng-lib, zlib))
     ifneq ($(wildcard $(NG_VENDOR_BINARIES_DIR)/zlib/$(NG_BUILD_TYPE)), )
-      $(info Enabling Songbird vendor lib: zlib)
+      $(info Enabling Nightingale vendor lib: zlib)
       NG_ZLIB_DIR := $(call find-dep-dir, zlib)
       NG_LDFLAGS += -L$(NG_ZLIB_DIR)/lib -lzlib
       NG_CFLAGS += -I$(NG_ZLIB_DIR)/include
@@ -388,7 +388,7 @@ else
   ifeq (1, $(NG_VENDOR_CROSS_COMP))
     ifneq (,$(call enable-ng-lib, zlib))
       ifneq ($(wildcard $(NG_VENDOR_BINARIES_DIR)/zlib/$(NG_BUILD_TYPE)), )
-        $(info Enabling Songbird vendor lib: zlib)
+        $(info Enabling Nightingale vendor lib: zlib)
         NG_ZLIB_DIR := $(call find-dep-dir, zlib)
         NG_LDFLAGS += -L$(NG_ZLIB_DIR)/lib -lz
         NG_CFLAGS += -I$(NG_ZLIB_DIR)/include
