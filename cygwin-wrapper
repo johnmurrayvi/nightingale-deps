@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+
+#require BSD::Resource;
+
+my @args;
+
+#push @args, ("strace", "-v", "-o", "/tmp/strace.log");
+
+#my $wineroot = "/mnt/dump/src/wine/objdir";
+#my $winepath = $wineroot . "/programs/winepath/winepath";
+#my $wineserver = $wineroot . "/server/wineserver";
+my $wineroot = "/usr/bin";
+my $winepath = $wineroot . "/winepath";
+my $wineserver = $wineroot . "/wineserver";
+
+# hack for broken wine, wine bug #8329
+push @args, ($wineroot . "/wine", $0 . ".exe");
+#push @args, ("/usr/bin/wine", $0 . ".exe");
+
+my $used = 0;
+
+# workaround for make 3.81+ with wine breaking rc and winepath
+#BSD::Resource::setrlimit(BSD::Resource::RLIMIT_STACK(),
+#                         8388608,
+#                         BSD::Resource::RLIM_INFINITY());
+
+foreach (@ARGV) {
+	if ($used and m!/(?:home|mnt|tmp)/!) {
+		m!(/(?:home|mnt|tmp)/[^"]*)!;
+		my $pre = $`;
+		my $post = $';
+		my $match = `$winepath -w -- $1`;
+		$match =~ s!\n!!gm;
+		$_ = $pre . $match . $post;
+	}
+	push @args, $_;
+	$used = 1;
+}
+
+#print { STDERR } join(' ', @args);
+#system {$wineserver} ( $wineserver, "-p" );
+exec {$args[0]} @args;
+
+die "Failed to run " . join(' ', @args) . "\n\t$?";
