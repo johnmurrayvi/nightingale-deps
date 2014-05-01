@@ -42,7 +42,6 @@ export WINEPREFIX="/home/jmurray/.wine-32"
 export BUVER="binutils-2.17.50"
 export PATH="$WPRE:$WPRE/VC10/bin:$PATH"
 
-export global_symbol_pipe="sed -n -e 's/^.*[   ]\\([ABCDGIRSTW][ABCDGIRSTW]*\\)[       ][    ]*\\(\\)\\([_A-Za-z][_A-Za-z0-9]*\\)\$/\\1\\2\\3 \\3/p'"
 echo $PATH
 
 
