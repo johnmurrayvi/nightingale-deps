@@ -83,6 +83,8 @@ VERSION=2.4
 TIMESTAMP=""
 package_revision=1.3293
 
+global_symbol_pipe="sed -n -e 's/^.*[   ]\\([ABCDGIRSTW][ABCDGIRSTW]*\\)[       ][    ]*\\(\\)\\([_A-Za-z][_A-Za-z0-9]*\\)\$/\\1\\2\\3 \\3/p'"
+
 # Be Bourne compatible
 if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then
   emulate sh
