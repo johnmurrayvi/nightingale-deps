@@ -357,15 +357,17 @@ endef
 
 ###########
 
-# #
-# # GNU libtool
-# #
-# ifneq (,$(call enable-ng-lib, libtool))
-#   $(info Enabling Nightingale vendor lib: libtool)
-#   NG_LIBTOOL_DIR = $(call find-dep-dir, libtool)
-#   NG_PATH += $(NG_LIBTOOL_DIR)/bin
-#   ACLOCAL_FLAGS += -I $(NG_LIBTOOL_DIR)/share/aclocal
-# endif
+#
+# GNU libtool
+#
+ifneq (,$(call enable-ng-lib, libtool))
+  ifneq ($(wildcard $(NG_VENDOR_BINARIES_DIR)/libtool/$(NG_BUILD_TYPE)),)
+    $(info Enabling Nightingale vendor lib: libtool)
+    NG_LIBTOOL_DIR = $(call find-dep-dir, libtool)
+    NG_PATH += $(NG_LIBTOOL_DIR)/bin
+    ACLOCAL_FLAGS += -I $(NG_LIBTOOL_DIR)/share/aclocal
+  endif
+endif
 
 #
 # GNU Gettext 
@@ -374,7 +376,7 @@ ifneq (,$(call enable-ng-lib, gettext))
   ifneq ($(wildcard $(NG_VENDOR_BINARIES_DIR)/gettext/$(NG_BUILD_TYPE)),)
     $(info Enabling Nightingale vendor lib: gettext)
     NG_GETTEXT_DIR = $(call find-dep-dir, gettext)
-    NG_LDFLAGS += -L$(NG_GETTEXT_DIR)/lib -lintl # COMMENT OUT UNTIL YOU BUILD LIBICONV
+    NG_LDFLAGS += -L$(NG_GETTEXT_DIR)/lib -lintl
     NG_CFLAGS += -I$(NG_GETTEXT_DIR)/include
     NG_CPPFLAGS += -I$(NG_GETTEXT_DIR)/include
     NG_PATH += $(NG_GETTEXT_DIR)/bin
