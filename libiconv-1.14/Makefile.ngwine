@@ -50,6 +50,10 @@ ifeq (1,$(NG_VENDOR_CROSS_COMP))
     NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
                                        --disable-static
   endif
+  ifeq (i686-wine-mingw32, $(CROSS))
+    NG_CC = $(CURDIR)/../cl_wine_wrapper.py
+    NG_CXX = $(CURDIR)/../cl_wine_wrapper.py
+  endif
 endif
 
 
