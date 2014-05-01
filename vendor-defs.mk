@@ -62,22 +62,37 @@ ifeq (Linux,$(NG_VENDOR_ARCH))
      NG_ARCH_DETECTED := 1
   endif
   ifeq (x86_64,$(NG_VENDOR_SUBARCH))
-     # mingw32 cross compilation
-     ifeq (1,$(NG_VENDOR_CROSS_COMP))
+    # mingw32 cross compilation
+    ifeq (1,$(NG_VENDOR_CROSS_COMP))
+      ifeq (i686-wine-mingw32, $(CROSS))
+        NG_TARGET_ARCH := windows-i686-wine
+        NG_VENDOR_OS = Msys
+      endif
+      ifeq (i686-w64-mingw32, $(CROSS))
+        NG_TARGET_ARCH := windows-i686-w64
+      endif
+      ifeq (i686-pc-mingw32, $(CROSS))
         NG_TARGET_ARCH := windows-i686-mingw32
-        # NG_VENDOR_TARGET_ARCH := i686-pc-mingw32
-        # NG_VENDOR_HOST_ARCH := i586-mingw32msvc
-        NG_VENDOR_HOST_ARCH := $(CROSS)
-        NG_VENDOR_BUILD_ARCH := x86_64-linux-gnu
-     else
-        NG_TARGET_ARCH := linux-x86_64
-     endif
-     NG_ARCH_DETECTED := 1
+      endif
+      # NG_VENDOR_TARGET_ARCH := i686-pc-mingw32
+      # NG_VENDOR_HOST_ARCH := i586-mingw32msvc
+      NG_VENDOR_HOST_ARCH := $(CROSS)
+      NG_VENDOR_BUILD_ARCH := x86_64-linux-gnu
+    else
+      NG_TARGET_ARCH := linux-x86_64
+    endif
+    NG_ARCH_DETECTED := 1
   endif
 endif
 
 ifeq (Msys,$(NG_VENDOR_OS))
-  NG_TARGET_ARCH := windows-i686-msvc10
+  ifeq (1,$(NG_VENDOR_CROSS_COMP))
+    ifeq (i686-wine-mingw32, $(CROSS))
+      NG_TARGET_ARCH := windows-i686-wine
+    endif
+  else
+    NG_TARGET_ARCH := windows-i686-msvc10
+  endif
   NG_ARCH_DETECTED := 1
   # We redefine NG_VENDOR_ARCH here to make it more useful to us; in Msys,
   # uname returns some some long, difficult string to compare against...
@@ -129,29 +144,33 @@ ifeq (Darwin,$(NG_VENDOR_ARCH))
   ifeq (i386,$(NG_VENDOR_SUBARCH))
      DUMP_SYMS_ARGS += -a i386
   else
-     ifeq (ppc,$(NG_VENDOR_SUBARCH))
-        DUMP_SYMS_ARGS += -a ppc
-     endif
+    ifeq (ppc,$(NG_VENDOR_SUBARCH))
+      DUMP_SYMS_ARGS += -a ppc
+    endif
   endif
 endif
 ifeq (Linux,$(NG_VENDOR_ARCH))
   ifneq (1,$(NG_VENDOR_CROSS_COMP))
-     STRIP ?= strip -v
-     DUMP_SYMS ?= $(MOZSDK_BIN_DIR)/dump_syms
-     INSTALL_NAME_TOOL ?= echo install_name_tool called on Linux && exit 1;
-     OTOOL ?= echo otool called on Linux && exit 1;
-     NG_AR ?= ar
+    ifneq (i686-wine-mingw32, $(CROSS))
+      STRIP ?= strip -v
+      DUMP_SYMS ?= $(MOZSDK_BIN_DIR)/dump_syms
+      INSTALL_NAME_TOOL ?= echo install_name_tool called on Linux && exit 1;
+      OTOOL ?= echo otool called on Linux && exit 1;
+      NG_AR ?= ar
+    endif
   else
-     STRIP ?= (CROSS)strip
-     DUMP_SYMS ?= $(MOZSDK_BIN_DIR)/dump_syms
-     INSTALL_NAME_TOOL ?= echo install_name_tool called on Linux && exit 1;
-     OTOOL ?= echo otool called on Linux && exit 1;
-     NG_AR = $(CROSS)$(CROSS_LIBTYPE)-ar
-     NG_CC = $(CROSS)$(CROSS_LIBTYPE)-gcc
-     NG_CXX = $(CROSS)$(CROSS_LIBTYPE)-g++
-     NG_LD = $(CROSS)$(CROSS_LIBTYPE)-ld
-     NG_OBJDUMP = $(CROSS)$(CROSS_LIBTYPE)-objdump
-     NG_PKG_CONFIG = $(CROSS)$(CROSS_LIBTYPE)-pkg-config
+    ifneq (i686-wine-mingw32, $(CROSS))
+      STRIP ?= (CROSS)strip
+      DUMP_SYMS ?= $(MOZSDK_BIN_DIR)/dump_syms
+      INSTALL_NAME_TOOL ?= echo install_name_tool called on Linux && exit 1;
+      OTOOL ?= echo otool called on Linux && exit 1;
+      NG_AR = $(CROSS)$(CROSS_LIBTYPE)-ar
+      NG_CC = $(CROSS)$(CROSS_LIBTYPE)-gcc
+      NG_CXX = $(CROSS)$(CROSS_LIBTYPE)-g++
+      NG_LD = $(CROSS)$(CROSS_LIBTYPE)-ld
+      NG_OBJDUMP = $(CROSS)$(CROSS_LIBTYPE)-objdump
+      NG_PKG_CONFIG = $(CROSS)$(CROSS_LIBTYPE)-pkg-config
+    endif
   endif
 endif
 ifeq (Msys,$(NG_VENDOR_ARCH))
@@ -165,7 +184,9 @@ ifeq (Msys,$(NG_VENDOR_ARCH))
   NG_CC = cl
   NG_CXX = cl
   NG_LD = link
-  NG_OBJDUMP = objdump
+  ifneq (i686-wine-mingw32, $(CROSS))
+    NG_OBJDUMP = objdump
+  endif
 endif
 
 
@@ -237,8 +258,12 @@ ifneq (,$(CONFIGURE_TARGET))
 endif
 
 ifeq (1,$(NG_VENDOR_CROSS_COMP))
-  NG_CONFIGURE_OPTS += --host=$(NG_VENDOR_HOST_ARCH)
+  # ifneq (i686-wine-mingw32, $(CROSS))
+    NG_CONFIGURE_OPTS += --host=$(NG_VENDOR_HOST_ARCH)
 #   NG_CONFIGURE_OPTS += --build=$(NG_VENDOR_BUILD_ARCH)
+  # else
+    # NG_CONFIGURE_OPTS += --host=i686-wine-mingw32
+  # endif
 endif
 
 ifneq (,$(filter linux-i686 macosx-i686,$(NG_TARGET_ARCH)))

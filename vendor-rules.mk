@@ -88,13 +88,13 @@ endif
 ifeq (1, $(NG_VENDOR_CROSS_COMP))
   ifneq (, $(CROSS))
     ifneq (, $(CROSS_LIBTYPE))
-        # MXE
-        CROSS_TRIPLET := $(CROSS).$(CROSS_LIBTYPE)-
-        CROSS_CMAKE_TC_FILE := $(CROSS_CMAKE_TC_PATH)/$(CROSS).$(CROSS_LIBTYPE)/share/cmake/mxe-conf.cmake
+      # MXE
+      CROSS_TRIPLET := $(CROSS).$(CROSS_LIBTYPE)-
+      CROSS_CMAKE_TC_FILE := $(CROSS_CMAKE_TC_PATH)/$(CROSS).$(CROSS_LIBTYPE)/share/cmake/mxe-conf.cmake
     else
-        # MINGW-W64
-        CROSS_TRIPLET := $(CROSS)-
-        CROSS_CMAKE_TC_FILE := $(CROSS_CMAKE_TC_PATH)/$(CROSS)/share/cmake/mingw-w64-conf.cmake
+      # MINGW-W64
+      CROSS_TRIPLET := $(CROSS)-
+      CROSS_CMAKE_TC_FILE := $(CROSS_CMAKE_TC_PATH)/$(CROSS)/share/cmake/mingw-w64-conf.cmake
     endif
   endif
 endif
@@ -109,29 +109,43 @@ ifneq (,$(BUILD_TARGET_SET))
     export AR = $(NG_AR)
     export OBJDUMP = $(NG_OBJDUMP)
   else
-    export CC = $(CROSS_TRIPLET)gcc
-    export CXX = $(CROSS_TRIPLET)g++
-    export LD = $(CROSS_TRIPLET)ld
-    export AR = $(CROSS_TRIPLET)ar
-    export AS = $(CROSS_TRIPLET)as
-    export NM = $(CROSS_TRIPLET)nm
-    export OBJDUMP = $(CROSS_TRIPLET)objdump
-    export RANLIB = $(CROSS_TRIPLET)ranlib
-    export STRIP = $(CROSS_TRIPLET)strip
-    export PKG_CONFIG = $(CROSS_TRIPLET)pkg-config
-    export DLLTOOL = $(CROSS_TRIPLET)dlltool
-    export RC = $(CROSS_TRIPLET)windres
-    export WINDRES = $(CROSS_TRIPLET)windres
-    ifneq (, $(CROSS_LIBTYPE))
-      export CMAKE_TOOLCHAIN_FILE = $(CROSS_CMAKE_TC_FILE)
+    ifneq (i686-wine-mingw32, $(CROSS))
+      export CC = $(CROSS_TRIPLET)gcc
+      export CXX = $(CROSS_TRIPLET)g++
+      export LD = $(CROSS_TRIPLET)ld
+      export AR = $(CROSS_TRIPLET)ar
+      export AS = $(CROSS_TRIPLET)as
+      export NM = $(CROSS_TRIPLET)nm
+      export OBJDUMP = $(CROSS_TRIPLET)objdump
+      export RANLIB = $(CROSS_TRIPLET)ranlib
+      export STRIP = $(CROSS_TRIPLET)strip
+      export PKG_CONFIG = $(CROSS_TRIPLET)pkg-config
+      export DLLTOOL = $(CROSS_TRIPLET)dlltool
+      export RC = $(CROSS_TRIPLET)windres
+      export WINDRES = $(CROSS_TRIPLET)windres
+      ifneq (, $(CROSS_LIBTYPE))
+        export CMAKE_TOOLCHAIN_FILE = $(CROSS_CMAKE_TC_FILE)
+      endif
+    else
+      export CC = $(NG_CC)
+      export CXX = $(NG_CXX)
+      export LD = $(NG_LD)
+      export DUMPBIN = dumpbin
+      export AS = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/as
+      export AR = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/ar
+      export NM = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/nm
+      export OBJDUMP = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/objdump
+      export DLLTOOL = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/dlltool
+      export RANLIB = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/ranlib
+      export WINDRES = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/windres
     endif
   endif
 
-    export CPPFLAGS = $(NG_CPPFLAGS)
-    export CFLAGS = $(NG_CFLAGS)
-    export CXXFLAGS = $(NG_CXXFLAGS)
-    export LDFLAGS = $(NG_LDFLAGS)
-    export ACLOCAL_FLAGS = $(NG_ACLOCAL_FLAGS)
+  export CPPFLAGS = $(NG_CPPFLAGS)
+  export CFLAGS = $(NG_CFLAGS)
+  export CXXFLAGS = $(NG_CXXFLAGS)
+  export LDFLAGS = $(NG_LDFLAGS)
+  export ACLOCAL_FLAGS = $(NG_ACLOCAL_FLAGS)
 ifeq (1, $(NG_VENDOR_CROSS_COMP))
   ifeq (static, $(CROSS_LIBTYPE))
     export PKG_CONFIG_PATH_i686_pc_mingw32_static = $(NG_PKG_CONFIG_PATH)
@@ -140,7 +154,9 @@ ifeq (1, $(NG_VENDOR_CROSS_COMP))
     export PKG_CONFIG_PATH_i686_pc_mingw32_shared = $(NG_PKG_CONFIG_PATH)
   endif
   ifeq (, $(CROSS_LIBTYPE))
-    export PKG_CONFIG_PATH_MINGWW64 = $(NG_PKG_CONFIG_PATH)
+    ifneq (i686-wine-mingw32, $(CROSS))
+      export PKG_CONFIG_PATH_MINGWW64 = $(NG_PKG_CONFIG_PATH)
+    endif
   endif
 endif
     export PKG_CONFIG_PATH = $(NG_PKG_CONFIG_PATH)
@@ -465,14 +481,16 @@ setup_build: \
 	@echo Paths
 	@echo -----
 ifeq (1, $(NG_VENDOR_CROSS_COMP))
-  ifeq (static, $(CROSS_LIBTYPE))
-	@echo PKG_CONFIG_PATH_i686_pc_mingw32_static = $(PKG_CONFIG_PATH_i686_pc_mingw32_static)
-  endif
-  ifeq (shared, $(CROSS_LIBTYPE))
-	@echo PKG_CONFIG_PATH_i686_pc_mingw32_shared = $(PKG_CONFIG_PATH_i686_pc_mingw32_shared)
-  endif
-  ifeq (, $(CROSS_LIBTYPE))
-	@echo PKG_CONFIG_PATH_MINGWW64 = $(PKG_CONFIG_PATH_MINGWW64)
+  ifneq (i686-wine-mingw32, $(CROSS))
+    ifeq (static, $(CROSS_LIBTYPE))
+	    @echo PKG_CONFIG_PATH_i686_pc_mingw32_static = $(PKG_CONFIG_PATH_i686_pc_mingw32_static)
+    endif
+    ifeq (shared, $(CROSS_LIBTYPE))
+	    @echo PKG_CONFIG_PATH_i686_pc_mingw32_shared = $(PKG_CONFIG_PATH_i686_pc_mingw32_shared)
+    endif
+    ifeq (, $(CROSS_LIBTYPE))
+	    @echo PKG_CONFIG_PATH_MINGWW64 = $(PKG_CONFIG_PATH_MINGWW64)
+    endif
   endif
 endif
 	@echo PKG_CONFIG_PATH = $(PKG_CONFIG_PATH)
