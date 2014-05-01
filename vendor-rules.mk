@@ -137,6 +137,7 @@ ifneq (,$(BUILD_TARGET_SET))
       export OBJDUMP = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/objdump
       export DLLTOOL = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/dlltool
       export RANLIB = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/ranlib
+      export RC = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/windres
       export WINDRES = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/windres
     endif
   endif
