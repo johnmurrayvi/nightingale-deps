@@ -22,7 +22,8 @@ def fix_link_args(fargs):
                    fargs[i].startswith("-LIBPATH"):
 			libpath = fargs[i][2:]
 			# make sure the path is a windows path
-			linkerargs.append("-LIBPATH:%s" % winpath(libpath))
+			# linkerargs.append("-LIBPATH:%s" % winpath(libpath))
+			linkerargs.append("-LIBPATH:%s" % libpath)
 		elif fargs[i].startswith("-l") and not fargs[i] == "-link":
 			libname = fargs[i][2:]
 			linkerargs.append("%s.lib" % libname)
@@ -30,6 +31,12 @@ def fix_link_args(fargs):
                      fargs[i].startswith("-DEFAULTLIB") or \
                      fargs[i].startswith("-LIBPATH"):
 			linkerargs.append(fargs[i])
+		elif fargs[i].startswith("-Wl,-DLL,-IMPLIB:"):
+			linkerargs.append("-DLL")
+			linkerargs.append("-IMPLIB:%s" % fargs[i][17:])
+		elif fargs[i].startswith("-Wl,--export-all-symbols"):
+			# no-op
+			linkerargs.append("")
 		else:
 			cargs.append(fargs[i])
 	resultargs = ["cl"] + cargs[1:] + ["-link"] + linkerargs
