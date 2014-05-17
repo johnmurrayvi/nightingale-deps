@@ -36,7 +36,7 @@ namespace TagLib {
    * \internal
    */
 
-  class TagUnion : public Tag
+  class TAGLIB_EXPORT TagUnion : public Tag
   {
   public:
 

@@ -39,8 +39,8 @@ include $(CURDIR)/../songbird-vendor-defs.mk
 
 # Set compiler flags.
 ifeq (Linux,$(SB_VENDOR_ARCH))
-  CMAKE_C_FLAGS := -fPIC -fno-stack-protector
-  CMAKE_CXX_FLAGS := -fPIC -fno-stack-protector
+  CMAKE_C_FLAGS := -fPIC -fno-stack-protector -fvar-tracking
+  CMAKE_CXX_FLAGS := -fPIC -fno-stack-protector -fvar-tracking
 endif
 
 SB_ZLIB_DIR := $(SB_VENDOR_BINARIES_DIR)/zlib/$(SB_BUILD_TYPE)
@@ -81,7 +81,7 @@ ifeq (Darwin,$(SB_VENDOR_ARCH))
 endif
 
 # Build a static taglib.
-CMAKE_ARGS += -DENABLE_STATIC=ON
+# CMAKE_ARGS += -DENABLE_STATIC=ON
 CMAKE_ARGS += -DWITH_ASF=ON
 CMAKE_ARGS += -DWITH_MP4=ON
 
