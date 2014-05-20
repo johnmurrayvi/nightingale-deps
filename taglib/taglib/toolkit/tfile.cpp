@@ -24,6 +24,8 @@
  ***************************************************************************/
 
 #include "tfile.h"
+#include "tlist.h"
+#include "tlocalfileio.h"
 #include "tfilestream.h"
 #include "tstring.h"
 #include "tdebug.h"
@@ -78,45 +80,80 @@ namespace
 class File::FilePrivate
 {
 public:
-  FilePrivate(IOStream *stream, bool owner);
+  FilePrivate();
 
-  IOStream *stream;
-  bool streamOwner;
+  FileIO *fileIO;
+
+  long maxScanBytes;
   bool valid;
+  static const uint bufferSize = 16384;
+  static List<const FileIOTypeResolver *> fileIOTypeResolvers;
 };
 
-File::FilePrivate::FilePrivate(IOStream *stream, bool owner) :
-  stream(stream),
-  streamOwner(owner),
+File::FilePrivate::FilePrivate() :
+  fileIO(NULL),
+  maxScanBytes(0),
   valid(true)
 {
 }
+
+List<const File::FileIOTypeResolver *> File::FilePrivate::fileIOTypeResolvers;
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-File::File(FileName fileName)
+File::File()
 {
-  IOStream *stream = new FileStream(fileName);
-  d = new FilePrivate(stream, true);
+  d = new FilePrivate();
 }
 
-File::File(IOStream *stream)
+File::File(FileName fileName)
 {
-  d = new FilePrivate(stream, false);
+  d = new FilePrivate();
+  open(fileName);
 }
+
 
 File::~File()
 {
-  if(d->stream && d->streamOwner)
-    delete d->stream;
+  if(d->fileIO)
+    delete d->fileIO;
   delete d;
+}
+
+void File::open(FileName file)
+{
+  List<const FileIOTypeResolver *>::ConstIterator it = FilePrivate::fileIOTypeResolvers.begin();
+
+  for(; it != FilePrivate::fileIOTypeResolvers.end(); ++it) {
+    FileIO *fileIO = (*it)->createFileIO(file);
+    if(fileIO) {
+      d->fileIO = fileIO;
+      break;
+    }
+  }
+
+  if (!d->fileIO)
+    d->fileIO = new LocalFileIO(file);
+
+  if (d->fileIO && !d->fileIO->isOpen()) {
+    delete d->fileIO;
+    d->fileIO = NULL;
+  }
+
+  if(!d->fileIO)
+    debug("Could not open file " + String((const char *) file));
 }
 
 FileName File::name() const
 {
-  return d->stream->name();
+  if(!d->fileIO) {
+    debug("File::name() -- Invalid File");
+    return (char *) NULL;
+  }
+
+  return d->fileIO->name();
 }
 
 PropertyMap File::properties() const
@@ -233,24 +270,36 @@ PropertyMap File::setProperties(const PropertyMap &properties)
     return tag()->setProperties(properties);
 }
 
+long File::getMaxScanBytes()
+{
+  return d->maxScanBytes;
+}
+
+void File::setMaxScanBytes(long maxScanBytes)
+{
+  d->maxScanBytes = maxScanBytes;
+}
+
 ByteVector File::readBlock(ulong length)
 {
-  return d->stream->readBlock(length);
+  return d->fileIO->readBlock(length);
 }
 
 void File::writeBlock(const ByteVector &data)
 {
-  d->stream->writeBlock(data);
+  d->fileIO->writeBlock(data);
 }
 
 long File::find(const ByteVector &pattern, long fromOffset, const ByteVector &before)
 {
-  if(!d->stream || pattern.size() > bufferSize())
+  if(!d->fileIO || pattern.size() > bufferSize())
       return -1;
 
   // The position in the file that the current buffer starts at.
 
+  long maxScanBytes = d->maxScanBytes;
   long bufferOffset = fromOffset;
+  long endBufferOffset;
   ByteVector buffer;
 
   // These variables are used to keep track of a partial match that happens at
@@ -263,6 +312,13 @@ long File::find(const ByteVector &pattern, long fromOffset, const ByteVector &be
   // position using seek() before all returns.
 
   long originalPosition = tell();
+
+  // Determine where to end search.
+
+  if (maxScanBytes > 0)
+    endBufferOffset = bufferOffset + maxScanBytes;
+  else
+    endBufferOffset = 0;
 
   // Start the search at the offset.
 
@@ -327,6 +383,9 @@ long File::find(const ByteVector &pattern, long fromOffset, const ByteVector &be
       beforePreviousPartialMatch = buffer.endsWithPartialMatch(before);
 
     bufferOffset += bufferSize();
+
+    if (endBufferOffset && (bufferOffset >= endBufferOffset))
+      break;
   }
 
   // Since we hit the end of the file, reset the status before continuing.
@@ -341,7 +400,7 @@ long File::find(const ByteVector &pattern, long fromOffset, const ByteVector &be
 
 long File::rfind(const ByteVector &pattern, long fromOffset, const ByteVector &before)
 {
-  if(!d->stream || pattern.size() > bufferSize())
+  if(!d->fileIO || pattern.size() > bufferSize())
       return -1;
 
   // The position in the file that the current buffer starts at.
@@ -363,7 +422,9 @@ long File::rfind(const ByteVector &pattern, long fromOffset, const ByteVector &b
 
   // Start the search at the offset.
 
+  long maxScanBytes = d->maxScanBytes;
   long bufferOffset;
+  long endBufferOffset;
   if(fromOffset == 0) {
     seek(-1 * int(bufferSize()), End);
     bufferOffset = tell();
@@ -372,6 +433,13 @@ long File::rfind(const ByteVector &pattern, long fromOffset, const ByteVector &b
     seek(fromOffset + -1 * int(bufferSize()), Beginning);
     bufferOffset = tell();
   }
+
+  // Determine where to end search.
+
+  if ((maxScanBytes > 0) && (bufferOffset > maxScanBytes))
+    endBufferOffset = bufferOffset - maxScanBytes;
+  else
+    endBufferOffset = 0;
 
   // See the notes in find() for an explanation of this algorithm.
 
@@ -396,6 +464,9 @@ long File::rfind(const ByteVector &pattern, long fromOffset, const ByteVector &b
 
     bufferOffset -= bufferSize();
     seek(bufferOffset);
+
+    if (endBufferOffset && (bufferOffset <= endBufferOffset))
+      break;
   }
 
   // Since we hit the end of the file, reset the status before continuing.
@@ -409,82 +480,116 @@ long File::rfind(const ByteVector &pattern, long fromOffset, const ByteVector &b
 
 void File::insert(const ByteVector &data, ulong start, ulong replace)
 {
-  d->stream->insert(data, start, replace);
+  if(!d->fileIO)
+    return;
+
+  d->fileIO->insert(data, start, replace);
 }
 
 void File::removeBlock(ulong start, ulong length)
 {
-  d->stream->removeBlock(start, length);
+  if(!d->fileIO)
+    return;
+
+  d->fileIO->removeBlock(start, length);
 }
 
 bool File::readOnly() const
 {
-  return d->stream->readOnly();
+  if(!d->fileIO)
+    return false;
+
+  return d->fileIO->readOnly();
 }
 
 bool File::isOpen() const
 {
-  return d->stream->isOpen();
+  if(!d->fileIO)
+    return false;
+
+  return d->fileIO->isOpen();
 }
 
 bool File::isValid() const
 {
+  if(!d->fileIO)
+    return false;
+
   return isOpen() && d->valid;
 }
 
-void File::seek(long offset, Position p)
+int File::seek(long offset, Position p)
 {
-  d->stream->seek(offset, IOStream::Position(p));
+  if(!d->fileIO) {
+    debug("File::seek() -- trying to seek in a file that isn't opened.");
+    return -1;
+  }
+
+  return d->fileIO->seek(offset, (TagLib::FileIO::Position) p);
 }
 
 void File::truncate(long length)
 {
-  d->stream->truncate(length);
+  if(!d->fileIO)
+    return;
+
+  d->fileIO->truncate(length);
 }
 
 void File::clear()
 {
-  d->stream->clear();
+  if(!d->fileIO)
+    return;
+
+  d->fileIO->clear();
 }
 
 long File::tell() const
 {
-  return d->stream->tell();
+  if(!d->fileIO)
+    return false;
+
+  return d->fileIO->tell();
 }
 
 long File::length()
 {
-  return d->stream->length();
+  if(!d->fileIO)
+    return false;
+
+  return d->fileIO->length();
 }
 
-bool File::isReadable(const char *file)
+bool File::isReadable()
 {
+  if(!d->fileIO)
+    return false;
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
-
-  return _access_s(file, R_OK) == 0;
-
-#else
-
-  return access(file, R_OK) == 0;
-
-#endif
-
+  return d->fileIO->isReadable();
 }
 
-bool File::isWritable(const char *file)
+bool File::isWritable()
 {
+  if(!d->fileIO)
+    return false;
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1400)  // VC++2005 or later
+  return d->fileIO->isWritable();
+}
 
-  return _access_s(file, W_OK) == 0;
+FileIO* File::tempFile()
+{
+  if (!d->fileIO)
+    return NULL;
 
-#else
+  return d->fileIO->tempFile();
+}
 
-  return access(file, W_OK) == 0;
+bool File::closeTempFile( bool overwrite )
+{
+  if (!d->fileIO)
+    return false;
 
-#endif
-
+  return d->fileIO->closeTempFile( overwrite );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

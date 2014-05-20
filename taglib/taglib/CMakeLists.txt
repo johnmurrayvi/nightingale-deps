@@ -46,7 +46,9 @@ set(tag_HDRS
   toolkit/tbytevectorstream.h
   toolkit/tiostream.h
   toolkit/tfile.h
+  toolkit/tfileio.h
   toolkit/tfilestream.h
+  toolkit/tlocalfileio.h
   toolkit/tmap.h
   toolkit/tmap.tcc
   toolkit/tpropertymap.h
@@ -288,7 +290,9 @@ set(toolkit_SRCS
   toolkit/tbytevectorstream.cpp
   toolkit/tiostream.cpp
   toolkit/tfile.cpp
+  toolkit/tfileio.cpp
   toolkit/tfilestream.cpp
+  toolkit/tlocalfileio.cpp
   toolkit/tdebug.cpp
   toolkit/tpropertymap.cpp
   toolkit/trefcounter.cpp

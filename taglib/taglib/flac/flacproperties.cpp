@@ -163,7 +163,7 @@ void FLAC::Properties::read()
 
   // Real bitrate:
 
-  d->bitrate = d->length > 0 ? ((d->streamLength * 8UL) / d->length) / 1000 : 0;
+  d->bitrate = d->length > 0 ? (d->streamLength / d->length) * 8 / 1000 : 0;
 
   d->signature = d->data.mid(pos, 32);
 }

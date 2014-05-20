@@ -69,6 +69,11 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
+Ogg::FLAC::File::File() : Ogg::File()
+{
+  d = new FilePrivate;
+}
+
 Ogg::FLAC::File::File(FileName file, bool readProperties,
                       Properties::ReadStyle propertiesStyle) : Ogg::File(file)
 {
@@ -146,6 +151,7 @@ bool Ogg::FLAC::File::hasXiphComment() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
+/* XXX public method but kept here to ease merging. */
 void Ogg::FLAC::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 {
   // Sanity: Check if we really have an Ogg/FLAC file

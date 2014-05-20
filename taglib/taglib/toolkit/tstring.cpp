@@ -153,18 +153,21 @@ class String::StringPrivate : public RefCounter
 public:
   StringPrivate() 
     : RefCounter() 
+    , trustCharset(true)
   {
   }
 
   StringPrivate(const wstring &s) 
     : RefCounter()
-    , data(s) 
+    , data(s)
+    , trustCharset(true)
   {
   }
   
   StringPrivate(uint n, wchar_t c) 
     : RefCounter()
-    , data(static_cast<size_t>(n), c) 
+    , data(static_cast<size_t>(n), c)
+    , trustCharset(true)
   {
   }
 
@@ -172,6 +175,8 @@ public:
    * Stores string in UTF-16. The byte order depends on the CPU endian. 
    */
   TagLib::wstring data;
+
+  bool trustCharset;
 
   /*!
    * This is only used to hold the the most recent value of toCString().
@@ -380,19 +385,25 @@ bool String::startsWith(const String &s) const
 
 String String::substr(uint position, uint n) const
 {
-  return String(d->data.substr(position, n));
+  // return String(d->data.substr(position, n));
+  String s;
+  s.d->data = d->data.substr(position, n);
+  s.d->trustCharset = d->trustCharset;
+  return s;
 }
 
 String &String::append(const String &s)
 {
   detach();
   d->data += s.d->data;
+  d->trustCharset &= s.d->trustCharset;
   return *this;
 }
 
 String String::upper() const
 {
   String s;
+  s.d->trustCharset = d->trustCharset;
 
   static int shift = 'A' - 'a';
 
@@ -435,8 +446,11 @@ ByteVector String::data(Type t) const
       ByteVector v(size(), 0);
       char *p = v.data();
 
+      // for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++)
+      //   *p++ = static_cast<char>(*it);
+
       for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); it++)
-        *p++ = static_cast<char>(*it);
+        *p++ = static_cast<char>(*it < 256 ? char(*it) : '?');
 
       return v;
     }
@@ -548,7 +562,7 @@ String String::stripWhiteSpace() const
   } while(*end == '\t' || *end == '\n' ||
           *end == '\f' || *end == '\r' || *end == ' ');
 
-  return String(wstring(begin, end + 1));
+  return String(wstring(begin, end + 1), d->trustCharset ? UTF16BE : Latin1);
 }
 
 bool String::isLatin1() const
@@ -567,6 +581,26 @@ bool String::isAscii() const
       return false;
   }
   return true;
+}
+
+bool String::isInt() const
+{
+  // An empty string is not an int.
+  if (d->data.size() == 0) {
+    return false;
+  }
+
+  for(wstring::const_iterator it = d->data.begin(); it != d->data.end(); ++it) {
+    if (*it < '0' || *it > '9')
+      return false;
+  }
+
+  return true;
+}
+
+bool String::shouldGuessCharacterSet() const
+{
+  return !d->trustCharset;
 }
 
 String String::number(int n) // static
@@ -623,6 +657,7 @@ String &String::operator+=(const String &s)
   detach();
 
   d->data += s.d->data;
+  d->trustCharset &= s.d->trustCharset;
   return *this;
 }
 
@@ -640,6 +675,7 @@ String &String::operator+=(const char *s)
 
   for(int i = 0; s[i] != 0; i++)
     d->data += uchar(s[i]);
+  d->trustCharset = false;
   return *this;
 }
 
@@ -656,6 +692,7 @@ String &String::operator+=(char c)
   detach();
 
   d->data += uchar(c);
+  d->trustCharset = false;
   return *this;
 }
 
@@ -678,7 +715,7 @@ String &String::operator=(const std::string &s)
 
   d = new StringPrivate;
   copyFromLatin1(s.c_str(), s.length());
-
+  d->trustCharset = false;
   return *this;
 }
 
@@ -705,6 +742,7 @@ String &String::operator=(char c)
     delete d;
 
   d = new StringPrivate(1, static_cast<uchar>(c));
+  d->trustCharset = false;
   return *this;
 }
 
@@ -714,6 +752,7 @@ String &String::operator=(wchar_t c)
     delete d;
 
   d = new StringPrivate(1, c);
+  d->trustCharset = false;
   return *this;
 }
 
@@ -724,7 +763,7 @@ String &String::operator=(const char *s)
 
   d = new StringPrivate;
   copyFromLatin1(s, ::strlen(s));
-
+  d->trustCharset = false;
   return *this;
 }
 
@@ -738,6 +777,7 @@ String &String::operator=(const ByteVector &v)
 
   // If we hit a null in the ByteVector, shrink the string again.
   d->data.resize(::wcslen(d->data.c_str()));
+  d->trustCharset = false;
 
   return *this;
 }

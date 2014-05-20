@@ -63,6 +63,11 @@ namespace TagLib {
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
+Vorbis::File::File() : Ogg::File()
+{
+  d = new FilePrivate;
+}
+
 Vorbis::File::File(FileName file, bool readProperties,
                    Properties::ReadStyle propertiesStyle) : Ogg::File(file)
 {
@@ -121,6 +126,7 @@ bool Vorbis::File::save()
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
+/* XXX public method but kept here to ease merging. */
 void Vorbis::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 {
   ByteVector commentHeaderData = packet(1);

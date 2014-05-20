@@ -32,6 +32,11 @@
 #include "taglib_export.h"
 #include "flacmetadatablock.h"
 
+const std::string base64_chars =
+             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+             "abcdefghijklmnopqrstuvwxyz"
+             "0123456789+/";
+
 namespace TagLib {
 
   namespace FLAC {
@@ -182,14 +187,20 @@ namespace TagLib {
       int code() const;
 
       /*!
-       * Render the content to the FLAC picture block format.
+       * Renders the picture block to a ByteVector suitable for inserting into
+       * a file.
+       *
+       * If \a b64Encode is true, then the returned ByteVector will be encoded
+       * as base64 output.
        */
       ByteVector render() const;
+      ByteVector render(bool b64Encode = false);
 
       /*!
        * Parse the picture data in the FLAC picture block format.
        */
       bool parse(const ByteVector &rawData);
+      bool parse(const String &encodedString);
 
     private:
       Picture(const Picture &item);
@@ -197,6 +208,10 @@ namespace TagLib {
 
       class PicturePrivate;
       PicturePrivate *d;
+
+      std::string base64_decode(std::string const& encoded_string);
+      std::string base64_encode(const unsigned char* bytes_to_encode,
+                                TagLib::uint in_len);
     };
 
     typedef List<Picture> PictureList;

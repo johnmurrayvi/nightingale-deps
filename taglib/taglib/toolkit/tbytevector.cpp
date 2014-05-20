@@ -508,6 +508,7 @@ ByteVector &ByteVector::replace(const ByteVector &pattern, const ByteVector &wit
   if(pattern.size() == 0 || pattern.size() > size())
     return *this;
 
+  // XXX CHECK THE DIFF
   const uint withSize = with.size();
   const uint patternSize = pattern.size();
   int offset = 0;

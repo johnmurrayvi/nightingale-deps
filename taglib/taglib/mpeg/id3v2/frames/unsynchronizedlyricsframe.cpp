@@ -30,6 +30,8 @@
 #include <id3v2tag.h>
 #include <tdebug.h>
 #include <tpropertymap.h>
+// XXX RECHECK IF THIS IS NEEDED:
+#include <tstringlist.h>
 
 using namespace TagLib;
 using namespace ID3v2;
@@ -171,12 +173,16 @@ void UnsynchronizedLyricsFrame::parseFields(const ByteVector &data)
 ByteVector UnsynchronizedLyricsFrame::renderFields() const
 {
   ByteVector v;
+  
+  String::Type encoding = d->textEncoding;
+  encoding = checkEncoding(d->description, encoding);
+  encoding = checkEncoding(d->text, encoding);
 
-  v.append(char(d->textEncoding));
+  v.append(char(encoding));
   v.append(d->language.size() == 3 ? d->language : "XXX");
-  v.append(d->description.data(d->textEncoding));
-  v.append(textDelimiter(d->textEncoding));
-  v.append(d->text.data(d->textEncoding));
+  v.append(d->description.data(encoding));
+  v.append(textDelimiter(encoding));
+  v.append(d->text.data(encoding));
 
   return v;
 }

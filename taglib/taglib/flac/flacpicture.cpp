@@ -29,6 +29,140 @@
 
 using namespace TagLib;
 
+std::string FLAC::Picture::base64_encode(unsigned char const* bytes_to_encode,
+                                         unsigned int in_len) {
+  std::string ret;
+  int i = 0;
+  int j = 0;
+  unsigned char char_array_3[3];
+  unsigned char char_array_4[4];
+
+  while (in_len--) {
+    char_array_3[i++] = *(bytes_to_encode++);
+    if (i == 3) {
+      char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+      char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+      char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+      char_array_4[3] = char_array_3[2] & 0x3f;
+
+      for(i = 0; (i <4) ; i++)
+        ret += base64_chars[char_array_4[i]];
+      i = 0;
+    }
+  }
+
+  if (i)
+  {
+    for(j = i; j < 3; j++)
+      char_array_3[j] = '\0';
+
+    char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+    char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+    char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+    char_array_4[3] = char_array_3[2] & 0x3f;
+
+    for (j = 0; (j < i + 1); j++)
+      ret += base64_chars[char_array_4[j]];
+
+    while((i++ < 3))
+      ret += '=';
+
+  }
+
+  return ret;
+
+}
+
+static const unsigned char base64lookup[256] = {
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff,   62, 0xff, 0xff, 0xff,   63,
+    52,   53,   54,   55,   56,   57,   58,   59,
+    60,   61, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff,    0,    1,    2,    3,    4,    5,    6,
+     7,    8,    9,   10,   11,   12,   13,   14,
+    15,   16,   17,   18,   19,   20,   21,   22,
+    23,   24,   25, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff,   26,   27,   28,   29,   30,   31,   32,
+    33,   34,   35,   36,   37,   38,   39,   40,
+    41,   42,   43,   44,   45,   46,   47,   48,
+    49,   50,   51, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+};
+
+std::string FLAC::Picture::base64_decode(std::string const& encoded_string) {
+  int i = 0;
+  std::string ret;
+
+  int in_len = encoded_string.size();
+  if (in_len % 4 != 0) {
+    // base-64 encoded data must always be a multiple of 4 bytes
+    return ret;
+  }
+
+  while (in_len > 0)
+  {
+    unsigned char vals[4];
+
+    vals[0] = base64lookup[(unsigned char)encoded_string[i]];
+    vals[1] = base64lookup[(unsigned char)encoded_string[i+1]];
+    vals[2] = base64lookup[(unsigned char)encoded_string[i+2]];
+    vals[3] = base64lookup[(unsigned char)encoded_string[i+3]];
+
+    if (in_len > 4)
+    {
+      /* Check that all input bytes are legal */
+      if (vals[0] == 0xff || vals[1] == 0xff || vals[2] == 0xff ||
+          vals[3] == 0xff)
+        return std::string();
+    }
+    else {
+      // Final chunk may have one or two padding '=' bytes
+      if (vals[0] == 0xff || vals[1] == 0xff)
+        return std::string();
+      if (vals[2] == 0xff || vals[3] == 0xff)
+      {
+        if (encoded_string[i+3] != '=' ||
+            (vals[2] == 0xff && encoded_string[i+2] != '='))
+          return std::string();
+
+        ret += vals[0]<<2 | vals[1]>>4;
+        if (vals[2] != 0xff)
+          ret += (vals[1]&0x0F)<<4 | vals[2]>>2;
+        // Done!
+        return ret;
+      }
+    }
+
+    ret += vals[0]<<2 | vals[1]>>4;
+    ret += (vals[1]&0x0F)<<4 | vals[2]>>2;
+    ret += (vals[2]&0x03)<<6 | vals[3];
+
+    in_len -= 4;
+    i += 4;
+  }
+
+  return ret;
+}
+
 class FLAC::Picture::PicturePrivate
 {
 public:
@@ -49,6 +183,10 @@ public:
   int numColors;
   ByteVector data;
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// public members
+////////////////////////////////////////////////////////////////////////////////
 
 FLAC::Picture::Picture()
 {
@@ -71,9 +209,28 @@ int FLAC::Picture::code() const
   return FLAC::MetadataBlock::Picture;
 }
 
+bool FLAC::Picture::parse(const String &encodedData)
+{
+  if (!encodedData.isNull())
+  {
+    std::string decodedData = base64_decode(encodedData.to8Bit());
+
+    if (decodedData.empty())
+      return false;
+
+    ByteVector bv;
+    bv.setData(decodedData.data(), decodedData.size());
+
+    return parse(bv);
+  }
+  return false;
+}
+
 bool FLAC::Picture::parse(const ByteVector &data)
 {
   if(data.size() < 32) {
+    // Minimum size of a METADATA_PICTURE_BLOCK element is 32 bytes
+    // assuming no mimetype, no description, and no picture data
     debug("A picture block must contain at least 5 bytes.");
     return false;
   }
@@ -133,6 +290,18 @@ ByteVector FLAC::Picture::render() const
   result.append(ByteVector::fromUInt(d->data.size()));
   result.append(d->data);
   return result;
+}
+
+ByteVector FLAC::Picture::render(bool b64Encode)
+{
+  if (!b64Encode) {
+    return render();
+  } else {
+    ByteVector bv = render();
+    std::string encodedData = base64_encode((const unsigned char *)bv.data(), bv.size());
+    bv = ByteVector(encodedData.data(), encodedData.length());
+    return bv;
+  }
 }
 
 FLAC::Picture::Type FLAC::Picture::type() const

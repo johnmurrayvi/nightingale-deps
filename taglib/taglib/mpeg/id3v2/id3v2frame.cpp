@@ -73,7 +73,7 @@ namespace
       return false;
 
     for(ByteVector::ConstIterator it = frameID.begin(); it != frameID.end(); it++) {
-      if( (*it < 'A' || *it > 'Z') && (*it < '0' || *it > '9') ) {
+      if( (*it < 'A' || *it > 'Z') && (*it < '0' || *it > '9') && *it != ' ') {
         return false;
       }
     }

@@ -73,6 +73,11 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
+Ogg::File::File() : TagLib::File()
+{
+  d = new FilePrivate;
+}
+
 Ogg::File::~File()
 {
   delete d;

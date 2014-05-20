@@ -66,9 +66,21 @@ namespace TagLib {
       virtual String album() const;
 
       /*!
+       * Returns the album artist name; if no artist name is present in the tag
+       * String::null will be returned.
+       */
+      virtual String albumArtist() const;
+
+      /*!
        * Returns the track comment.
        */
       virtual String comment() const;
+
+      /*!
+       * Returns the track lyrics; if no lyrics are present in the tag
+       * String::null will be returned.
+       */
+      virtual String lyrics() const;
 
       /*!
        * Returns the genre name; if no genre is present in the tag String::null
@@ -77,15 +89,66 @@ namespace TagLib {
       virtual String genre() const;
 
       /*!
+       * Returns the producer name; if no producer is present in the tag String::null
+       * will be returned.
+       */
+      virtual String producer() const;
+
+      /*!
+       * Returns the composer name; if no composer is present in the tag String::null
+       * will be returned.
+       */
+      virtual String composer() const;
+
+      /*!
+       * Returns the conductor name; if no conductor is present in the tag String::null
+       * will be returned.
+       */
+      virtual String conductor() const;
+
+      /*!
+       * Returns the lyricist name; if no lyricist is present in the tag String::null
+       * will be returned.
+       */
+      virtual String lyricist() const;
+
+      /*!
+       * Returns the record label name; if no record label is present in the tag String::null
+       * will be returned.
+       */
+      virtual String recordLabel() const;
+
+      /*!
        * Returns the rating.
        */
       virtual String rating() const;
 
       /*!
-       * Returns the genre name; if no genre is present in the tag String::null
+       * Returns the language; if no language is present in the tag String::null
+       * will be returned.
+       * TODO: NOT IMPLEMENTED
+       */
+      virtual String language() const { return String::null; };
+
+      /*!
+       * Returns the key; if no key is present in the tag String::null
+       * will be returned.
+       * TODO: NOT IMPLEMENTED
+       */
+      virtual String key() const { return String::null; };
+
+      /*!
+       * Returns the license; if no license is present in the tag String::null
        * will be returned.
        */
-      virtual String copyright() const;
+      virtual String license() const;
+
+      /*!
+       * Returns the license; if no license is present in the tag String::null
+       * will be returned.
+       * TODO: NOT IMPLEMENTED
+       */
+      virtual String licenseUrl() const { return String::null; };
 
       /*!
        * Returns the year; if there is no year set, this will return 0.
@@ -97,6 +160,38 @@ namespace TagLib {
        * return 0.
        */
       virtual uint track() const;
+
+      /*!
+       * Returns the total tracks number; if there is no total tracks number set, 
+       * this will return 0.
+       * TODO: NOT IMPLEMENTED
+       */
+      virtual uint totalTracks() const { return 0; }; // todo
+
+      /*!
+       * Returns the disc number; if there is no disc number set, this will
+       * return 0.
+       */
+      virtual uint disc() const;
+
+      /*!
+       * Returns the total discs number; if there is no total discs number set, 
+       * this will return 0.
+       * TODO: NOT IMPLEMENTED
+       */
+      virtual uint totalDiscs() const { return 0; }; // todo
+
+      /*!
+       * Returns the bpm number; if there is no bpm number set, this will
+       * return 0.
+       */
+      virtual uint bpm() const;
+
+      /*!
+       * Returns the compilation flag.
+       * TODO: NOT IMPLEMENTED
+       */
+      virtual bool isCompilation() const { return false; }; // todo
 
       /*!
        * Sets the title to \a s.
@@ -115,9 +210,51 @@ namespace TagLib {
       virtual void setAlbum(const String &s);
 
       /*!
+       * Sets the album artist to \a s.  If \a s is String::null then this value will be
+       * cleared.
+       */
+      virtual void setAlbumArtist(const String &s);
+
+      /*!
        * Sets the comment to \a s.
        */
       virtual void setComment(const String &s);
+
+      /*!
+       * Sets the lyrics to \a s.  If \a s is String::null then this value will be
+       * cleared.
+       */
+      virtual void setLyrics(const String &s);
+
+      /*!
+       * Sets the genre to \a s.
+       */
+      virtual void setGenre(const String &s);
+
+      /*!
+       * Sets the producer to \a s.
+       */
+      virtual void setProducer(const String &s);
+
+      /*!
+       * Sets the composer to \a s.
+       */
+      virtual void setComposer(const String &s);
+
+      /*!
+       * Sets the conductor to \a s.
+       */
+      virtual void setConductor(const String &s);
+
+      /*!
+       * Sets the lyricist to \a s.
+       */
+      virtual void setLyricist(const String &s);
+
+      /*!
+       * Sets the record label to \a s.
+       */
+      virtual void setRecordLabel(const String &s);
 
       /*!
        * Sets the rating to \a s.
@@ -125,14 +262,27 @@ namespace TagLib {
       virtual void setRating(const String &s);
 
       /*!
-       * Sets the copyright to \a s.
+       * Sets the language to \a s.
+       * TODO: NOT IMPLEMENTED
        */
-      virtual void setCopyright(const String &s);
+      virtual void setLanguage(const String &s) {};
 
       /*!
-       * Sets the genre to \a s.
+       * Sets the key to \a s.
+       * TODO: NOT IMPLEMENTED
        */
-      virtual void setGenre(const String &s);
+      virtual void setKey(const String &s) {};
+
+      /*!
+       * Sets the license to \a s.
+       */
+      virtual void setLicense(const String &s);
+
+      /*!
+       * Sets the license url to \a s.
+       * TODO: NOT IMPLEMENTED
+       */
+      virtual void setLicenseUrl(const String &s) {};
 
       /*!
        * Sets the year to \a i.  If \a s is 0 then this value will be cleared.
@@ -143,6 +293,34 @@ namespace TagLib {
        * Sets the track to \a i.  If \a s is 0 then this value will be cleared.
        */
       virtual void setTrack(uint i);
+
+      /*!
+       * Sets the total track number to \a i.  If \a s is 0 then this value will be cleared.
+       * TODO: NOT IMPLEMENTED
+       */
+      virtual void setTotalTracks(uint i) {};
+
+      /*!
+       * Sets the disc numer to \a i.  If \a s is 0 then this value will be cleared.
+       */
+      virtual void setDisc(uint i);
+
+      /*!
+       * Sets the total disc number to \a i.  If \a s is 0 then this value will be cleared.
+       * TODO: NOT IMPLEMENTED
+       */
+      virtual void setTotalDiscs(uint i) {};
+
+      /*!
+       * Sets the bpm to \a i.  If \a s is 0 then this value will be cleared.
+       */
+      virtual void setBpm(uint i);
+
+      /*!
+       * Sets the compilation flag to false if \a i is 0 and true otherwise.
+       * TODO: NOT IMPLEMENTED
+       */
+      virtual void setIsCompilation(bool i) {};
 
       /*!
        * Returns true if the tag does not contain any data.  This should be

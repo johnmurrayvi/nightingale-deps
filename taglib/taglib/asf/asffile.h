@@ -46,6 +46,11 @@ namespace TagLib {
     class TAGLIB_EXPORT File : public TagLib::File
     {
     public:
+      /*!
+       * Contructs a ASF file object without reading a file.  Allows object
+       * fields to be set up before reading.
+       */
+      File();
 
       /*!
        * Constructs an ASF file from \a file.
@@ -115,6 +120,9 @@ namespace TagLib {
        */
       virtual bool save();
 
+      void read(bool readProperties = true,
+                Properties::ReadStyle propertiesStyle = Properties::Average);
+
     private:
       int readBYTE(bool *ok = 0);
       int readWORD(bool *ok = 0);
@@ -122,7 +130,6 @@ namespace TagLib {
       long long readQWORD(bool *ok = 0);
       static ByteVector renderString(const String &str, bool includeLength = false);
       String readString(int len);
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
 
       friend class Attribute;
       friend class Picture;

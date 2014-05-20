@@ -82,6 +82,12 @@ namespace TagLib {
 
     protected:
       /*!
+       * Contructs an Ogg file object without reading a file.  Allows object
+       * fields to be set up before reading.
+       */
+      File();
+
+      /*!
        * Constructs an Ogg file from \a file.
        *
        * \note This constructor is protected since Ogg::File shouldn't be
