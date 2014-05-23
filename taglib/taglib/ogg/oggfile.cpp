@@ -15,8 +15,8 @@
  *                                                                         *
  *   You should have received a copy of the GNU Lesser General Public      *
  *   License along with this library; if not, write to the Free Software   *
- *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA         *
- *   02110-1301  USA                                                       *
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+ *   USA                                                                   *
  *                                                                         *
  *   Alternatively, this file is available under the Mozilla Public        *
  *   License Version 1.1.  You may obtain a copy of the License at         *
@@ -208,12 +208,12 @@ bool Ogg::File::save()
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
-Ogg::File::File(FileName file) : TagLib::File(file)
+Ogg::File::File() : TagLib::File()
 {
   d = new FilePrivate;
 }
 
-Ogg::File::File(IOStream *stream) : TagLib::File(stream)
+Ogg::File::File(FileName file) : TagLib::File(file)
 {
   d = new FilePrivate;
 }
@@ -281,8 +281,8 @@ void Ogg::File::writePageGroup(const List<int> &thePageGroup)
     return;
 
 
-  // pages in the pageGroup and packets must be equivalent
-  // (originalSize and size of packets would not work together),
+  // pages in the pageGroup and packets must be equivalent 
+  // (originalSize and size of packets would not work together), 
   // therefore we sometimes have to add pages to the group
   List<int> pageGroup(thePageGroup);
   while (!d->pages[pageGroup.back()]->header()->lastPacketCompleted()) {
@@ -341,7 +341,7 @@ void Ogg::File::writePageGroup(const List<int> &thePageGroup)
 
   if (pages.back()->header()->pageSequenceNumber() != pageGroup.back()) {
 
-    // TODO: change the internal data structure so that we don't need to hold the
+    // TODO: change the internal data structure so that we don't need to hold the 
     // complete file in memory (is unavoidable at the moment)
 
     // read the complete stream

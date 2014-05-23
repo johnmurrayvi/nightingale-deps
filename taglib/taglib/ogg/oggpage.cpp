@@ -15,8 +15,8 @@
  *                                                                         *
  *   You should have received a copy of the GNU Lesser General Public      *
  *   License along with this library; if not, write to the Free Software   *
- *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA         *
- *   02110-1301  USA                                                       *
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+ *   USA                                                                   *
  *                                                                         *
  *   Alternatively, this file is available under the Mozilla Public        *
  *   License Version 1.1.  You may obtain a copy of the License at         *
@@ -116,9 +116,9 @@ Ogg::Page::ContainsPacketFlags Ogg::Page::containsPacket(int index) const
     flags = ContainsPacketFlags(flags | CompletePacket);
   }
 
-  // Or if there is more than one page and the page is
-  // (a) the first page and it's complete or
-  // (b) the last page and it's complete or
+  // Or if there is more than one page and the page is 
+  // (a) the first page and it's complete or 
+  // (b) the last page and it's complete or 
   // (c) a page in the middle.
   else if(packetCount() > 1 &&
           ((flags & BeginsWithPacket && !d->header.firstPacketContinued()) ||
@@ -266,7 +266,7 @@ List<Ogg::Page *> Ogg::Page::paginate(const ByteVectorList &packets,
       }
 
       Page *p = new Page(packetList, streamSerialNumber, firstPage+pageIndex, continued,
-                         lastPacketInList ? lastPacketCompleted : true,
+                         lastPacketInList ? lastPacketCompleted : true, 
                          isVeryLastPacket);
       pageIndex++;
 

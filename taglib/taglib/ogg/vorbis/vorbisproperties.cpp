@@ -15,8 +15,8 @@
  *                                                                         *
  *   You should have received a copy of the GNU Lesser General Public      *
  *   License along with this library; if not, write to the Free Software   *
- *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA         *
- *   02110-1301  USA                                                       *
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+ *   USA                                                                   *
  *                                                                         *
  *   Alternatively, this file is available under the Mozilla Public        *
  *   License Version 1.1.  You may obtain a copy of the License at         *
@@ -173,7 +173,7 @@ void Vorbis::Properties::read()
     long long end = last->absoluteGranularPosition();
 
     if(start >= 0 && end >= 0 && d->sampleRate > 0)
-      d->length = (int)((end - start) / (long long) d->sampleRate);
+      d->length = (end - start) / (long long) d->sampleRate;
     else
       debug("Vorbis::Properties::read() -- Either the PCM values for the start or "
             "end of this file was incorrect or the sample rate is zero.");

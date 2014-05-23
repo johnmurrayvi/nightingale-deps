@@ -15,8 +15,8 @@
  *                                                                         *
  *   You should have received a copy of the GNU Lesser General Public      *
  *   License along with this library; if not, write to the Free Software   *
- *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA         *
- *   02110-1301  USA                                                       *
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  *
+ *   USA                                                                   *
  *                                                                         *
  *   Alternatively, this file is available under the Mozilla Public        *
  *   License Version 1.1.  You may obtain a copy of the License at         *
@@ -28,11 +28,8 @@
 
 #include "taglib_export.h"
 #include "tfile.h"
-#include "tag.h"
 
 #include "mpcproperties.h"
-
-#include "tlist.h"
 
 namespace TagLib {
 
@@ -84,22 +81,17 @@ namespace TagLib {
       };
 
       /*!
-       * Contructs an MPC file from \a file.  If \a readProperties is true the
-       * file's audio properties will also be read using \a propertiesStyle.  If
-       * false, \a propertiesStyle is ignored.
+       * Contructs an MPC file object without reading a file.  Allows object
+       * fields to be set up before reading.
        */
-      File(FileName file, bool readProperties = true,
-           Properties::ReadStyle propertiesStyle = Properties::Average);
+      File();
 
       /*!
        * Contructs an MPC file from \a file.  If \a readProperties is true the
        * file's audio properties will also be read using \a propertiesStyle.  If
        * false, \a propertiesStyle is ignored.
-       *
-       * \note TagLib will *not* take ownership of the stream, the caller is
-       * responsible for deleting it after the File object.
        */
-      File(IOStream *stream, bool readProperties = true,
+      File(FileName file, bool readProperties = true,
            Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
@@ -114,26 +106,18 @@ namespace TagLib {
       virtual TagLib::Tag *tag() const;
 
       /*!
-       * Implements the unified property interface -- export function.
-       * If the file contains both an APE and an ID3v1 tag, only the APE
-       * tag  will be converted to the PropertyMap.
-       */
-      PropertyMap properties() const;
-
-      void removeUnsupportedProperties(const StringList &properties);
-
-      /*!
-       * Implements the unified property interface -- import function.
-       * As with the export, only one tag is taken into account. If the file
-       * has no tag at all, an APE tag will be created.
-       */
-      PropertyMap setProperties(const PropertyMap &);
-
-      /*!
        * Returns the MPC::Properties for this file.  If no audio properties
        * were read then this will return a null pointer.
        */
       virtual Properties *audioProperties() const;
+
+      /*!
+       * Reads from MPC file.  If \a readProperties is true the file's audio
+       * properties will also be read using \a propertiesStyle.  If false,
+       * \a propertiesStyle is ignored.
+       */
+      void read(bool readProperties = true,
+                Properties::ReadStyle propertiesStyle = Properties::Average);
 
       /*!
        * Saves the file.
@@ -185,11 +169,11 @@ namespace TagLib {
        */
       void remove(int tags = AllTags);
 
+
     private:
       File(const File &);
       File &operator=(const File &);
 
-      void read(bool readProperties, Properties::ReadStyle propertiesStyle);
       void scan();
       long findAPE();
       long findID3v1();
