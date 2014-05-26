@@ -31,7 +31,6 @@
 #include "tag.h"
 #include "tbytevector.h"
 #include "tiostream.h"
-#include "tfileio.h"
 
 namespace TagLib {
 
@@ -48,52 +47,9 @@ namespace TagLib {
    * ByteVector and a binary search method for finding patterns in a file.
    */
 
-  class TAGLIB_EXPORT File : public TagLib::FileIO
+  class TAGLIB_EXPORT File
   {
   public:
-
-    //! A class for pluggable file I/O type resolution.
-
-    /*!
-     * This class is used to extend TagLib's very basic file name based file I/O
-     * type resolution.
-     *
-     * This can be accomplished with:
-     *
-     * \code
-     *
-     * class MyFileIOTypeResolver : FileIOTypeResolver
-     * {
-     *   TagLib::FileIO *createFileIO(FileName fileName)
-     *   {
-     *     if(someCheckForAnHTTPFile(fileName))
-     *       return new MyHTTPFileIO(fileName);
-     *     return 0;
-     *   }
-     * }
-     *
-     * File::addFileIOTypeResolver(new MyFileIOTypeResolver);
-     *
-     * \endcode
-     *
-     * Naturally a less contrived example would be slightly more complex.  This
-     * can be used to add new file I/O types to TagLib.
-     */
-
-    class FileIOTypeResolver
-    {
-    public:
-      /*!
-       * This method must be overriden to provide an additional file I/O type
-       * resolver.  If the resolver is able to determine the file I/O type it
-       * should return a valid File I/O object; if not it should return 0.
-       *
-       * \note The created file I/O is then owned by the File and should not be
-       * deleted.  Deletion will happen automatically when the File passes out
-       * of scope.
-       */
-      virtual FileIO *createFileIO(FileName fileName) const = 0;
-    };
 
     /*!
      * Destroys this File instance.
@@ -313,7 +269,7 @@ namespace TagLib {
      * Returns true if the file can be opened for reading.  If the file does not
      * exist, this will return false.
      */
-     bool isReadable();
+    bool isReadable();
 
     /*!
      * Returns true if the file can be opened for writing.

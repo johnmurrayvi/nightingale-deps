@@ -135,61 +135,59 @@ namespace TagLib {
 
       // Reimplementations.
 
-      // Reimplementations.
-
       virtual String title() const;
       virtual String artist() const;
+      virtual String albumArtist() const { return String::null; };
       virtual String album() const;
-      virtual String albumArtist() const;
       virtual String comment() const;
-      virtual String lyrics() const;
+      virtual String lyrics() const { return String::null; };
       virtual String genre() const;
-      virtual String producer() const;
-      virtual String composer() const;
-      virtual String conductor() const;
-      virtual String lyricist() const;
-      virtual String recordLabel() const;
-      virtual String rating() const;
-      virtual String language() const;
-      virtual String key() const;
-      virtual String license() const;
-      virtual String licenseUrl() const;
+      virtual String producer() const { return String::null; };
+      virtual String composer() const { return String::null; };
+      virtual String conductor() const { return String::null; };
+      virtual String lyricist() const { return String::null; };
+      virtual String recordLabel() const { return String::null; };
+      virtual String rating() const { return String::null; };
+      virtual String language() const { return String::null; };
+      virtual String key() const { return String::null; };
+      virtual String license() const { return String::null; };
+      virtual String licenseUrl() const { return String::null; };
 
-      virtual TagLib::uint totalTracks() const;
-      virtual TagLib::uint disc() const;
-      virtual TagLib::uint totalDiscs() const;
-      virtual TagLib::uint bpm() const;
       virtual TagLib::uint year() const;
       virtual TagLib::uint track() const;
+      virtual TagLib::uint totalTracks() const { return 0; };
+      virtual TagLib::uint disc() const { return 0; };
+      virtual TagLib::uint totalDiscs() const { return 0; };
+      virtual TagLib::uint bpm() const { return 0; };
 
-      virtual bool isCompilation() const;
+      virtual bool isCompilation() const { return false; };
 
       virtual void setTitle(const String &s);
       virtual void setArtist(const String &s);
       virtual void setAlbum(const String &s);
-      virtual void setAlbumArtist(const String &s);
+      virtual void setAlbumArtist(const String &s) {};
       virtual void setComment(const String &s);
-      virtual void setLyrics(const String &s);
+      virtual void setLyrics(const String &s) {};
       virtual void setGenre(const String &s);
-      virtual void setProducer(const String &s);
-      virtual void setComposer(const String &s);
-      virtual void setConductor(const String &s);
-      virtual void setLyricist(const String &s);
-      virtual void setRecordLabel(const String &s);
-      virtual void setRating(const String &s);
-      virtual void setLanguage(const String &s);
-      virtual void setKey(const String &s);
-      virtual void setLicense(const String &s);
-      virtual void setLicenseUrl(const String &s);
+      virtual void setProducer(const String &s) {};
+      virtual void setComposer(const String &s) {};
+      virtual void setConductor(const String &s) {};
+      virtual void setLyricist(const String &s) {};
+      virtual void setRecordLabel(const String &s) {};
+      virtual void setRating(const String &s) {};
+      virtual void setLanguage(const String &s) {};
+      virtual void setKey(const String &s) {};
+      virtual void setLicense(const String &s) {};
+      virtual void setLicenseUrl(const String &s) {};
 
       virtual void setYear(TagLib::uint i);
       virtual void setTrack(TagLib::uint i);
-      virtual void setTotalTracks(TagLib::uint i);
-      virtual void setDisc(TagLib::uint i);
-      virtual void setTotalDiscs(TagLib::uint i);
-      virtual void setBpm(TagLib::uint i);
+      virtual void setTotalTracks(TagLib::uint i) {};
+      virtual void setDisc(TagLib::uint i) {};
+      virtual void setTotalDiscs(TagLib::uint i) {};
+      virtual void setBpm(TagLib::uint i) {};
 
-      virtual void setIsCompilation(bool i);
+      virtual void setIsCompilation(bool i) {};
 
       /*!
        * Returns the genre in number.
