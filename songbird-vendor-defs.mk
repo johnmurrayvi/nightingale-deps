@@ -218,6 +218,10 @@ ifeq (Msys,$(SB_VENDOR_ARCH))
      -D_CRT_SECURE_NO_WARNINGS -DHAVE_WIN32 -D_WINDOWS \
      -wd4820 -wd4668 -wd4100 -wd4706 -wd4127 -wd4255 -wd4710 -wd4055
 
+   ifeq (1600, $(_MSC_VER))
+     SB_TARGET_ARCH = windows-i686-msvc10
+   endif
+
    SB_CFLAGS += -Zi
    SB_CXXFLAGS += -Zi
    SB_LDFLAGS += -DEBUG
