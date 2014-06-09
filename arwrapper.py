@@ -16,6 +16,10 @@ def winpath(unixpath):
 if __name__ == "__main__":
     fargs = ["lib"] + sys.argv[1:]
 
+    # fix for sqlite calling $(AR) -cr libsqlite.a 
+    if fargs[1].startswith("-cr"):
+        del fargs[1]
+
     fargs[1] = "-OUT:%s" % (fargs[1])
 
     print "Calling ", fargs
