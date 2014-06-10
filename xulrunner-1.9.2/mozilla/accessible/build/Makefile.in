@@ -93,7 +93,6 @@ endif
 
 ifeq ($(OS_ARCH),WINNT)
 OS_LIBS += \
-	ole32.lib \
 	oleaut32.lib \
 	version.lib \
 	$(NULL)

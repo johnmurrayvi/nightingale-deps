@@ -64,23 +64,25 @@
 #include "nsDirectoryServiceDefs.h"
 #include "nsICommandLineRunner.h"
 
-class AutoAutoreleasePool {
-public:
-  AutoAutoreleasePool()
-  {
-    mLocalPool = [[NSAutoreleasePool alloc] init];
-  }
-  ~AutoAutoreleasePool()
-  {
-    [mLocalPool release];
-  }
-private:
-  NSAutoreleasePool *mLocalPool;
-};
+#define ABOUT_MENUITEM_ID         1
+#define PREFERENCES_MENUTITEM_ID  2
+#define QUIT_MENUITEM_ID          3
 
 @interface MacApplicationDelegate : NSObject
 {
+  BOOL mIsSimulatingModalSession;
+  id   mAppDelegateOverride;
 }
+
+- (void)setAppDelegateOverride:(id)aDelegateOverride;
+
+@end
+
+@interface MacApplicationDelegate (Private)
+
+- (void)onBeginGeckoModalSession:(id)sender;
+- (void)onEndGeckoModalSession:(id)sender;
+- (void)configureAppMenu:(BOOL)inIsModal;
 
 @end
 
@@ -103,10 +105,6 @@ SetupMacApplicationDelegate()
 {
   NS_OBJC_BEGIN_TRY_ABORT_BLOCK;
 
-  // this is called during startup, outside an event loop, and therefore
-  // needs an autorelease pool to avoid cocoa object leakage (bug 559075)
-  AutoAutoreleasePool pool;
-
   // This call makes it so that application:openFile: doesn't get bogus calls
   // from Cocoa doing its own parsing of the argument string. And yes, we need
   // to use a string with a boolean value in it. That's just how it works.
@@ -127,22 +125,20 @@ SetupMacApplicationDelegate()
   NS_OBJC_BEGIN_TRY_ABORT_BLOCK_RETURN;
 
   if ((self = [super init])) {
-    NSAppleEventManager *aeMgr = [NSAppleEventManager sharedAppleEventManager];
+    [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
+                                                       andSelector:@selector(handleAppleEvent:withReplyEvent:)
+                                                     forEventClass:kInternetEventClass
+                                                        andEventID:kAEGetURL];
 
-    [aeMgr setEventHandler:self
-               andSelector:@selector(handleAppleEvent:withReplyEvent:)
-             forEventClass:kInternetEventClass
-                andEventID:kAEGetURL];
-
-    [aeMgr setEventHandler:self
-               andSelector:@selector(handleAppleEvent:withReplyEvent:)
-             forEventClass:'WWW!'
-                andEventID:'OURL'];
-
-    [aeMgr setEventHandler:self
-               andSelector:@selector(handleAppleEvent:withReplyEvent:)
-             forEventClass:kCoreEventClass
-                andEventID:kAEOpenDocuments];
+    mAppDelegateOverride = nil;
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+                                             selector:@selector(onBeginGeckoModalSession:) 
+                                                 name:@"GeckoStartModal" 
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self 
+                                             selector:@selector(onEndGeckoModalSession:) 
+                                                 name:@"GeckoEndModal" 
+                                               object:nil];
   }
   return self;
 
@@ -153,13 +149,16 @@ SetupMacApplicationDelegate()
 {
   NS_OBJC_BEGIN_TRY_ABORT_BLOCK;
 
-  NSAppleEventManager *aeMgr = [NSAppleEventManager sharedAppleEventManager];
-  [aeMgr removeEventHandlerForEventClass:kInternetEventClass andEventID:kAEGetURL];
-  [aeMgr removeEventHandlerForEventClass:'WWW!' andEventID:'OURL'];
-  [aeMgr removeEventHandlerForEventClass:kCoreEventClass andEventID:kAEOpenDocuments];
+  [[NSAppleEventManager sharedAppleEventManager] removeEventHandlerForEventClass:kInternetEventClass andEventID:kAEGetURL];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [super dealloc];
 
   NS_OBJC_END_TRY_ABORT_BLOCK;
+}
+
+- (void)setAppDelegateOverride:(id)aDelegateOverride
+{
+  mAppDelegateOverride = aDelegateOverride;
 }
 
 // Opening the application is handled specially elsewhere,
@@ -172,6 +171,12 @@ SetupMacApplicationDelegate()
 // nsCocoaNativeReOpen() if 'flag' is 'true'.
 - (BOOL)applicationShouldHandleReopen:(NSApplication*)theApp hasVisibleWindows:(BOOL)flag
 {
+  if (mAppDelegateOverride && 
+      [mAppDelegateOverride respondsToSelector:@selector(applicationShouldHandleReopen:hasVisibleWindows:)])
+  {
+    return [mAppDelegateOverride applicationShouldHandleReopen:theApp hasVisibleWindows:flag];
+  }
+
   nsCOMPtr<nsINativeAppSupport> nas = do_CreateInstance(NS_NATIVEAPPSUPPORT_CONTRACTID);
   NS_ENSURE_TRUE(nas, NO);
 
@@ -190,23 +195,12 @@ SetupMacApplicationDelegate()
 {
   NS_OBJC_BEGIN_TRY_ABORT_BLOCK_RETURN;
 
-  NSURL *url = [NSURL fileURLWithPath:filename];
-  if (!url)
-    return NO;
-
-  NSString *urlString = [url absoluteString];
-  if (!urlString)
-    return NO;
-
+  // Take advantage of the existing "command line" code for Macs.
   nsMacCommandLine& cmdLine = nsMacCommandLine::GetMacCommandLine();
-
-  // Add the URL to any command line we're currently setting up.
-  if (cmdLine.AddURLToCurrentCommandLine([urlString UTF8String]))
-    return YES;
-
+  // URLWithString expects our string to be a legal URL with percent escapes.
+  filename = [filename stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
   // We don't actually care about Mac filetypes in this context, just pass a placeholder.
-  
-  cmdLine.HandleOpenOneDoc((CFURLRef)url, 'abcd');
+  cmdLine.HandleOpenOneDoc((CFURLRef)[NSURL URLWithString:filename], 'abcd');
 
   return YES;
 
@@ -252,6 +246,12 @@ static NSWindow* GetCocoaWindowForXULWindow(nsISupports *aXULWindow)
 {
   NS_OBJC_BEGIN_TRY_ABORT_BLOCK_NIL;
 
+  if (mAppDelegateOverride &&
+      [mAppDelegateOverride respondsToSelector:@selector(applicationDockMenu:)]) 
+  {
+    return [mAppDelegateOverride applicationDockMenu:sender];
+  }
+
   // Why we're not just using Cocoa to enumerate our windows:
   // The Dock thinks we're a Carbon app, probably because we don't have a
   // blessed Window menu, so we get none of the automatic handling for dock
@@ -284,6 +284,13 @@ static NSWindow* GetCocoaWindowForXULWindow(nsISupports *aXULWindow)
 
   // Iterate through our list of windows to create our menu
   NSMenu *menu = [[[NSMenu alloc] initWithTitle:@""] autorelease];
+  
+  // If we are currently running a gecko modal session, this item 
+  // needs to be disabled.
+  if (mIsSimulatingModalSession) {
+    [menu setAutoenablesItems:NO];
+  }
+  
   PRBool more;
   while (NS_SUCCEEDED(windowList->HasMoreElements(&more)) && more) {
     // Get our native window
@@ -307,6 +314,9 @@ static NSWindow* GetCocoaWindowForXULWindow(nsISupports *aXULWindow)
     // If this is the foreground window, put a checkmark next to it
     if (SameCOMIdentity(xulWindow, frontWindow))
       [menuItem setState:NSOnState];
+    
+    if (mIsSimulatingModalSession)
+      [menuItem setEnabled:NO];
 
     [menu addItem:menuItem];
     [menuItem release];
@@ -363,10 +373,7 @@ static NSWindow* GetCocoaWindowForXULWindow(nsISupports *aXULWindow)
   if (!event)
     return;
 
-  AutoAutoreleasePool pool;
-
-  if (([event eventClass] == kInternetEventClass && [event eventID] == kAEGetURL) ||
-      ([event eventClass] == 'WWW!' && [event eventID] == 'OURL')) {
+  if ([event eventClass] == kInternetEventClass && [event eventID] == kAEGetURL) {
     NSString* urlString = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
 
     // don't open chrome URLs
@@ -377,11 +384,6 @@ static NSWindow* GetCocoaWindowForXULWindow(nsISupports *aXULWindow)
                         range:NSMakeRange(0, [schemeString length])] == NSOrderedSame) {
       return;
     }
-
-    // Add the URL to any command line we're currently setting up.
-    nsMacCommandLine& macCmdLine = nsMacCommandLine::GetMacCommandLine();
-    if (macCmdLine.AddURLToCurrentCommandLine([urlString UTF8String]))
-      return;
 
     nsCOMPtr<nsICommandLineRunner> cmdLine(do_CreateInstance("@mozilla.org/toolkit/command-line;1"));
     if (!cmdLine) {
@@ -398,26 +400,27 @@ static NSWindow* GetCocoaWindowForXULWindow(nsISupports *aXULWindow)
       return;
     rv = cmdLine->Run();
   }
-  else if ([event eventClass] == kCoreEventClass && [event eventID] == kAEOpenDocuments) {
-    NSAppleEventDescriptor* fileListDescriptor = [event paramDescriptorForKeyword:keyDirectObject];
-    if (!fileListDescriptor)
-      return;
+}
 
-    // Descriptor list indexing is one-based...
-    int numberOfFiles = [fileListDescriptor numberOfItems];
-    for (int i = 1; i <= numberOfFiles; i++) {
-      NSString* urlString = [[fileListDescriptor descriptorAtIndex:i] stringValue];
-      if (!urlString)
-        continue;
+- (void)onBeginGeckoModalSession:(id)sender
+{
+  mIsSimulatingModalSession = YES;
+  [self configureAppMenu:YES];
+}
 
-      // We need a path, not a URL
-      NSURL* url = [NSURL URLWithString:urlString];
-      if (!url)
-        continue;
+- (void)onEndGeckoModalSession:(id)sender
+{
+  mIsSimulatingModalSession = NO;
+  [self configureAppMenu:NO];
+}
 
-      [self application:NSApp openFile:[url path]];
-    }
-  }
+- (void)configureAppMenu:(BOOL)inIsModal
+{
+  NSMenu *menu = [[[NSApp mainMenu] itemAtIndex:0] submenu];
+  [menu setAutoenablesItems:!inIsModal];
+  [[menu itemWithTag:ABOUT_MENUITEM_ID] setEnabled:!inIsModal];
+  [[menu itemWithTag:PREFERENCES_MENUTITEM_ID] setEnabled:!inIsModal];
+  [[menu itemWithTag:QUIT_MENUITEM_ID] setEnabled:!inIsModal];
 }
 
 @end

@@ -410,11 +410,7 @@ ThinkPadSensor::~ThinkPadSensor()
 PRBool
 ThinkPadSensor::Startup()
 {
-  WCHAR path[MAX_PATH + sizeof("sensor.dll")];
-  if (GetSystemDirectoryW(path, MAX_PATH)) {
-    wcscat(path, L"sensor.dll");
-    mLibrary = LoadLibraryW(path);
-  }
+  mLibrary = LoadLibrary("sensor.dll");
   if (!mLibrary)
     return PR_FALSE;
 

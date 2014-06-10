@@ -54,7 +54,6 @@ DIRS = \
 
 XPCSHELL_TESTS = \
   unit \
-  unit2 \
   $(NULL)
 
 _CHROME_FILES = \

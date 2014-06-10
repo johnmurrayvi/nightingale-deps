@@ -696,9 +696,9 @@ Statement::Execute()
 
   PRBool ret;
   nsresult rv = ExecuteStep(&ret);
-  nsresult rv2 = Reset();
+  NS_ENSURE_SUCCESS(rv, rv);
 
-  return NS_FAILED(rv) ? rv : rv2;
+  return Reset();
 }
 
 NS_IMETHODIMP

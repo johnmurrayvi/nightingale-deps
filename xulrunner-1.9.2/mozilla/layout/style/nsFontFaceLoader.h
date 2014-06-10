@@ -113,7 +113,6 @@ public:
 
 private:
   nsRefPtr<gfxFontEntry>  mFontEntry;
-  nsRefPtr<gfxFontFamily> mFontFamily;
   nsCOMPtr<nsIURI>        mFontURI;
   nsRefPtr<nsUserFontSet> mFontSet;
   nsCOMPtr<nsIChannel>    mChannel;

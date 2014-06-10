@@ -172,8 +172,6 @@ private: // data
   PRPackedBool mNeverUseDeviceSurface;
   PRPackedBool mFormatChanged;
   PRPackedBool mCompositingFailed;
-  /** Indicates if the image data is currently locked */
-  PRPackedBool mLocked;
 
 #ifdef XP_WIN
   PRPackedBool mIsDDBSurface;

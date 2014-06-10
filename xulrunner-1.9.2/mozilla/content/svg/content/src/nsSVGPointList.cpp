@@ -265,7 +265,10 @@ NS_IMETHODIMP nsSVGPointList::Clear()
 NS_IMETHODIMP nsSVGPointList::Initialize(nsIDOMSVGPoint *newItem,
                                          nsIDOMSVGPoint **_retval)
 {
-  NS_ENSURE_NATIVE_SVG_POINT(newItem, _retval);
+  if (!newItem) {
+    *_retval = nsnull;
+    return NS_ERROR_DOM_SVG_WRONG_TYPE_ERR;
+  }
   Clear();
   return AppendItem(newItem, _retval);
 }
@@ -333,8 +336,9 @@ NS_IMETHODIMP nsSVGPointList::AppendItem(nsIDOMSVGPoint *newItem,
   // is removed from its previous list before it is inserted into this
   // list'. We don't do that. Should we?
   
-  NS_ENSURE_NATIVE_SVG_POINT(newItem, _retval);
   *_retval = newItem;
+  if (!newItem)
+    return NS_ERROR_DOM_SVG_WRONG_TYPE_ERR;
   AppendElement(newItem);
   NS_ADDREF(*_retval);
   return NS_OK;

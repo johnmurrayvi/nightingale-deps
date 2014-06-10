@@ -4151,7 +4151,7 @@ ExecuteREBytecode(REGlobalData *gData, REMatchState *x)
     jsbytecode *nextpc, *testpc;
     REOp nextop;
     RECapture *cap;
-    REProgState *curState=NULL;
+    REProgState *curState;
     const jschar *startcp;
     size_t parenIndex, k;
     size_t parenSoFar = 0;
@@ -4273,8 +4273,7 @@ ExecuteREBytecode(REGlobalData *gData, REMatchState *x)
                 if (!result)
                     result = x;
 
-                if(gData->stateStackTop)
-                    --gData->stateStackTop;
+                --gData->stateStackTop;
                 pc += GET_OFFSET(pc);
                 op = (REOp) *pc++;
                 continue;
@@ -4290,8 +4289,7 @@ ExecuteREBytecode(REGlobalData *gData, REMatchState *x)
                 if (!result)
                     result = x;
 
-                if(gData->stateStackTop)
-                    --gData->stateStackTop;
+                --gData->stateStackTop;
                 op = (REOp) *pc++;
                 continue;
 
@@ -4368,8 +4366,7 @@ ExecuteREBytecode(REGlobalData *gData, REMatchState *x)
                 continue;
 
               case REOP_ASSERTTEST:
-                if(gData->stateStackTop)
-                    --gData->stateStackTop;
+                --gData->stateStackTop;
                 --curState;
                 x->cp = gData->cpbegin + curState->index;
                 gData->backTrackSP =
@@ -4381,8 +4378,7 @@ ExecuteREBytecode(REGlobalData *gData, REMatchState *x)
                 break;
 
               case REOP_ASSERTNOTTEST:
-                if(gData->stateStackTop)
-                    --gData->stateStackTop;
+                --gData->stateStackTop;
                 --curState;
                 x->cp = gData->cpbegin + curState->index;
                 gData->backTrackSP =
@@ -4458,8 +4454,7 @@ ExecuteREBytecode(REGlobalData *gData, REMatchState *x)
               case REOP_REPEAT:
                 --curState;
                 do {
-                    if(gData->stateStackTop)
-                        --gData->stateStackTop;
+                    --gData->stateStackTop;
                     if (!result) {
                         /* Failed, see if we have enough children. */
                         if (curState->u.quantifier.min == 0)
@@ -4547,16 +4542,14 @@ ExecuteREBytecode(REGlobalData *gData, REMatchState *x)
                                             pc, x, x->cp, 0, 0)) {
                         goto bad;
                     }
-                    if(gData->stateStackTop)
-                        --gData->stateStackTop;
+                    --gData->stateStackTop;
                     pc = pc + GET_OFFSET(pc);
                     op = (REOp) *pc++;
                 }
                 continue;
 
               case REOP_MINIMALREPEAT:
-                if(gData->stateStackTop)
-                    --gData->stateStackTop;
+                --gData->stateStackTop;
                 --curState;
 
                 re_debug("{%d,%d}", curState->u.quantifier.min,
@@ -4610,8 +4603,7 @@ ExecuteREBytecode(REGlobalData *gData, REMatchState *x)
                                         parenSoFar - curState->parenSoFar)) {
                     goto bad;
                 }
-                if(gData->stateStackTop)
-                    --gData->stateStackTop;
+                --gData->stateStackTop;
                 pc = pc + GET_OFFSET(pc);
                 op = (REOp) *pc++;
                 JS_ASSERT(op < REOP_LIMIT);
@@ -4654,7 +4646,6 @@ ExecuteREBytecode(REGlobalData *gData, REMatchState *x)
             op = (REOp) backTrackData->backtrack_op;
             JS_ASSERT(op < REOP_LIMIT);
             gData->stateStackTop = backTrackData->saveStateStackTop;
-
             JS_ASSERT(gData->stateStackTop);
 
             memcpy(gData->stateStack, backTrackData + 1,
@@ -4830,21 +4821,6 @@ bad:
     return NULL;
 }
 
-void
-JSRegExpStatics::clear(JSContext *cx)
-{
-    input = NULL;
-    pendingInput = NULL;
-    multiline = JS_FALSE;
-    parenCount = 0;
-    lastMatch = lastParen = js_EmptySubString;
-    leftContext = rightContext = js_EmptySubString;
-    if (moreParens) {
-        cx->free(moreParens);
-        moreParens = NULL;
-    }
-}
-
 JSBool
 js_ExecuteRegExp(JSContext *cx, JSRegExp *re, JSString *str, size_t *indexp,
                  JSBool test, jsval *rval)
@@ -4856,13 +4832,14 @@ js_ExecuteRegExp(JSContext *cx, JSRegExp *re, JSString *str, size_t *indexp,
     size_t i, length, start;
     JSSubString *morepar;
     JSBool ok;
-    JSRegExpStatics *res = NULL;
+    JSRegExpStatics *res;
     ptrdiff_t matchlen;
     uintN num, morenum;
     JSString *parstr, *matchstr;
     JSObject *obj;
 
     RECapture *parsub = NULL;
+    void *mark;
     int64 *timestamp;
 
     /*
@@ -4889,7 +4866,7 @@ js_ExecuteRegExp(JSContext *cx, JSRegExp *re, JSString *str, size_t *indexp,
             return JS_FALSE;
         *timestamp = JS_Now();
     }
-    void *mark = JS_ARENA_MARK(&cx->regexpPool);
+    mark = JS_ARENA_MARK(&cx->regexpPool);
 
     x = InitMatch(cx, &gData, re, length);
 
@@ -4960,7 +4937,7 @@ js_ExecuteRegExp(JSContext *cx, JSRegExp *re, JSString *str, size_t *indexp,
     }
 
     res = &cx->regExpStatics;
-    res->pendingInput = res->input = str;
+    res->input = str;
     res->parenCount = re->parenCount;
     if (re->parenCount == 0) {
         res->lastParen = js_EmptySubString;
@@ -5056,8 +5033,6 @@ js_ExecuteRegExp(JSContext *cx, JSRegExp *re, JSString *str, size_t *indexp,
     res->rightContext.length = gData.cpend - ep;
 
 out:
-    if (!ok && res)
-        res->clear(cx);
     JS_ARENA_RELEASE(&cx->regexpPool, mark);
     return ok;
 }
@@ -5218,11 +5193,10 @@ js_InitRegExpStatics(JSContext *cx)
 
 JS_FRIEND_API(void)
 js_SaveAndClearRegExpStatics(JSContext *cx, JSRegExpStatics *statics,
-                             JSTempValueRooter *tvr, JSTempValueRooter *tvr2)
+                             JSTempValueRooter *tvr)
 {
     *statics = cx->regExpStatics;
     JS_PUSH_TEMP_ROOT_STRING(cx, statics->input, tvr);
-    JS_PUSH_TEMP_ROOT_STRING(cx, statics->pendingInput, tvr2);
     /*
      * Prevent JS_ClearRegExpStatics from freeing moreParens, since we've only
      * moved it elsewhere (into statics->moreParens).
@@ -5233,12 +5207,11 @@ js_SaveAndClearRegExpStatics(JSContext *cx, JSRegExpStatics *statics,
 
 JS_FRIEND_API(void)
 js_RestoreRegExpStatics(JSContext *cx, JSRegExpStatics *statics,
-                        JSTempValueRooter *tvr, JSTempValueRooter *tvr2)
+                        JSTempValueRooter *tvr)
 {
     /* Clear/free any new JSRegExpStatics data before clobbering. */
     JS_ClearRegExpStatics(cx);
     cx->regExpStatics = *statics;
-    JS_POP_TEMP_ROOT(cx, tvr2);
     JS_POP_TEMP_ROOT(cx, tvr);
 }
 
@@ -5249,8 +5222,6 @@ js_TraceRegExpStatics(JSTracer *trc, JSContext *acx)
 
     if (res->input)
         JS_CALL_STRING_TRACER(trc, res->input, "res->input");
-    if (res->pendingInput)
-        JS_CALL_STRING_TRACER(trc, res->pendingInput, "res->pendingInput");
 }
 
 void
@@ -5274,8 +5245,8 @@ regexp_static_getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
     slot = JSVAL_TO_INT(id);
     switch (slot) {
       case REGEXP_STATIC_INPUT:
-        *vp = res->pendingInput ? STRING_TO_JSVAL(res->pendingInput)
-                                : JS_GetEmptyStringValue(cx);
+        *vp = res->input ? STRING_TO_JSVAL(res->input)
+                         : JS_GetEmptyStringValue(cx);
         return JS_TRUE;
       case REGEXP_STATIC_MULTILINE:
         *vp = BOOLEAN_TO_JSVAL(res->multiline);
@@ -5317,7 +5288,7 @@ regexp_static_setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
             !JS_ConvertValue(cx, *vp, JSTYPE_STRING, vp)) {
             return JS_FALSE;
         }
-        res->pendingInput = JSVAL_TO_STRING(*vp);
+        res->input = JSVAL_TO_STRING(*vp);
     } else if (JSVAL_TO_INT(id) == REGEXP_STATIC_MULTILINE) {
         if (!JSVAL_IS_BOOLEAN(*vp) &&
             !JS_ConvertValue(cx, *vp, JSTYPE_BOOLEAN, vp)) {
@@ -5692,7 +5663,7 @@ regexp_exec_sub(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 
     /* Now that obj is unlocked, it's safe to (potentially) grab the GC lock. */
     if (argc == 0) {
-        str = cx->regExpStatics.pendingInput;
+        str = cx->regExpStatics.input;
         if (!str) {
             const char *bytes = js_GetStringBytes(cx, re->source);
 

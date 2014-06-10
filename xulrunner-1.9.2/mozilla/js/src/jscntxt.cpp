@@ -85,6 +85,7 @@ InitThreadData(JSThreadData *data)
 #ifdef JS_TRACER
     js_InitJIT(&data->traceMonitor);
 #endif
+    js_InitRandom(data);
 }
 
 static void
@@ -485,8 +486,6 @@ js_NewContext(JSRuntime *rt, size_t stackChunkSize)
     }
     JS_APPEND_LINK(&cx->link, &rt->contextList);
     JS_UNLOCK_GC(rt);
-
-    js_InitRandom(cx);
 
     /*
      * If cx is the first context on this runtime, initialize well-known atoms,
@@ -1380,7 +1379,7 @@ js_ReportOutOfScriptQuota(JSContext *cx)
                          JSMSG_SCRIPT_STACK_QUOTA);
 }
 
-JS_FRIEND_API(void)
+void
 js_ReportOverRecursed(JSContext *cx)
 {
     JS_ReportErrorNumber(cx, js_GetErrorMessage, NULL, JSMSG_OVER_RECURSED);

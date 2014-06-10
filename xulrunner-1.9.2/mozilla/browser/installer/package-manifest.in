@@ -40,7 +40,6 @@
 #endif
 
 [xpcom]
-@BINPATH@/dependentlibs.list
 #ifdef XP_WIN32
 @BINPATH@/js3250.dll
 #else
@@ -55,9 +54,6 @@
 #else
 @BINPATH@/@DLL_PREFIX@xul@DLL_SUFFIX@
 #endif
-#ifdef MOZ_IPC
-@BINPATH@/@MOZ_CHILD_PROCESS_NAME@
-#endif
 #ifdef WINCE
 @BINPATH@/mozce_shunt.dll
 #elifdef XP_WIN32
@@ -68,13 +64,12 @@
 @BINPATH@/msvcr80.dll
 #else
 @BINPATH@/mozcrt19.dll
-@BINPATH@/mozcpp19.dll
 #endif
 #endif
 
 [browser]
 ; [Base Browser Files]
-#ifndef XP_UNIX
+#ifdef XP_WIN32
 @BINPATH@/@MOZ_APP_NAME@.exe
 #else
 @BINPATH@/@MOZ_APP_NAME@-bin
@@ -96,8 +91,6 @@
 #ifndef WINCE
 @BINPATH@/plugins/npnul32.dll
 #endif
-#elifdef XP_OS2
-@BINPATH@/plugins/npnulos2.dll
 #endif
 @BINPATH@/@DLL_PREFIX@sqlite3@DLL_SUFFIX@
 @BINPATH@/README.txt
@@ -332,17 +325,12 @@
 @BINPATH@/components/nsSessionStartup.js
 @BINPATH@/components/nsSessionStore.js
 @BINPATH@/components/nsURLFormatter.js
-#ifndef XP_OS2
 @BINPATH@/components/@DLL_PREFIX@browserdirprovider@DLL_SUFFIX@
 #ifdef XP_WIN32
 ;XXX: lame, kill use_short_libname
 @BINPATH@/components/brwsrcmp.dll
 #else
 @BINPATH@/components/@DLL_PREFIX@browsercomps@DLL_SUFFIX@
-#endif
-#else
-@BINPATH@/components/brwsrdir@DLL_SUFFIX@
-@BINPATH@/components/brwsrcmp@DLL_SUFFIX@
 #endif
 @BINPATH@/components/txEXSLTRegExFunctions.js
 @BINPATH@/components/nsLivemarkService.js
@@ -362,7 +350,6 @@
 #ifdef MOZ_ENABLE_DBUS
 @BINPATH@/components/@DLL_PREFIX@dbusservice@DLL_SUFFIX@
 #endif
-@BINPATH@/components/nsINIProcessor.js
 
 ; Modules
 @BINPATH@/modules/*
@@ -403,7 +390,7 @@
 
 
 ; shell icons
-#ifdef XP_UNIX
+#ifndef XP_WIN32
 @BINPATH@/icons/*.xpm
 @BINPATH@/icons/*.png
 #endif
@@ -472,8 +459,6 @@
 @BINPATH@/res/unixcharset.properties
 #elifdef XP_WIN32
 @BINPATH@/res/wincharset.properties
-#elifdef XP_OS2
-@BINPATH@/res/os2charset.properties
 #endif
 
 ; svg

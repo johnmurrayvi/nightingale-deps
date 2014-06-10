@@ -213,7 +213,6 @@ static NS_DEFINE_CID(kCSSStyleSheetCID, NS_CSS_STYLESHEET_CID);
 static NS_DEFINE_IID(kRangeCID,     NS_RANGE_CID);
 
 PRBool nsIPresShell::gIsAccessibilityActive = PR_FALSE;
-nsIContent* nsIPresShell::gKeyDownTarget;
 
 // convert a color value to a string, in the CSS format #RRGGBB
 // *  - initially created for bugs 31816, 20760, 22963
@@ -1844,10 +1843,6 @@ PresShell::Destroy()
   if (mHaveShutDown)
     return NS_OK;
 
-  if (gKeyDownTarget && gKeyDownTarget->GetOwnerDoc() == mDocument) {
-    NS_RELEASE(gKeyDownTarget);
-  }
-
   mContentToScrollTo = nsnull;
 
   if (mPresContext) {
@@ -2875,8 +2870,6 @@ NS_IMETHODIMP
 PresShell::NotifyDestroyingFrame(nsIFrame* aFrame)
 {
   if (!mIgnoreFrameDestruction) {
-    mPresContext->StopImagesFor(aFrame);
-
     mFrameConstructor->NotifyDestroyingFrame(aFrame);
 
     for (PRInt32 idx = mDirtyRoots.Length(); idx; ) {
@@ -4333,7 +4326,7 @@ NS_IMETHODIMP PresShell::GetLinkLocation(nsIDOMNode* aNode, nsAString& aLocation
   NS_ENSURE_ARG_POINTER(aNode);
   nsresult rv;
   nsAutoString anchorText;
-  static const char strippedChars[] = "\t\r\n";
+  static char strippedChars[] = {'\t','\r','\n'};
 
   // are we an anchor?
   nsCOMPtr<nsIDOMHTMLAnchorElement> anchor(do_QueryInterface(aNode));
@@ -6266,42 +6259,8 @@ PresShell::HandleEvent(nsIView         *aView,
       // frame goes away while it is focused.
       if (!mCurrentEventContent || !GetCurrentEventFrame())
         mCurrentEventContent = mDocument->GetRootContent();
-
-      if (aEvent->message == NS_KEY_DOWN) {
-        NS_IF_RELEASE(gKeyDownTarget);
-        NS_IF_ADDREF(gKeyDownTarget = mCurrentEventContent);
-      }
-      else if ((aEvent->message == NS_KEY_PRESS || aEvent->message == NS_KEY_UP) &&
-               gKeyDownTarget) {
-
-        nsCOMPtr<nsIContent> retargetContent = gKeyDownTarget;
-        if (aEvent->message == NS_KEY_UP) {
-          NS_RELEASE(gKeyDownTarget);
-        }
-
-        // If a different element is now focused for the keypress/keyup event
-        // than what was focused during the keydown event, check if the new
-        // focused element is not in a chrome document any more, and if so,
-        // retarget the event back at the keydown target. This prevents a
-        // content area from grabbing the focus from chrome in-between key
-        // events.
-        if (mCurrentEventContent &&
-            nsContentUtils::IsChromeDoc(retargetContent->GetCurrentDoc()) &&
-            !nsContentUtils::IsChromeDoc(mCurrentEventContent->GetCurrentDoc())) {
-
-          nsIDocument* retargetDoc = retargetContent->GetCurrentDoc();
-          if (retargetDoc) {
-            nsCOMPtr<nsIPresShell> retargetShell = retargetDoc->GetPrimaryShell();
-            if (retargetShell) {
-              rv = retargetShell->HandleEventWithTarget(aEvent, nsnull, retargetContent, aEventStatus);
-              PopCurrentEventInfo();
-              return rv;
-            }
-          }
-        }
-      }
-
       mCurrentEventFrame = nsnull;
+
         
       if (!mCurrentEventContent || InZombieDocument(mCurrentEventContent)) {
         rv = RetargetEventToParent(aEvent, aEventStatus);
@@ -6422,8 +6381,8 @@ PresShell::HandleEventWithTarget(nsEvent* aEvent, nsIFrame* aFrame,
   return NS_OK;
 }
 
-static inline PRBool
-IsSynthesizedMouseEvent(nsEvent* aEvent)
+inline PRBool
+IsSynthesizedMouseMove(nsEvent* aEvent)
 {
   return aEvent->eventStructType == NS_MOUSE_EVENT &&
          static_cast<nsMouseEvent*>(aEvent)->reason != nsMouseEvent::eReal;
@@ -6548,16 +6507,9 @@ PresShell::HandleEventInternal(nsEvent* aEvent, nsIView *aView,
 
     // 2. Give event to the DOM for third party and JS use.
     if (GetCurrentEventFrame() && NS_SUCCEEDED(rv)) {
-      PRBool wasHandlingKeyBoardEvent =
-        nsContentUtils::IsHandlingKeyBoardEvent();
-      if (aEvent->eventStructType == NS_KEY_EVENT) {
-        nsContentUtils::SetIsHandlingKeyBoardEvent(PR_TRUE);
-      }
       // We want synthesized mouse moves to cause mouseover and mouseout
       // DOM events (PreHandleEvent above), but not mousemove DOM events.
-      // Synthesized button up events also do not cause DOM events
-      // because they do not have a reliable refPoint.
-      if (!IsSynthesizedMouseEvent(aEvent)) {
+      if (!IsSynthesizedMouseMove(aEvent)) {
         nsPresShellEventCB eventCB(this);
         if (mCurrentEventContent) {
           nsEventDispatcher::Dispatch(mCurrentEventContent, mPresContext,
@@ -6576,8 +6528,6 @@ PresShell::HandleEventInternal(nsEvent* aEvent, nsIView *aView,
           }
         }
       }
-
-      nsContentUtils::SetIsHandlingKeyBoardEvent(wasHandlingKeyBoardEvent);
 
       // 3. Give event to event manager for post event state changes and
       //    generation of synthetic events.

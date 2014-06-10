@@ -759,8 +759,7 @@
         </body>
       </method>
 
-      <method name="getWindowTitleForBrowser">
-        <parameter name="aBrowser"/>
+      <method name="updateTitlebar">
         <body>
           <![CDATA[
             var newTitle = "";
@@ -768,8 +767,8 @@
             var docElement = this.ownerDocument.documentElement;
             var sep = docElement.getAttribute("titlemenuseparator");
 
-            if (aBrowser.docShell.contentViewer)
-              docTitle = aBrowser.contentTitle;
+            if (this.docShell.contentViewer)
+              docTitle = this.contentTitle;
 
             if (!docTitle)
               docTitle = docElement.getAttribute("titledefault");
@@ -789,7 +788,7 @@
             try {
               if (docElement.getAttribute("chromehidden").indexOf("location") != -1) {
                 var uri = this.mURIFixup.createExposableURI(
-                            aBrowser.currentURI);
+                            this.mCurrentBrowser.currentURI);
                 if (uri.scheme == "about")
                   newTitle = uri.spec + sep + newTitle;
                 else
@@ -797,15 +796,7 @@
               }
             } catch (e) {}
 
-            return newTitle;
-          ]]>
-        </body>
-      </method>
-
-      <method name="updateTitlebar">
-        <body>
-          <![CDATA[
-            this.ownerDocument.title = this.getWindowTitleForBrowser(this.mCurrentBrowser);
+            this.ownerDocument.title = newTitle;
           ]]>
         </body>
       </method>
@@ -891,12 +882,12 @@
                 }
             }
 
-            // Don't switch the fast find or update the titlebar (bug 540248) - this tab switch is temporary
-            if (!this._previewMode) {
+            // Don't switch the fast find - this tab switch is temporary
+            if (!this._previewMode)
               this._fastFind.setDocShell(this.mCurrentBrowser.docShell);
 
-              this.updateTitlebar();
-            }
+            // Update the window title.
+            this.updateTitlebar();
 
             // If the new tab is busy, and our current state is not busy, then
             // we need to fire a start to all progress listeners.
@@ -1482,7 +1473,7 @@
 
             if (!aTabWillBeMoved) {
               let ds = browser.docShell;
-              if (ds && ds.contentViewer && !ds.contentViewer.permitUnload())
+              if (ds.contentViewer && !ds.contentViewer.permitUnload())
                 return null;
             }
 
@@ -2168,7 +2159,7 @@
               // valid urls don't contain spaces ' '; if we have a space it isn't a valid url.
               // Also disallow dropping javascript: or data: urls--bail out
               if (!url || !url.length || url.indexOf(" ", 0) != -1 ||
-                  /^\s*(javascript|data):/i.test(url))
+                  /^\s*(javascript|data):/.test(url))
                 return;
 
               // XXXmano: temporary fix until dragDropSecurityCheck make the

@@ -788,8 +788,6 @@ nsPromptService::DoDialog(nsIDOMWindow *aParent,
     aParent = activeParent;
   }
 
-  aParamBlock->SetInt(eButtonPressed, 1);
-
   nsCOMPtr<nsISupports> arguments(do_QueryInterface(aParamBlock));
   nsCOMPtr<nsIDOMWindow> dialog;
   rv = mWatcher->OpenWindow(aParent, aChromeURL, "_blank",

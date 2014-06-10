@@ -214,8 +214,7 @@ NS_IMETHODIMP nsSVGLengthList::Clear()
 NS_IMETHODIMP nsSVGLengthList::Initialize(nsIDOMSVGLength *newItem,
                                           nsIDOMSVGLength **_retval)
 {
-  nsCOMPtr<nsISVGLength> length = do_QueryInterface(newItem);
-  if (!length) {
+  if (!newItem) {
     *_retval = nsnull;
     return NS_ERROR_DOM_SVG_WRONG_TYPE_ERR;
   }

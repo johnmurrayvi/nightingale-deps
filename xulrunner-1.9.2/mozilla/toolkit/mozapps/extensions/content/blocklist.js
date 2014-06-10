@@ -42,16 +42,6 @@ function init() {
   var hasSoftBlocks = false;
   gArgs = window.arguments[0].wrappedJSObject;
 
-  // NOTE: We use strings from the "updates.properties" bundleset to change the
-  // text on the "Cancel" button to "Restart Later". (bug 523784)
-  let strings = Components.classes["@mozilla.org/intl/stringbundle;1"].
-                getService(Components.interfaces.nsIStringBundleService);
-  let bundle = strings.createBundle("chrome://mozapps/locale/update/updates.properties");
-  let cancelButton = document.documentElement.getButton("cancel");
-  cancelButton.setAttribute("label", bundle.GetStringFromName("restartLaterButton"));
-  cancelButton.setAttribute("accesskey",
-                            bundle.GetStringFromName("restartLaterButton.accesskey"));
-
   var richlist = document.getElementById("addonList");
   var list = gArgs.list;
   list.sort(function(a, b) { return String.localeCompare(a.name, b.name); });
@@ -85,8 +75,8 @@ function init() {
   link.setAttribute("href", url);
 }
 
-function finish(shouldRestartNow) {
-  gArgs.restart = shouldRestartNow;
+function accept() {
+  gArgs.restart = true;
   var list = gArgs.list;
   var items = document.getElementById("addonList").childNodes;
   for (let i = 0; i < list.length; i++) {

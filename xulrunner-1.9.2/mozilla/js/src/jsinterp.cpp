@@ -1862,8 +1862,6 @@ js_InvokeConstructor(JSContext *cx, uintN argc, JSBool clampReturn, jsval *vp)
     if (!obj)
         return JS_FALSE;
 
-    JSAutoTempValueRooter tvr(cx, obj);
-
     /* Now we have an object with a constructor method; call it. */
     vp[1] = OBJECT_TO_JSVAL(obj);
     if (!js_Invoke(cx, argc, vp, JSINVOKE_CONSTRUCT))
@@ -2060,7 +2058,7 @@ js_GetUpvar(JSContext *cx, uintN level, uintN cookie)
     uintN slot = UPVAR_FRAME_SLOT(cookie);
     jsval *vp;
 
-    if (!fp->fun || (fp->flags & JSFRAME_EVAL)) {
+    if (!fp->fun) {
         vp = fp->slots + fp->script->nfixed;
     } else if (slot < fp->fun->nargs) {
         vp = fp->argv;
@@ -3069,6 +3067,7 @@ js_Interpret(JSContext *cx)
         // Handle other exceptions as if they came from the imacro-calling pc.
         regs.pc = fp->imacpc;
         fp->imacpc = NULL;
+        atoms = script->atomMap.vector;
     }
 
     JS_ASSERT((size_t)((fp->imacpc ? fp->imacpc : regs.pc) - script->code) < script->length);
@@ -3090,9 +3089,6 @@ js_Interpret(JSContext *cx)
         JSTrapHandler handler;
         JSTryNote *tn, *tnlimit;
         uint32 offset;
-
-        /* Restore atoms local in case we will resume. */
-        atoms = script->atomMap.vector;
 
         /* Call debugger throw hook if set. */
         handler = cx->debugHooks->throwHook;

@@ -145,8 +145,6 @@ public:
   virtual ~imgContainer();
 
 private:
-  friend class imgRequest;
-
   struct Anim
   {
     //! Area of the first frame that needs to be redrawn on subsequent loops.

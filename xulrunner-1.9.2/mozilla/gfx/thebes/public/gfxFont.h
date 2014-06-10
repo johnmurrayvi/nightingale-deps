@@ -206,8 +206,6 @@ public:
 
     const nsString& FamilyName();
 
-    gfxFontFamily    *Family() { return mFamily; }
-
     nsString         mName;
 
     PRPackedBool     mItalic      : 1;

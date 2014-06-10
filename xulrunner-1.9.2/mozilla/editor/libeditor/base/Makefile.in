@@ -109,5 +109,4 @@ include $(topsrcdir)/config/rules.mk
 
 INCLUDES	+= \
 		-I$(topsrcdir)/content/base/src \
-		-I$(topsrcdir)/layout/style \
 		$(NULL)

@@ -236,7 +236,7 @@ ReifyPropertyOps(JSContext *cx, JSObject *obj, jsval idval, jsid interned_id,
 }
 
 static JSBool
-LookupGetterOrSetter(JSContext *cx, JSBool wantGetter, uintN argc, jsval *vp)
+LookupGetterOrSetter(JSContext *cx, JSBool wantGetter, jsval *vp)
 {
     uintN attrs;
     JSBool found;
@@ -246,13 +246,6 @@ LookupGetterOrSetter(JSContext *cx, JSBool wantGetter, uintN argc, jsval *vp)
     jsval v;
 
     XPC_QS_ASSERT_CONTEXT_OK(cx);
-
-    if(argc == 0)
-    {
-        JS_SET_RVAL(cx, vp, JSVAL_VOID);
-        return JS_TRUE;
-    }
-
     JSObject *obj = JS_THIS_OBJECT(cx, vp);
     if (!obj)
         return JS_FALSE;
@@ -323,13 +316,13 @@ LookupGetterOrSetter(JSContext *cx, JSBool wantGetter, uintN argc, jsval *vp)
 static JSBool
 SharedLookupGetter(JSContext *cx, uintN argc, jsval *vp)
 {
-    return LookupGetterOrSetter(cx, PR_TRUE, argc, vp);
+    return LookupGetterOrSetter(cx, PR_TRUE, vp);
 }
 
 static JSBool
 SharedLookupSetter(JSContext *cx, uintN argc, jsval *vp)
 {
-    return LookupGetterOrSetter(cx, PR_FALSE, argc, vp);
+    return LookupGetterOrSetter(cx, PR_FALSE, vp);
 }
 
 // XXX Hack! :-/

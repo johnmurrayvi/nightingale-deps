@@ -57,7 +57,6 @@
 #include "nsIScriptSecurityManager.h"
 #include "nsIServiceManager.h"
 #include "nsCRT.h"
-#include "nsNetUtil.h"
 
 #include "nsTraceRefcnt.h"
 
@@ -104,70 +103,38 @@ nsCSecurityContext::Implies(const char* target, const char* action, PRBool *bAll
     return NS_OK;
 }
 
-nsresult
-nsCSecurityContext::GetOriginImpl(nsXPIDLCString& origin)
-{
-    nsresult rv = NS_OK;
 
-    if (!m_pPrincipal) {
-        // Get the Script Security Manager.
-        nsCOMPtr<nsIScriptSecurityManager> secMan =
-             do_GetService(NS_SCRIPTSECURITYMANAGER_CONTRACTID, &rv);
-        if (NS_FAILED(rv) || !secMan)
-            return NS_ERROR_FAILURE;
-
-        secMan->GetSubjectPrincipal(getter_AddRefs(m_pPrincipal));
-        if (!m_pPrincipal)
-            return NS_ERROR_FAILURE;
-    }
-
-    m_pPrincipal->GetOrigin(getter_Copies(origin));
-    if (origin.IsEmpty())
-        return NS_ERROR_FAILURE;
-
-    return NS_OK;
-}
-
-// This method is called from the OJI plugin without checking its return
-// value (from getAndPackSecurityInfo() in remotejni.cpp).  So we need to
-// set the origin appropriately except in the very worst of circumstances,
-// and only then do an error return.
-NS_METHOD
+NS_METHOD 
 nsCSecurityContext::GetOrigin(char* buf, int buflen)
 {
-    nsXPIDLCString origin;
-    PRBool javaCompatible = PR_FALSE;
+    if (!m_pPrincipal) {
+        // Get the Script Security Manager.
+        nsresult rv = NS_OK;
+        nsCOMPtr<nsIScriptSecurityManager> secMan =
+             do_GetService(NS_SCRIPTSECURITYMANAGER_CONTRACTID, &rv);
+        if (NS_FAILED(rv) || !secMan) {
+            return NS_ERROR_FAILURE;
+        }
 
-    if (NS_SUCCEEDED(GetOriginImpl(origin))) {
-        if (NS_FAILED(NS_CheckIsJavaCompatibleURLString(origin, &javaCompatible)))
-            javaCompatible = PR_FALSE;
-    } else {
-        javaCompatible = PR_FALSE;
+        secMan->GetSubjectPrincipal(getter_AddRefs(m_pPrincipal));
+        if (!m_pPrincipal) {
+            return NS_ERROR_FAILURE;
+        }
     }
+
+    nsXPIDLCString origin;
+    m_pPrincipal->GetOrigin(getter_Copies(origin));
 
     PRInt32 originlen = origin.Length();
-
-    // Don't pass back a value that Java won't be able to understand or
-    // won't handle correctly.  Instead pass back something that Java will
-    // understand but won't be able to use to access the network, and for
-    // which same-origin checks will always fail.
-    if (!javaCompatible) {
-        if (mFakeOrigin.IsVoid()) {
-            if (NS_FAILED(NS_MakeRandomInvalidURLString(mFakeOrigin)))
-                return NS_ERROR_FAILURE;
-        }
-        origin.Assign(mFakeOrigin);
-        originlen = origin.Length();
-    }
-
-    if (originlen > buflen - 1)
+    if (origin.IsEmpty() || originlen > buflen - 1) {
         return NS_ERROR_FAILURE;
+    }
 
     // Copy the string into to user supplied buffer. Is there a better
     // way to do this?
 
     memcpy(buf, origin, originlen);
-    buf[originlen] = '\0'; // Gotta terminate it.
+    buf[originlen] = nsnull; // Gotta terminate it.
 
     return NS_OK;
 }

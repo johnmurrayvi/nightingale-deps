@@ -116,6 +116,10 @@ nsTextServicesDocument::nsTextServicesDocument()
 
 nsTextServicesDocument::~nsTextServicesDocument()
 {
+  nsCOMPtr<nsIEditor> editor (do_QueryReferent(mEditor));
+  if (editor && mNotifier)
+    editor->RemoveEditActionListener(mNotifier);
+
   ClearOffsetTable(&mOffsetTable);
 }
 
@@ -139,24 +143,33 @@ nsTextServicesDocument::Shutdown()
   NS_IF_RELEASE(sRangeHelper);
 }
 
-NS_IMPL_CYCLE_COLLECTING_ADDREF(nsTextServicesDocument)
-NS_IMPL_CYCLE_COLLECTING_RELEASE(nsTextServicesDocument)
+#define DEBUG_TEXT_SERVICES__DOCUMENT_REFCNT 1
 
-NS_INTERFACE_MAP_BEGIN(nsTextServicesDocument)
-  NS_INTERFACE_MAP_ENTRY(nsITextServicesDocument)
-  NS_INTERFACE_MAP_ENTRY(nsIEditActionListener)
-  NS_INTERFACE_MAP_ENTRY_AMBIGUOUS(nsISupports, nsITextServicesDocument)
-  NS_INTERFACE_MAP_ENTRIES_CYCLE_COLLECTION(nsTextServicesDocument)
-NS_INTERFACE_MAP_END
+#ifdef DEBUG_TEXT_SERVICES__DOCUMENT_REFCNT
 
-NS_IMPL_CYCLE_COLLECTION_7(nsTextServicesDocument,
-                           mDOMDocument,
-                           mSelCon,
-                           mIterator,
-                           mPrevTextBlock,
-                           mNextTextBlock,
-                           mExtent,
-                           mTxtSvcFilter)
+nsrefcnt nsTextServicesDocument::AddRef(void)
+{
+  return ++mRefCnt;
+}
+
+nsrefcnt nsTextServicesDocument::Release(void)
+{
+  NS_PRECONDITION(0 != mRefCnt, "dup release");
+  if (--mRefCnt == 0) {
+    NS_DELETEXPCOM(this);
+    return 0;
+  }
+  return mRefCnt;
+}
+
+#else
+
+NS_IMPL_ADDREF(nsTextServicesDocument)
+NS_IMPL_RELEASE(nsTextServicesDocument)
+
+#endif
+
+NS_IMPL_QUERY_INTERFACE1(nsTextServicesDocument, nsITextServicesDocument)
 
 NS_IMETHODIMP
 nsTextServicesDocument::InitWithEditor(nsIEditor *aEditor)
@@ -231,8 +244,17 @@ nsTextServicesDocument::InitWithEditor(nsIEditor *aEditor)
   }
 
   mEditor = do_GetWeakReference(aEditor);
+  nsTSDNotifier *notifier = new nsTSDNotifier(this);
 
-  result = aEditor->AddEditActionListener(this);
+  if (!notifier)
+  {
+    UNLOCK_DOC(this);
+    return NS_ERROR_OUT_OF_MEMORY;
+  }
+
+  mNotifier = do_QueryInterface(notifier);
+
+  result = aEditor->AddEditActionListener(mNotifier);
 
   UNLOCK_DOC(this);
 
@@ -1795,21 +1817,17 @@ nsTextServicesDocument::InsertText(const nsString *aText)
   return result;
 }
 
-NS_IMETHODIMP
-nsTextServicesDocument::DidInsertNode(nsIDOMNode *aNode,
-                                      nsIDOMNode *aParent,
-                                      PRInt32     aPosition,
-                                      nsresult    aResult)
+nsresult
+nsTextServicesDocument::InsertNode(nsIDOMNode *aNode,
+                                   nsIDOMNode *aParent,
+                                   PRInt32 aPosition)
 {
   return NS_OK;
 }
 
-NS_IMETHODIMP
-nsTextServicesDocument::DidDeleteNode(nsIDOMNode *aChild, nsresult aResult)
+nsresult
+nsTextServicesDocument::DeleteNode(nsIDOMNode *aChild)
 {
-  if (NS_FAILED(aResult))
-    return NS_OK;
-
   NS_ENSURE_TRUE(mIterator, NS_ERROR_FAILURE);
 
   //**** KDEBUG ****
@@ -1879,11 +1897,10 @@ nsTextServicesDocument::DidDeleteNode(nsIDOMNode *aChild, nsresult aResult)
   return NS_OK;
 }
 
-NS_IMETHODIMP
-nsTextServicesDocument::DidSplitNode(nsIDOMNode *aExistingRightNode,
-                                     PRInt32     aOffset,
-                                     nsIDOMNode *aNewLeftNode,
-                                     nsresult    aResult)
+nsresult
+nsTextServicesDocument::SplitNode(nsIDOMNode *aExistingRightNode,
+                                  PRInt32 aOffset,
+                                  nsIDOMNode *aNewLeftNode)
 {
   //**** KDEBUG ****
   // printf("** SplitNode: 0x%.8x  %d  0x%.8x\n", aExistingRightNode, aOffset, aNewLeftNode);
@@ -1892,15 +1909,11 @@ nsTextServicesDocument::DidSplitNode(nsIDOMNode *aExistingRightNode,
   return NS_OK;
 }
 
-NS_IMETHODIMP
-nsTextServicesDocument::DidJoinNodes(nsIDOMNode  *aLeftNode,
-                                     nsIDOMNode  *aRightNode,
-                                     nsIDOMNode  *aParent,
-                                     nsresult     aResult)
+nsresult
+nsTextServicesDocument::JoinNodes(nsIDOMNode  *aLeftNode,
+                                  nsIDOMNode  *aRightNode,
+                                  nsIDOMNode  *aParent)
 {
-  if (NS_FAILED(aResult))
-    return NS_OK;
-
   PRInt32 i;
   PRUint16 type;
   nsresult result;
@@ -2411,11 +2424,6 @@ nsTextServicesDocument::ClearDidSkip(nsIContentIterator* aFilteredIter)
 PRBool
 nsTextServicesDocument::IsBlockNode(nsIContent *aContent)
 {
-  if (!aContent) {
-    NS_ERROR("How did a null pointer get passed to IsBlockNode?");
-    return PR_FALSE;
-  }
-
   nsIAtom *atom = aContent->Tag();
 
   return (sAAtom       != atom &&
@@ -4134,86 +4142,3 @@ nsTextServicesDocument::PrintContentNode(nsIContent *aContent)
   fflush(stdout);
 }
 #endif
-
-NS_IMETHODIMP
-nsTextServicesDocument::WillInsertNode(nsIDOMNode *aNode,
-                              nsIDOMNode *aParent,
-                              PRInt32     aPosition)
-{
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-nsTextServicesDocument::WillDeleteNode(nsIDOMNode *aChild)
-{
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-nsTextServicesDocument::WillSplitNode(nsIDOMNode *aExistingRightNode,
-                             PRInt32     aOffset)
-{
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-nsTextServicesDocument::WillJoinNodes(nsIDOMNode  *aLeftNode,
-                             nsIDOMNode  *aRightNode,
-                             nsIDOMNode  *aParent)
-{
-  return NS_OK;
-}
-
-
-// -------------------------------
-// stubs for unused listen methods
-// -------------------------------
-
-NS_IMETHODIMP
-nsTextServicesDocument::WillCreateNode(const nsAString& aTag, nsIDOMNode *aParent, PRInt32 aPosition)
-{
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-nsTextServicesDocument::DidCreateNode(const nsAString& aTag, nsIDOMNode *aNode, nsIDOMNode *aParent, PRInt32 aPosition, nsresult aResult)
-{
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-nsTextServicesDocument::WillInsertText(nsIDOMCharacterData *aTextNode, PRInt32 aOffset, const nsAString &aString)
-{
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-nsTextServicesDocument::DidInsertText(nsIDOMCharacterData *aTextNode, PRInt32 aOffset, const nsAString &aString, nsresult aResult)
-{
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-nsTextServicesDocument::WillDeleteText(nsIDOMCharacterData *aTextNode, PRInt32 aOffset, PRInt32 aLength)
-{
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-nsTextServicesDocument::DidDeleteText(nsIDOMCharacterData *aTextNode, PRInt32 aOffset, PRInt32 aLength, nsresult aResult)
-{
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-nsTextServicesDocument::WillDeleteSelection(nsISelection *aSelection)
-{
-  return NS_OK;
-}
-
-NS_IMETHODIMP
-nsTextServicesDocument::DidDeleteSelection(nsISelection *aSelection)
-{
-  return NS_OK;
-}
-

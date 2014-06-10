@@ -315,10 +315,8 @@ main(int argc, char **argv)
   // 3) give up
 
   struct stat fileStat;
-  char *testp;
 
-  testp = realpath(argv[0], iniPath);
-  if (!(testp != NULL && stat(iniPath, &fileStat) == 0 && S_ISREG(fileStat.st_mode) && fileStat.st_mode & S_IXUSR) || (testp != NULL && stat(iniPath, &fileStat))) {
+  if (!realpath(argv[0], iniPath) || stat(iniPath, &fileStat)) {
     const char *path = getenv("PATH");
     if (!path)
       return 1;
@@ -331,7 +329,7 @@ main(int argc, char **argv)
     char *token = strtok(pathdup, ":");
     while (token) {
       sprintf(tmpPath, "%s/%s", token, argv[0]);
-      if (realpath(tmpPath, iniPath) && stat(iniPath, &fileStat) == 0 && S_ISREG(fileStat.st_mode) && fileStat.st_mode & S_IXUSR) {
+      if (realpath(tmpPath, iniPath) && stat(iniPath, &fileStat) == 0) {
         found = PR_TRUE;
         break;
       }

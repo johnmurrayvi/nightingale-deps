@@ -209,19 +209,17 @@ AddonRepository.prototype = {
               getService(Ci.nsIXULAppInfo).
               QueryInterface(Ci.nsIXULRuntime);
 
-    var guidList = element.getElementsByTagName("guid");
-    if (guidList.length != 1)
+    var guid = element.getElementsByTagName("guid");
+    if (guid.length != 1)
       return;
-
-    var guid = guidList[0].textContent.trim();
 
     // Ignore add-ons already seen in the results
     for (var i = 0; i < this._addons.length; i++)
-      if (this._addons[i].id == guid)
+      if (this._addons[i].id == guid[0].textContent)
         return;
 
     // Ignore installed add-ons
-    if (em.getItemForID(guid) != null)
+    if (em.getItemForID(guid[0].textContent) != null)
       return;
 
     // Ignore sandboxed add-ons
@@ -231,15 +229,14 @@ AddonRepository.prototype = {
       return;
 
     // Ignore add-ons not compatible with this OS
-    var osList = element.getElementsByTagName("compatible_os");
+    var os = element.getElementsByTagName("compatible_os");
     // Only the version 0 schema included compatible_os if it isn't there then
     // we will see os compatibility on the install elements.
-    if (osList.length > 0) {
+    if (os.length > 0) {
       var compatible = false;
       var i = 0;
-      while (i < osList.length && !compatible) {
-        var os = osList[i].textContent.trim();
-        if (os == "ALL" || os == app.OS) {
+      while (i < os.length && !compatible) {
+        if (os[i].textContent == "ALL" || os[i].textContent == app.OS) {
           compatible = true;
           break;
         }
@@ -259,10 +256,9 @@ AddonRepository.prototype = {
     var apps = tags[0].getElementsByTagName("appID");
     var i = 0;
     while (i < apps.length) {
-      if (apps[i].textContent.trim() == app.ID) {
-        var parent = apps[i].parentNode;
-        var minversion = parent.getElementsByTagName("min_version")[0].textContent.trim();
-        var maxversion = parent.getElementsByTagName("max_version")[0].textContent.trim();
+      if (apps[i].textContent == app.ID) {
+        var minversion = apps[i].parentNode.getElementsByTagName("min_version")[0].textContent;
+        var maxversion = apps[i].parentNode.getElementsByTagName("max_version")[0].textContent;
         if ((vc.compare(minversion, app.version) > 0) ||
             (vc.compare(app.version, maxversion) > 0))
           return;
@@ -275,7 +271,7 @@ AddonRepository.prototype = {
       return;
 
     var addon = new AddonSearchResult();
-    addon.id = guid;
+    addon.id = guid[0].textContent;
     addon.rating = -1;
     var node = element.firstChild;
     while (node) {
@@ -286,7 +282,7 @@ AddonRepository.prototype = {
           case "summary":
           case "description":
           case "eula":
-            addon[node.localName] = node.textContent.trim();
+            addon[node.localName] = node.textContent;
             break;
           case "rating":
             if (node.textContent.length > 0) {
@@ -296,13 +292,13 @@ AddonRepository.prototype = {
             }
             break;
           case "thumbnail":
-            addon.thumbnailURL = node.textContent.trim();
+            addon.thumbnailURL = node.textContent;
             break;
           case "icon":
-            addon.iconURL = node.textContent.trim();
+            addon.iconURL = node.textContent;
             break;
           case "learnmore":
-            addon.homepageURL = node.textContent.trim();
+            addon.homepageURL = node.textContent;
             break;
           case "type":
             // The type element has an id attribute that is the id from AMO's
@@ -320,7 +316,7 @@ AddonRepository.prototype = {
               if (os != "all" && os != app.OS.toLowerCase())
                 break;
             }
-            addon.xpiURL = node.textContent.trim();
+            addon.xpiURL = node.textContent;
             if (node.hasAttribute("hash"))
               addon.xpiHash = node.getAttribute("hash");
             break;

@@ -253,7 +253,6 @@ nsDOMWorkerTimeout::Init(JSContext* aCx, PRUint32 aArgc, jsval* aArgv,
   else {
     // If no interval was specified, treat this like a timeout, to avoid
     // setting an interval of 0 milliseconds.
-    interval = 0;
     aIsInterval = PR_FALSE;
   }
 

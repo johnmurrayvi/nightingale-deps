@@ -139,7 +139,7 @@ public:
 
 private:
     nsresult Restart();
-    nsresult ParseLine(char *line);
+    void     ParseLine(char *line);
     nsresult ParseLineSegment(char *seg, PRUint32 len);
     nsresult ParseHead(char *, PRUint32 count, PRUint32 *countRead);
     nsresult HandleContentStart();

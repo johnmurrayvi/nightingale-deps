@@ -334,7 +334,6 @@ public:
   virtual NS_HIDDEN_(nsresult) SetNewDocument(nsIDocument *aDocument,
                                               nsISupports *aState,
                                               PRBool aClearScopeHint);
-  void DispatchDOMWindowCreated();
   virtual NS_HIDDEN_(void) SetOpenerWindow(nsIDOMWindowInternal *aOpener,
                                            PRBool aOriginalOpener);
   virtual NS_HIDDEN_(void) EnsureSizeUpToDate();
@@ -450,8 +449,6 @@ public:
   static PRBool DOMWindowDumpEnabled();
 
 protected:
-  friend class nsBarProp;
-
   // Object Management
   virtual ~nsGlobalWindow();
   void CleanUp();
@@ -553,7 +550,6 @@ protected:
 
   // The timeout implementation functions.
   void RunTimeout(nsTimeout *aTimeout);
-  void RunTimeout() { RunTimeout(nsnull); }
 
   void ClearAllTimeouts();
   // Insert aTimeout into the list, before all timeouts that would

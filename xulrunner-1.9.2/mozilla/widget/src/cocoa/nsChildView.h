@@ -67,7 +67,7 @@
 
 class gfxASurface;
 class nsChildView;
-class nsITimer;
+union nsPluginPort;
 
 enum {
   // Currently focused ChildView (while this TSM document is active).
@@ -160,6 +160,11 @@ enum {
   BOOL mIsTransparent;
   PRIntervalTime mLastShadowInvalidation;
   BOOL mNeedsShadowInvalidation;
+  
+  // Since the native modal event loop can not be used with the gecko modal
+  // loop, we have to simulate the event ourselves. In order to accomplish this
+  // this view must disable click through to prevent window ordering.
+  BOOL mDisableView;
 
   // Holds our drag service across multiple drag calls. The reference to the
   // service is obtained when the mouse enters the view and is released when
@@ -228,6 +233,8 @@ enum {
 - (void)magnifyWithEvent:(NSEvent *)anEvent;
 - (void)rotateWithEvent:(NSEvent *)anEvent;
 - (void)endGestureWithEvent:(NSEvent *)anEvent;
+
+- (void)setViewDisabled:(BOOL)inIsDisabled;
 @end
 
 
@@ -243,15 +250,12 @@ public:
   static PRBool IsComposing() { return sComposingView ? PR_TRUE : PR_FALSE; }
   static PRBool IsIMEEnabled() { return sIsIMEEnabled; }
   static PRBool IgnoreCommit() { return sIgnoreCommit; }
-  // returns nsIWidget::IME_STATUS_*
-  static PRUint32 GetIMEEnabled() { return sIMEEnabledStatus; }
+
+  static void OnDestroyView(NSView<mozView>* aDestroyingView);
 
   // Note that we cannot get the actual state in TSM. But we can trust this
   // value. Because nsIMEStateManager reset this at every focus changing.
-  // XXX If plug-ins changed that, we cannot return correct state.
   static PRBool IsRomanKeyboardsOnly() { return sIsRomanKeyboardsOnly; }
-
-  static void OnDestroyView(NSView<mozView>* aDestroyingView);
 
   static PRBool GetIMEOpenState();
 
@@ -259,13 +263,12 @@ public:
   static void StartComposing(NSView<mozView>* aComposingView);
   static void UpdateComposing(NSString* aComposingString);
   static void EndComposing();
+  static void EnableIME(PRBool aEnable);
   static void SetIMEOpenState(PRBool aOpen);
-  static nsresult SetIMEEnabled(PRUint32 aEnabled);
+  static void SetRomanKeyboardsOnly(PRBool aRomanOnly);
 
   static void CommitIME();
   static void CancelIME();
-
-  static void Shutdown();
 private:
   static PRBool sIsIMEEnabled;
   static PRBool sIsRomanKeyboardsOnly;
@@ -273,15 +276,8 @@ private:
   static NSView<mozView>* sComposingView;
   static TSMDocumentID sDocumentID;
   static NSString* sComposingString;
-  static nsITimer* sSyncKeyScriptTimer;
-  static PRUint32 sIMEEnabledStatus; // nsIWidget::IME_STATUS_*
 
   static void KillComposing();
-  static void CallKeyScriptAPI();
-  static void SyncKeyScript(nsITimer* aTimer, void* aClosure);
-
-  static void EnableIME(PRBool aEnable);
-  static void SetRomanKeyboardsOnly(PRBool aRomanOnly);
 };
 
 //-------------------------------------------------------------------------

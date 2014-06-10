@@ -846,7 +846,6 @@ JavaObject_lookupProperty(JSContext *cx, JSObject *obj, jsid id,
             *objp = obj;
             *propp = (JSProperty*)1;
         }
-        js_SetObjectWeakRoot(cx, *objp);
     } else {
         *objp = NULL;
         *propp = NULL;

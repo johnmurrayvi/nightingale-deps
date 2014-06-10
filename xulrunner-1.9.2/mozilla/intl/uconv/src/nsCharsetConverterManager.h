@@ -46,11 +46,10 @@
 #include "nsINativeUConvService.h"
 #endif
 
-class nsCharsetConverterManager : public nsICharsetConverterManager_1_9_BRANCH
+class nsCharsetConverterManager : public nsICharsetConverterManager
 {
   NS_DECL_ISUPPORTS
   NS_DECL_NSICHARSETCONVERTERMANAGER
-  NS_DECL_NSICHARSETCONVERTERMANAGER_1_9_BRANCH
 
 public:
 

@@ -43,7 +43,7 @@ interface nsIOutputStream;
 
 %{C++
 #include "nsplugindefs.h"
-#include "nsStringGlue.h"
+#include "nsString.h"
 struct JSContext;
 struct JSObject;
 

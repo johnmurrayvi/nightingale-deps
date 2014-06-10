@@ -325,10 +325,8 @@ public:
     NS_IMETHOD GetThebesSurface(gfxASurface **surface);
     NS_IMETHOD SetIsOpaque(PRBool isOpaque);
 
-    // nsISupports interface + CC
-    NS_DECL_CYCLE_COLLECTING_ISUPPORTS
-
-    NS_DECL_CYCLE_COLLECTION_CLASS_AMBIGUOUS(nsCanvasRenderingContext2D, nsIDOMCanvasRenderingContext2D)
+    // nsISupports interface
+    NS_DECL_ISUPPORTS
 
     // nsIDOMCanvasRenderingContext2D interface
     NS_DECL_NSIDOMCANVASRENDERINGCONTEXT2D
@@ -361,8 +359,9 @@ protected:
     PRPackedBool mValid;
     PRPackedBool mOpaque;
 
-    // the canvas element we're a context of
-    nsCOMPtr<nsICanvasElement> mCanvasElement;
+    // the canvas element informs us when it's going away,
+    // so these are not nsCOMPtrs
+    nsICanvasElement* mCanvasElement;
 
     // If mCanvasElement is not provided, then a docshell is
     nsCOMPtr<nsIDocShell> mDocShell;
@@ -655,18 +654,10 @@ protected:
     friend struct nsCanvasBidiProcessor;
 };
 
-NS_IMPL_CYCLE_COLLECTING_ADDREF_AMBIGUOUS(nsCanvasRenderingContext2D, nsIDOMCanvasRenderingContext2D)
-NS_IMPL_CYCLE_COLLECTING_RELEASE_AMBIGUOUS(nsCanvasRenderingContext2D, nsIDOMCanvasRenderingContext2D)
+NS_IMPL_ADDREF(nsCanvasRenderingContext2D)
+NS_IMPL_RELEASE(nsCanvasRenderingContext2D)
 
-NS_IMPL_CYCLE_COLLECTION_CLASS(nsCanvasRenderingContext2D)
-NS_IMPL_CYCLE_COLLECTION_UNLINK_BEGIN(nsCanvasRenderingContext2D)
-  NS_IMPL_CYCLE_COLLECTION_UNLINK_NSCOMPTR(mCanvasElement)
-NS_IMPL_CYCLE_COLLECTION_UNLINK_END
-NS_IMPL_CYCLE_COLLECTION_TRAVERSE_BEGIN(nsCanvasRenderingContext2D)
-  NS_IMPL_CYCLE_COLLECTION_TRAVERSE_NSCOMPTR(mCanvasElement)
-NS_IMPL_CYCLE_COLLECTION_TRAVERSE_END
-
-NS_INTERFACE_MAP_BEGIN_CYCLE_COLLECTION(nsCanvasRenderingContext2D)
+NS_INTERFACE_MAP_BEGIN(nsCanvasRenderingContext2D)
   NS_INTERFACE_MAP_ENTRY(nsIDOMCanvasRenderingContext2D)
   NS_INTERFACE_MAP_ENTRY(nsICanvasRenderingContextInternal)
   NS_INTERFACE_MAP_ENTRY_AMBIGUOUS(nsISupports, nsIDOMCanvasRenderingContext2D)
@@ -855,10 +846,8 @@ nsCanvasRenderingContext2D::ApplyStyle(Style aWhichStyle,
 nsresult
 nsCanvasRenderingContext2D::Redraw()
 {
-    if (!mCanvasElement) {
-        NS_ASSERTION(mDocShell, "Redraw with no canvas element or docshell!");
+    if (!mCanvasElement)
         return NS_OK;
-    }
 
     if (mIsEntireFrameInvalid)
         return NS_OK;
@@ -870,10 +859,8 @@ nsCanvasRenderingContext2D::Redraw()
 nsresult
 nsCanvasRenderingContext2D::Redraw(const gfxRect& r)
 {
-    if (!mCanvasElement) {
-        NS_ASSERTION(mDocShell, "Redraw with no canvas element or docshell!");
+    if (!mCanvasElement)
         return NS_OK;
-    }
 
     if (mIsEntireFrameInvalid)
         return NS_OK;
@@ -940,9 +927,6 @@ nsCanvasRenderingContext2D::InitializeWithSurface(nsIDocShell *docShell, gfxASur
     mSaveCount = 0;
 
     ContextState *state = mStyleStack.AppendElement();
-    if (!state) {
-        return NS_ERROR_OUT_OF_MEMORY;
-    }
     state->globalAlpha = 1.0;
 
     state->colorStyles[STYLE_FILL] = NS_RGB(0,0,0);
@@ -1085,6 +1069,7 @@ nsCanvasRenderingContext2D::GetInputStream(const char *aMimeType,
 NS_IMETHODIMP
 nsCanvasRenderingContext2D::SetCanvasElement(nsICanvasElement* aCanvasElement)
 {
+    // don't hold a ref to this!
     mCanvasElement = aCanvasElement;
 
     return NS_OK;
@@ -1109,9 +1094,7 @@ NS_IMETHODIMP
 nsCanvasRenderingContext2D::Save()
 {
     ContextState state = CurrentState();
-    if (!mStyleStack.AppendElement(state)) {
-        return NS_ERROR_OUT_OF_MEMORY;
-    }
+    mStyleStack.AppendElement(state);
     mThebes->Save();
     mSaveCount++;
     return NS_OK;
@@ -3432,17 +3415,7 @@ nsCanvasRenderingContext2D::GetImageData()
     if (!mValid)
         return NS_ERROR_FAILURE;
 
-    if (!mCanvasElement && !mDocShell) {
-        NS_ERROR("No canvas element and no docshell in GetImageData!!!");
-        return NS_ERROR_DOM_SECURITY_ERR;
-    }
-
-    // Check only if we have a canvas element; if we were created with a docshell,
-    // then it's special internal use.
-    if (mCanvasElement &&
-        mCanvasElement->IsWriteOnly() &&
-        !nsContentUtils::IsCallerTrustedForRead())
-    {
+    if (mCanvasElement && mCanvasElement->IsWriteOnly() && !nsContentUtils::IsCallerTrustedForRead()) {
         // XXX ERRMSG we need to report an error to developers here! (bug 329026)
         return NS_ERROR_DOM_SECURITY_ERR;
     }

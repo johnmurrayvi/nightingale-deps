@@ -180,11 +180,6 @@ CanCallerAccess(JSContext *cx, JSObject *unsafeObj)
 #define XPC_SJOW_SLOT_PRINCIPAL              1
 
 
-// Slot for holding the function that we fill our fake frame with.
-static const PRUint32 sScopeFunSlot = XPCWrapper::sNumSlots + 1;
-
-static const PRUint32 sSJOWSlots = XPCWrapper::sNumSlots + 2;
-
 // Returns a weak reference.
 static nsIPrincipal *
 FindObjectPrincipals(JSContext *cx, JSObject *safeObj, JSObject *innerObj)
@@ -224,7 +219,7 @@ JSExtendedClass sXPC_SJOW_JSClass = {
   // JSClass (JSExtendedClass.base) initialization
   { "XPCSafeJSObjectWrapper",
     JSCLASS_NEW_RESOLVE | JSCLASS_IS_EXTENDED |
-    JSCLASS_HAS_RESERVED_SLOTS(sSJOWSlots),
+    JSCLASS_HAS_RESERVED_SLOTS(XPCWrapper::sNumSlots + 3),
     XPC_SJOW_AddProperty, XPC_SJOW_DelProperty,
     XPC_SJOW_GetProperty, XPC_SJOW_SetProperty,
     XPC_SJOW_Enumerate,   (JSResolveOp)XPC_SJOW_NewResolve,
@@ -247,12 +242,6 @@ static JSBool
 XPC_SJOW_toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
                   jsval *rval);
 
-
-static JSBool
-DummyNative(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
-{
-  return JS_TRUE;
-}
 
 // Wrap a JS value in a safe wrapper of a function wrapper if
 // needed. Note that rval must point to something rooted when calling
@@ -394,42 +383,6 @@ UnwrapJSValue(jsval val)
   return val;
 }
 
-static JSObject *
-GetScopeFunction(JSContext *cx, JSObject *outerObj)
-{
-  jsval v;
-  if (!JS_GetReservedSlot(cx, outerObj, sScopeFunSlot, &v)) {
-    return nsnull;
-  }
-
-  JSObject *unsafeObj = GetUnsafeObject(outerObj);
-  JSObject *scopeobj = JS_GetGlobalForObject(cx, unsafeObj);
-  OBJ_TO_INNER_OBJECT(cx, scopeobj);
-  if (!scopeobj) {
-    return nsnull;
-  }
-
-  if (JSVAL_IS_OBJECT(v)) {
-    JSObject *funobj = JSVAL_TO_OBJECT(v);
-    if (JS_GetGlobalForObject(cx, funobj) == scopeobj) {
-      return funobj;
-    }
-  }
-
-  JSFunction *fun = JS_NewFunction(cx, DummyNative, 0, 0, scopeobj,
-                                   "SJOWContentBoundary");
-  if (!fun) {
-    return nsnull;
-  }
-
-  JSObject *funobj = JS_GetFunctionObject(fun);
-  if (!JS_SetReservedSlot(cx, outerObj, sScopeFunSlot, OBJECT_TO_JSVAL(funobj))) {
-    return nsnull;
-  }
-
-  return funobj;
-}
-
 static JSBool
 XPC_SJOW_AddProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
@@ -500,7 +453,7 @@ public:
       }
     }
 
-    js_SaveAndClearRegExpStatics(cx, &statics, &tvr, &tvr2);
+    js_SaveAndClearRegExpStatics(cx, &statics, &tvr);
     fp = JS_SaveFrameChain(cx);
     options =
       JS_SetOptions(cx, JS_GetOptions(cx) | JSOPTION_DONT_REPORT_UNCAUGHT);
@@ -514,7 +467,7 @@ public:
     if (cx) {
       JS_SetOptions(cx, options);
       JS_RestoreFrameChain(cx, fp);
-      js_RestoreRegExpStatics(cx, &statics, &tvr, &tvr2);
+      js_RestoreRegExpStatics(cx, &statics, &tvr);
       nsIScriptSecurityManager_1_9_2 *ssm = XPCWrapper::GetSecurityManager();
       if (ssm) {
         ssm->PopContextPrincipal(cx);
@@ -526,7 +479,6 @@ private:
   JSContext *cx;
   JSRegExpStatics statics;
   JSTempValueRooter tvr;
-  JSTempValueRooter tvr2;
   uint32 options;
   JSStackFrame *fp;
 };
@@ -554,11 +506,6 @@ XPC_SJOW_GetOrSetProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp,
     return JS_FALSE;
   }
 
-  JSObject *scopeFun = GetScopeFunction(cx, obj);
-  if (!scopeFun) {
-    return JS_FALSE;
-  }
-
   {
     SafeCallGuard guard(cx, FindObjectPrincipals(cx, obj, unsafeObj));
     if (!guard.ready()) {
@@ -575,10 +522,8 @@ XPC_SJOW_GetOrSetProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp,
     }
 
     JSBool ok = aIsSet
-                ? js_SetPropertyByIdWithFakeFrame(cx, unsafeObj, scopeFun,
-                                                  interned_id, vp)
-                : js_GetPropertyByIdWithFakeFrame(cx, unsafeObj, scopeFun,
-                                                  interned_id, vp);
+                ? JS_SetPropertyById(cx, unsafeObj, interned_id, vp)
+                : JS_GetPropertyById(cx, unsafeObj, interned_id, vp);
     if (!ok) {
       return JS_FALSE;
     }
@@ -776,11 +721,6 @@ XPC_SJOW_Call(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     return JS_FALSE;
   }
 
-  JSObject *scopeFun = GetScopeFunction(cx, safeObj);
-  if (!scopeFun) {
-    return JS_FALSE;
-  }
-
   {
     SafeCallGuard guard(cx, FindObjectPrincipals(cx, safeObj, funToCall));
 
@@ -788,9 +728,8 @@ XPC_SJOW_Call(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
       argv[i] = UnwrapJSValue(argv[i]);
     }
 
-    if (!js_CallFunctionValueWithFakeFrame(cx, callThisObj, scopeFun,
-                                           OBJECT_TO_JSVAL(funToCall),
-                                           argc, argv, rval)) {
+    if (!JS_CallFunctionValue(cx, callThisObj, OBJECT_TO_JSVAL(funToCall),
+                              argc, argv, rval)) {
       return JS_FALSE;
     }
   }
@@ -888,20 +827,14 @@ XPC_SJOW_Create(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
     return JS_FALSE;
   }
 
-  JSObject *scopeFun = GetScopeFunction(cx, callee);
-  if (!scopeFun) {
-    return JS_FALSE;
-  }
-
   {
     SafeCallGuard guard(cx, FindObjectPrincipals(cx, callee, unsafeObj));
     if (!guard.ready()) {
       return JS_FALSE;
     }
 
-    if (!js_CallFunctionValueWithFakeFrame(cx, obj, scopeFun,
-                                           OBJECT_TO_JSVAL(callee),
-                                           argc, argv, rval)) {
+    if (!JS_CallFunctionValue(cx, obj, OBJECT_TO_JSVAL(callee),
+                              argc, argv, rval)) {
       return JS_FALSE;
     }
   }

@@ -1496,7 +1496,6 @@ void
 nsCacheService::OnProfileShutdown(PRBool cleanse)
 {
     if (!gService)  return;
-    if (!gService->mInitialized)  return;
     nsCacheServiceAutoLock lock;
 
     gService->DoomActiveEntries();

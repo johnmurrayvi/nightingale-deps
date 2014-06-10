@@ -29,7 +29,7 @@
  *   Daniel Glazman <glazman@netscape.com>
  *   Neil Deakin <neil@mozdevgroup.com>
  *   Masayuki Nakano <masayuki@d-toybox.com>
- *   Mats Palmgren <matspal@gmail.com>
+ *   Mats Palmgren <mats.palmgren@bredband.net>
  *   Uri Bernstein <uriber@gmail.com>
  *   Stephen Blackheath <entangled.mooched.stephen@blacksapphire.com>
  *   Michael Ventnor <m.ventnor@gmail.com>
@@ -348,101 +348,44 @@ DestroyUserData(void* aUserData)
   }
 }
 
-/**
- * Remove |aTextRun| from the frame continuation chain starting at
- * |aStartContinuation| if non-null, otherwise starting at |aFrame|.
- * Unmark |aFrame| as a text run owner if it's the frame we start at.
- * Return PR_TRUE if |aStartContinuation| is non-null and was found
- * in the next-continuation chain of |aFrame|.
- */
-static PRBool
-ClearAllTextRunReferences(nsTextFrame* aFrame, gfxTextRun* aTextRun,
-                          nsTextFrame* aStartContinuation)
+// Remove the textrun from the frame continuation chain starting at aFrame,
+// which should be marked as a textrun owner.
+static void
+ClearAllTextRunReferences(nsTextFrame* aFrame, gfxTextRun* aTextRun)
 {
-  NS_PRECONDITION(aFrame, "");
-  NS_PRECONDITION(!aStartContinuation ||
-                  !aStartContinuation->GetTextRun() ||
-                  aStartContinuation->GetTextRun() == aTextRun,
-                  "wrong aStartContinuation for this text run");
-
-  if (!aStartContinuation || aStartContinuation == aFrame) {
-    aFrame->RemoveStateBits(TEXT_IN_TEXTRUN_USER_DATA);
-  } else {
-    do {
-      NS_ASSERTION(aFrame->GetType() == nsGkAtoms::textFrame, "Bad frame");
-      aFrame = static_cast<nsTextFrame*>(aFrame->GetNextContinuation());
-    } while (aFrame && aFrame != aStartContinuation);
-  }
-  PRBool found = aStartContinuation == aFrame;
+  aFrame->RemoveStateBits(TEXT_IN_TEXTRUN_USER_DATA);
   while (aFrame) {
-    NS_ASSERTION(aFrame->GetType() == nsGkAtoms::textFrame, "Bad frame");
+    NS_ASSERTION(aFrame->GetType() == nsGkAtoms::textFrame,
+                 "Bad frame");
     if (aFrame->GetTextRun() != aTextRun)
       break;
     aFrame->SetTextRun(nsnull);
     aFrame = static_cast<nsTextFrame*>(aFrame->GetNextContinuation());
   }
-  NS_POSTCONDITION(!found || aStartContinuation, "how did we find null?");
-  return found;
 }
 
-/**
- * Kill all references to |aTextRun| starting at |aStartContinuation|.
- * It could be referenced by any of its owners, and all their in-flows.
- * If |aStartContinuation| is null then process all userdata frames
- * and their continuations.
- * @note the caller is expected to take care of possibly destroying the
- * text run if all userdata frames were reset (userdata is deallocated
- * by this function though). The caller can detect this has occured by
- * checking |aTextRun->GetUserData() == nsnull|.
- */
+// Figure out which frames 
 static void
-UnhookTextRunFromFrames(gfxTextRun* aTextRun, nsTextFrame* aStartContinuation)
+UnhookTextRunFromFrames(gfxTextRun* aTextRun)
 {
   if (!aTextRun->GetUserData())
     return;
 
+  // Kill all references to the textrun. It could be referenced by any of its
+  // owners, and all their in-flows.
   if (aTextRun->GetFlags() & nsTextFrameUtils::TEXT_IS_SIMPLE_FLOW) {
-    nsIFrame* userDataFrame = static_cast<nsIFrame*>(aTextRun->GetUserData());
-    PRBool found =
-      ClearAllTextRunReferences(static_cast<nsTextFrame*>(userDataFrame),
-                                aTextRun, aStartContinuation);
-    NS_ASSERTION(!aStartContinuation || found,
-                 "aStartContinuation wasn't found in simple flow text run");
-    if (!(userDataFrame->GetStateBits() & TEXT_IN_TEXTRUN_USER_DATA)) {
-      aTextRun->SetUserData(nsnull);
-    }
+    nsIFrame* firstInFlow = static_cast<nsIFrame*>(aTextRun->GetUserData());
+    ClearAllTextRunReferences(static_cast<nsTextFrame*>(firstInFlow), aTextRun);
   } else {
     TextRunUserData* userData =
       static_cast<TextRunUserData*>(aTextRun->GetUserData());
-    PRInt32 destroyFromIndex = aStartContinuation ? -1 : 0;
-    for (PRInt32 i = 0; i < userData->mMappedFlowCount; ++i) {
-      nsTextFrame* userDataFrame = userData->mMappedFlows[i].mStartFrame;
-      PRBool found =
-        ClearAllTextRunReferences(userDataFrame, aTextRun,
-                                  aStartContinuation);
-      if (found) {
-        if (userDataFrame->GetStateBits() & TEXT_IN_TEXTRUN_USER_DATA) {
-          destroyFromIndex = i + 1;
-        }
-        else {
-          destroyFromIndex = i;
-        }
-        aStartContinuation = nsnull;
-      }
+    PRInt32 i;
+    for (i = 0; i < userData->mMappedFlowCount; ++i) {
+      ClearAllTextRunReferences(userData->mMappedFlows[i].mStartFrame, aTextRun);
     }
-    NS_ASSERTION(destroyFromIndex >= 0,
-                 "aStartContinuation wasn't found in multi flow text run");
-    if (destroyFromIndex == 0) {
-      DestroyUserData(userData);
-      aTextRun->SetUserData(nsnull);
-    }
-    else {
-      userData->mMappedFlowCount = destroyFromIndex;
-      if (userData->mLastFlowIndex >= destroyFromIndex) {
-        userData->mLastFlowIndex = destroyFromIndex - 1;
-      }
-    }
+    DestroyUserData(userData);
   }
+  aTextRun->SetUserData(nsnull);  
 }
 
 class FrameTextRunCache;
@@ -472,7 +415,7 @@ public:
 
   // This gets called when the timeout has expired on a gfxTextRun
   virtual void NotifyExpired(gfxTextRun* aTextRun) {
-    UnhookTextRunFromFrames(aTextRun, nsnull);
+    UnhookTextRunFromFrames(aTextRun);
     RemoveFromCache(aTextRun);
     delete aTextRun;
   }
@@ -850,7 +793,6 @@ private:
   // on the line, or null if there was no previous leaf frame.
   nsIFrame*                     mCommonAncestorWithLastFrame;
   // mMaxTextLength is an upper bound on the size of the text in all mapped frames
-  // The value PR_UINT32_MAX represents overflow; text will be discarded
   PRUint32                      mMaxTextLength;
   PRPackedBool                  mDoubleByteText;
   PRPackedBool                  mBidiEnabled;
@@ -1267,11 +1209,8 @@ void BuildTextRunsScanner::FlushFrames(PRBool aFlushLineBreaks, PRBool aSuppress
       }
     } else {
       nsAutoTArray<PRUint8,BIG_TEXT_NODE_SIZE> buffer;
-      PRUint32 bufferSize = mMaxTextLength*(mDoubleByteText ? 2 : 1);
-      if (bufferSize < mMaxTextLength || bufferSize == PR_UINT32_MAX ||
-          !buffer.AppendElements(bufferSize)) {
+      if (!buffer.AppendElements(mMaxTextLength*(mDoubleByteText ? 2 : 1)))
         return;
-      }
       textRun = BuildTextRunForFrames(buffer.Elements());
     }
   }
@@ -1315,14 +1254,8 @@ void BuildTextRunsScanner::FlushLineBreaks(gfxTextRun* aTrailingTextRun)
 
 void BuildTextRunsScanner::AccumulateRunInfo(nsTextFrame* aFrame)
 {
-  if (mMaxTextLength != PR_UINT32_MAX) {
-    NS_ASSERTION(mMaxTextLength < PR_UINT32_MAX - aFrame->GetContentLength(), "integer overflow");
-    if (mMaxTextLength >= PR_UINT32_MAX - aFrame->GetContentLength()) {
-      mMaxTextLength = PR_UINT32_MAX;
-    } else {
-      mMaxTextLength += aFrame->GetContentLength();
-    }
-  }
+  NS_ASSERTION(mMaxTextLength <= mMaxTextLength + aFrame->GetContentLength(), "integer overflow");
+  mMaxTextLength += aFrame->GetContentLength();
   mDoubleByteText |= aFrame->GetFragment()->Is2b();
   mLastFrame = aFrame;
   mCommonAncestorWithLastFrame = aFrame->GetParent();
@@ -1982,50 +1915,6 @@ BuildTextRunsScanner::SetupBreakSinksForTextRun(gfxTextRun* aTextRun,
   }
 }
 
-// Find the flow corresponding to aContent in aUserData
-static inline TextRunMappedFlow*
-FindFlowForContent(TextRunUserData* aUserData, nsIContent* aContent)
-{
-  // Find the flow that contains us
-  PRInt32 i = aUserData->mLastFlowIndex;
-  PRInt32 delta = 1;
-  PRInt32 sign = 1;
-  // Search starting at the current position and examine close-by
-  // positions first, moving further and further away as we go.
-  while (i >= 0 && i < aUserData->mMappedFlowCount) {
-    TextRunMappedFlow* flow = &aUserData->mMappedFlows[i];
-    if (flow->mStartFrame->GetContent() == aContent) {
-      return flow;
-    }
-
-    i += delta;
-    delta = -delta - sign;
-    sign = -sign;
-  }
-
-  // We ran into an array edge.  Add |delta| to |i| once more to get
-  // back to the side where we still need to search, then step in
-  // the |sign| direction.
-  i += delta;
-  if (sign > 0) {
-    for (; i < aUserData->mMappedFlowCount; ++i) {
-      TextRunMappedFlow* flow = &aUserData->mMappedFlows[i];
-      if (flow->mStartFrame->GetContent() == aContent) {
-        return flow;
-      }
-    }
-  } else {
-    for (; i >= 0; --i) {
-      TextRunMappedFlow* flow = &aUserData->mMappedFlows[i];
-      if (flow->mStartFrame->GetContent() == aContent) {
-        return flow;
-      }
-    }
-  }
-
-  return nsnull;
-}
-
 void
 BuildTextRunsScanner::AssignTextRun(gfxTextRun* aTextRun)
 {
@@ -2056,50 +1945,7 @@ BuildTextRunsScanner::AssignTextRun(gfxTextRun* aTextRun)
         }
       }
 #endif
-
-      gfxTextRun* oldTextRun = f->GetTextRun();
-      if (oldTextRun) {
-        nsTextFrame* firstFrame = nsnull;
-        PRUint32 startOffset = 0;
-        if (oldTextRun->GetFlags() & nsTextFrameUtils::TEXT_IS_SIMPLE_FLOW) {
-          firstFrame = static_cast<nsTextFrame*>(oldTextRun->GetUserData());
-        }
-        else {
-          TextRunUserData* userData = static_cast<TextRunUserData*>(oldTextRun->GetUserData());
-          firstFrame = userData->mMappedFlows[0].mStartFrame;
-          if (NS_UNLIKELY(f != firstFrame)) {
-            TextRunMappedFlow* flow = FindFlowForContent(userData, f->GetContent());
-            if (flow) {
-              startOffset = flow->mDOMOffsetToBeforeTransformOffset;
-            }
-            else {
-              NS_ERROR("Can't find flow containing frame 'f'");
-            }
-          }
-        }
-
-        // Optimization: if |f| is the first frame in the flow then there are no
-        // prev-continuations that use |oldTextRun|.
-        nsTextFrame* clearFrom = nsnull;
-        if (NS_UNLIKELY(f != firstFrame)) {
-          // If all the frames in the mapped flow starting at |f| (inclusive)
-          // are empty then we let the prev-continuations keep the old text run.
-          gfxSkipCharsIterator iter(oldTextRun->GetSkipChars(), startOffset, f->GetContentOffset());
-          PRUint32 textRunOffset = iter.ConvertOriginalToSkipped(f->GetContentOffset());
-          clearFrom = textRunOffset == oldTextRun->GetLength() ? f : nsnull;
-        }
-        f->ClearTextRun(clearFrom);
-
-#ifdef DEBUG
-        if (firstFrame && !firstFrame->GetTextRun()) {
-          // oldTextRun was destroyed - assert that we don't reference it.
-          for (PRUint32 i = 0; i < mBreakSinks.Length(); ++i) {
-            NS_ASSERTION(oldTextRun != mBreakSinks[i]->mTextRun,
-                         "destroyed text run is still in use");
-          }
-        }
-#endif
-      }
+      f->ClearTextRun();
       f->SetTextRun(aTextRun);
     }
     // Set this bit now; we can't set it any earlier because
@@ -3553,7 +3399,7 @@ nsTextFrame::Destroy()
   // We might want to clear NS_CREATE_FRAME_IF_NON_WHITESPACE or
   // NS_REFRAME_IF_WHITESPACE on mContent here, since our parent frame
   // type might be changing.  Not clear whether it's worth it.
-  ClearTextRun(nsnull);
+  ClearTextRun();
   if (mNextContinuation) {
     mNextContinuation->SetPrevInFlow(nsnull);
   }
@@ -3646,7 +3492,7 @@ nsContinuingTextFrame::Init(nsIContent* aContent,
   if (prev->GetStyleContext() != GetStyleContext()) {
     // We're taking part of prev's text, and its style may be different
     // so clear its textrun which may no longer be valid (and don't set ours)
-    prev->ClearTextRun(nsnull);
+    prev->ClearTextRun();
   } else {
     mTextRun = prev->GetTextRun();
   }
@@ -3702,11 +3548,11 @@ nsContinuingTextFrame::Destroy()
   if ((GetStateBits() & TEXT_IN_TEXTRUN_USER_DATA) ||
       !mPrevContinuation ||
       mPrevContinuation->GetStyleContext() != GetStyleContext()) {
-    ClearTextRun(nsnull);
+    ClearTextRun();
     // Clear the previous continuation's text run also, so that it can rebuild
     // the text run to include our text.
     if (mPrevContinuation) {
-      (static_cast<nsTextFrame*>(mPrevContinuation))->ClearTextRun(nsnull);
+      (static_cast<nsTextFrame*>(mPrevContinuation))->ClearTextRun();
     }
   }
   nsSplittableFrame::RemoveFromFlow(this);
@@ -3887,15 +3733,15 @@ nsTextFrame::GetLastContinuation() const
 }
 
 void
-nsTextFrame::ClearTextRun(nsTextFrame* aStartContinuation)
+nsTextFrame::ClearTextRun()
 {
-  // save textrun because ClearAllTextRunReferences may clear ours
+  // save textrun because ClearAllTextRunReferences will clear ours
   gfxTextRun* textRun = mTextRun;
   
   if (!textRun)
     return;
 
-  UnhookTextRunFromFrames(textRun, aStartContinuation);
+  UnhookTextRunFromFrames(textRun);
   // see comments in BuildTextRunForFrames...
 //  if (textRun->GetFlags() & gfxFontGroup::TEXT_IS_PERSISTENT) {
 //    NS_ERROR("Shouldn't reach here for now...");
@@ -3908,8 +3754,7 @@ nsTextFrame::ClearTextRun(nsTextFrame* aStartContinuation)
 //    return;
 //  }
 
-  if (!(textRun->GetFlags() & gfxTextRunWordCache::TEXT_IN_CACHE) &&
-      !textRun->GetUserData()) {
+  if (!(textRun->GetFlags() & gfxTextRunWordCache::TEXT_IN_CACHE)) {
     // Remove it now because it's not doing anything useful
     gTextRuns->RemoveFromCache(textRun);
     delete textRun;
@@ -3921,7 +3766,7 @@ ClearTextRunsInFlowChain(nsTextFrame* aFrame)
 {
   nsTextFrame* f;
   for (f = aFrame; f; f = static_cast<nsTextFrame*>(f->GetNextContinuation())) {
-    f->ClearTextRun(nsnull);
+    f->ClearTextRun();
   }
 }
 
@@ -3970,7 +3815,7 @@ nsTextFrame::CharacterDataChanged(CharacterDataChangeInfo* aInfo)
 nsTextFrame::DidSetStyleContext(nsStyleContext* aOldStyleContext)
 {
   nsFrame::DidSetStyleContext(aOldStyleContext);
-  ClearTextRun(nsnull);
+  ClearTextRun();
 } 
 
 class nsDisplayText : public nsDisplayItem {
@@ -3987,11 +3832,9 @@ public:
   virtual nsRect GetBounds(nsDisplayListBuilder* aBuilder) {
     return mFrame->GetOverflowRect() + aBuilder->ToReferenceFrame(mFrame);
   }
-  virtual void HitTest(nsDisplayListBuilder* aBuilder, const nsRect& aRect,
-                       HitTestState* aState, nsTArray<nsIFrame*> *aOutFrames) {
-    if (nsRect(aBuilder->ToReferenceFrame(mFrame), mFrame->GetSize()).Intersects(aRect)) {
-      aOutFrames->AppendElement(mFrame);
-    }
+  virtual nsIFrame* HitTest(nsDisplayListBuilder* aBuilder, nsPoint aPt,
+                            HitTestState* aState) {
+    return nsRect(aBuilder->ToReferenceFrame(mFrame), mFrame->GetSize()).Contains(aPt) ? mFrame : nsnull;
   }
   virtual void Paint(nsDisplayListBuilder* aBuilder,
                      nsIRenderingContext* aCtx);
@@ -5758,7 +5601,7 @@ FindStartAfterSkippingWhitespace(PropertyProvider* aProvider,
 /* virtual */ 
 void nsTextFrame::MarkIntrinsicWidthsDirty()
 {
-  ClearTextRun(nsnull);
+  ClearTextRun();
   nsFrame::MarkIntrinsicWidthsDirty();
 }
 
@@ -6091,8 +5934,8 @@ nsTextFrame::SetLength(PRInt32 aLength)
     // Our frame is shrinking. Give the text to our next in flow.
     f->mContentOffset = end;
     if (f->GetTextRun() != mTextRun) {
-      ClearTextRun(nsnull);
-      f->ClearTextRun(nsnull);
+      ClearTextRun();
+      f->ClearTextRun();
     }
     return;
   }
@@ -6100,8 +5943,8 @@ nsTextFrame::SetLength(PRInt32 aLength)
     // Our frame is growing. Take text from our in-flow.
     f->mContentOffset = end;
     if (f->GetTextRun() != mTextRun) {
-      ClearTextRun(nsnull);
-      f->ClearTextRun(nsnull);
+      ClearTextRun();
+      f->ClearTextRun();
     }
     f = static_cast<nsTextFrame*>(f->GetNextInFlow());
   }
@@ -6234,7 +6077,7 @@ nsTextFrame::Reflow(nsPresContext*           aPresContext,
       // floating first-letter boundaries are significant in textrun
       // construction, so clear the textrun out every time we hit a first-letter
       // and have changed our length (which controls the first-letter boundary)
-      ClearTextRun(nsnull);
+      ClearTextRun();
       // Find the length of the first-letter. We need a textrun for this.
       gfxSkipCharsIterator iter =
         EnsureTextRun(ctx, lineContainer, lineLayout.GetLine(), &flowEndInTextRun);
@@ -6272,7 +6115,7 @@ nsTextFrame::Reflow(nsPresContext*           aPresContext,
         // right first-letter boundary
         SetLength(offset + length - GetContentOffset());
         // Ensure that the textrun will be rebuilt
-        ClearTextRun(nsnull);
+        ClearTextRun();
       }
     } 
   }
@@ -6285,7 +6128,7 @@ nsTextFrame::Reflow(nsPresContext*           aPresContext,
     // when the textrun was ended in the middle of a text node because a
     // preformatted newline was encountered, and prev-in-flow frames have
     // consumed all the text of the textrun. We need a new textrun.
-    ClearTextRun(nsnull);
+    ClearTextRun();
     iter = EnsureTextRun(ctx, lineContainer,
                          lineLayout.GetLine(), &flowEndInTextRun);
   }
@@ -6909,10 +6752,12 @@ nsTextFrame::List(FILE* out, PRInt32 aIndent) const
   // Output the tag
   IndentBy(out, aIndent);
   ListTag(out);
+#ifdef DEBUG_waterson
+  fprintf(out, " [parent=%p]", mParent);
+#endif
   if (HasView()) {
     fprintf(out, " [view=%p]", static_cast<void*>(GetView()));
   }
-  fprintf(out, " [run=%p]", static_cast<void*>(mTextRun));
 
   PRInt32 totalContentLength;
   nsCAutoString tmp;
@@ -6986,7 +6831,7 @@ nsTextFrame::AdjustOffsetsForBidi(PRInt32 aStart, PRInt32 aEnd)
    * This is called during bidi resolution from the block container, so we
    * shouldn't be holding a local reference to a textrun anywhere.
    */
-  ClearTextRun(nsnull);
+  ClearTextRun();
 
   nsTextFrame* prev = static_cast<nsTextFrame*>(GetPrevContinuation());
   if (prev) {
@@ -6995,7 +6840,7 @@ nsTextFrame::AdjustOffsetsForBidi(PRInt32 aStart, PRInt32 aEnd)
     PRInt32 prevOffset = prev->GetContentOffset();
     aStart = PR_MAX(aStart, prevOffset);
     aEnd = PR_MAX(aEnd, prevOffset);
-    prev->ClearTextRun(nsnull);
+    prev->ClearTextRun();
   }
 
   mContentOffset = aStart;

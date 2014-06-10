@@ -777,6 +777,7 @@ components/xultmpl.xpt
 components/zipwriter.xpt
 run-mozilla.sh
 firefox
+dependentlibs.list
 components/nsProgressDialog.js
 libwidget.rsrc
 #endif
@@ -812,4 +813,3 @@ components/nsUpdateService.js
 components/nsUpdateServiceStub.js
 #endif
 old-homepage-default.properties
-mozilla-runtime@BIN_SUFFIX@

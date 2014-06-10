@@ -1,6 +1,5 @@
 prefix=%prefix%
 sdkdir=%sdkdir%
-libdir=%libdir%
 includedir=%includedir%
 
 Name: mozilla-gtkembedmoz

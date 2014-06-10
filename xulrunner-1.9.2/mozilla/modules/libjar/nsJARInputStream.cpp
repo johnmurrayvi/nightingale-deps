@@ -47,9 +47,6 @@
 #include "nsEscape.h"
 #include "nsIFile.h"
 #include "nsDebug.h"
-#if defined(XP_WIN)
-#include <windows.h>
-#endif
 
 /*---------------------------------------------
  *  nsISupports implementation
@@ -92,8 +89,6 @@ nsJARInputStream::InitFile(nsJAR *aJar, nsZipItem *item)
     // Must keep handle to filepointer and mmap structure as long as we need access to the mmapped data
     mFd = aJar->mZip.GetFD();
     mZs.next_in = aJar->mZip.GetData(item);
-    if (!mZs.next_in)
-        return NS_ERROR_FILE_CORRUPTED;
     mZs.avail_in = item->Size();
     mOutSize = item->RealSize();
     mZs.total_out = 0;
@@ -215,7 +210,6 @@ nsJARInputStream::Read(char* aBuffer, PRUint32 aCount, PRUint32 *aBytesRead)
     *aBytesRead = 0;
 
     nsresult rv = NS_OK;
-MOZ_WIN_MEM_TRY_BEGIN
     switch (mMode) {
       case MODE_NOTINITED:
         return NS_OK;
@@ -254,7 +248,6 @@ MOZ_WIN_MEM_TRY_BEGIN
         }
         break;
     }
-MOZ_WIN_MEM_TRY_CATCH(rv = NS_ERROR_FAILURE)
     return rv;
 }
 

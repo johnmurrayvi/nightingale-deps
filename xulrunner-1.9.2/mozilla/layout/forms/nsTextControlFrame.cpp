@@ -465,11 +465,7 @@ nsTextInputListener::EditAction()
   mFrame->SetValueChanged(PR_TRUE);
 
   // Fire input event
-  nsCOMPtr<nsIEditor_MOZILLA_1_9_2_BRANCH> editor192 = do_QueryInterface(editor);
-  NS_ASSERTION(editor192, "Something is very wrong!");
-  PRBool trusted = PR_FALSE;
-  editor192->GetLastKeypressEventTrusted(&trusted);
-  mFrame->FireOnInput(trusted);
+  mFrame->FireOnInput();
 
   return NS_OK;
 }
@@ -1558,8 +1554,7 @@ nsTextControlFrame::InitEditor()
     if (NS_FAILED(rv))
       return rv;
 
-    rv = SetValue(defaultValue);
-    NS_ENSURE_SUCCESS(rv, rv);
+    SetValue(defaultValue);
 
     rv = mEditor->EnableUndo(PR_TRUE);
     NS_ASSERTION(NS_SUCCEEDED(rv),"Transaction Manager must have failed");
@@ -1899,10 +1894,10 @@ nsresult nsTextControlFrame::SetFormProperty(nsIAtom* aName, const nsAString& aV
       }
       SetValueChanged(PR_TRUE);
       nsresult rv = SetValue(aValue); // set new text value
-      NS_ENSURE_SUCCESS(rv, rv);
       if (isUserInput) {
         SetFireChangeEventState(fireChangeEvent);
       }
+      NS_ENSURE_SUCCESS(rv, rv);
     }
     else if (nsGkAtoms::select == aName)
     {
@@ -2483,14 +2478,14 @@ nsTextControlFrame::GetMaxLength(PRInt32* aSize)
 
 // this is where we propagate a content changed event
 void
-nsTextControlFrame::FireOnInput(PRBool aTrusted)
+nsTextControlFrame::FireOnInput()
 {
   if (!mNotifyOnInput)
     return; // if notification is turned off, do nothing
   
   // Dispatch the "input" event
   nsEventStatus status = nsEventStatus_eIgnore;
-  nsUIEvent event(aTrusted, NS_FORM_INPUT, 0);
+  nsUIEvent event(PR_TRUE, NS_FORM_INPUT, 0);
 
   // Have the content handle the event, propagating it according to normal
   // DOM rules.
@@ -2687,27 +2682,11 @@ nsTextControlFrame::SetValue(const nsAString& aValue)
         plaintextEditor->GetMaxTextLength(&savedMaxLength);
         plaintextEditor->SetMaxTextLength(-1);
 
-        nsCOMPtr<nsIContent> content = GetContent();
-        NS_ASSERTION(content, "Where is our content?");
-
         if (currentValue.Length() < 1)
           editor->DeleteSelection(nsIEditor::eNone);
         else {
           if (plaintextEditor)
             plaintextEditor->InsertText(currentValue);
-        }
-        if (!weakFrame.IsAlive()) {
-          nsCOMPtr<nsIDOMHTMLInputElement> inputElement = do_QueryInterface(content);
-          if (inputElement) {
-            inputElement->SetValue(currentValue);
-            return NS_ERROR_UNEXPECTED;
-          }
-          nsCOMPtr<nsIDOMHTMLTextAreaElement> textAreaElement = do_QueryInterface(content);
-          if (textAreaElement) {
-            textAreaElement->SetValue(currentValue);
-            return NS_ERROR_UNEXPECTED;
-          }
-          NS_NOTREACHED("The content node should either be an input or a textarea element");
         }
 
         plaintextEditor->SetMaxTextLength(savedMaxLength);
@@ -2716,7 +2695,6 @@ nsTextControlFrame::SetValue(const nsAString& aValue)
           selPriv->EndBatchChanges();
       }
 
-      // This second check _shouldn't_ be necessary, but let's be safe.
       NS_ENSURE_STATE(weakFrame.IsAlive());
       if (outerTransaction)
         mNotifyOnInput = PR_TRUE;

@@ -190,9 +190,6 @@ nsJSEventListener::HandleEvent(nsIDOMEvent* aEvent)
   }
 
 
-  if (!mContext)
-    return NS_OK;
-
   nsScriptObjectHolder funcval(mContext);
   rv = mContext->GetBoundEventHandler(mTarget, mScopeObject, atomName,
                                       funcval);

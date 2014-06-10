@@ -95,8 +95,6 @@ public:
   void           SetRebuild(PRBool aMenuEvent);
   NSMenuItem*    NativeMenuItem();
 
-  static PRBool  IsXULHelpMenu(nsIContent* aMenuContent);
-
 protected:
   void           MenuConstruct();
   nsresult       RemoveAll();

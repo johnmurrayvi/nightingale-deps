@@ -61,10 +61,6 @@
 #include "WinMobileLocationProvider.h"
 #endif
 
-#ifdef MOZ_PLATFORM_MAEMO
-#include "MaemoLocationProvider.h"
-#endif
-
 #include "nsIDOMDocument.h"
 #include "nsIDocument.h"
 
@@ -414,14 +410,9 @@ nsresult nsGeolocationService::Init()
 
   // we should move these providers outside of this file! dft
 
+  // if WINCE, see if we should try the WINCE location provider
 #ifdef WINCE_WINDOWS_MOBILE
   provider = new WinMobileLocationProvider();
-  if (provider)
-    mProviders.AppendObject(provider);
-#endif
-
-#ifdef MOZ_PLATFORM_MAEMO
-  provider = new MaemoLocationProvider();
   if (provider)
     mProviders.AppendObject(provider);
 #endif
@@ -926,7 +917,7 @@ NS_IMETHODIMP
 nsGeolocation::ClearWatch(PRInt32 aWatchId)
 {
   PRUint32 count = mWatchingCallbacks.Length();
-  if (aWatchId < 0 || count == 0 || PRUint32(aWatchId) >= count)
+  if (aWatchId < 0 || count == 0 || aWatchId > count)
     return NS_OK;
 
   mWatchingCallbacks[aWatchId]->MarkCleared();

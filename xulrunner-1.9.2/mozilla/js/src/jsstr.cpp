@@ -1168,9 +1168,10 @@ str_indexOf(JSContext *cx, uintN argc, jsval *vp)
     if (!patstr)
         return JS_FALSE;
 
+    const jschar *text = str->chars();
     jsuint textlen = str->length();
+    const jschar *pat = patstr->chars();
     jsuint patlen = patstr->length();
-    jsuint textoffset = 0;
 
     jsuint start;
     if (argc > 1) {
@@ -1184,7 +1185,7 @@ str_indexOf(JSContext *cx, uintN argc, jsval *vp)
                 textlen = 0;
             } else {
                 start = i;
-                textoffset = start;
+                text += start;
                 textlen -= start;
             }
         } else {
@@ -1199,16 +1200,13 @@ str_indexOf(JSContext *cx, uintN argc, jsval *vp)
                 textlen = 0;
             } else {
                 start = (jsint)d;
-                textoffset = start;
+                text += start;
                 textlen -= start;
             }
         }
     } else {
         start = 0;
     }
-
-    const jschar *text = str->chars() + textoffset;
-    const jschar *pat = patstr->chars();
 
     jsint match = StringMatch(text, textlen, pat, patlen);
     *vp = INT_TO_JSVAL((match == -1) ? -1 : start + match);
@@ -1219,10 +1217,12 @@ static JSBool
 str_lastIndexOf(JSContext *cx, uintN argc, jsval *vp)
 {
     JSString *str, *str2;
+    const jschar *text, *pat;
     jsint i, j, textlen, patlen;
     jsdouble d;
 
     NORMALIZE_THIS(cx, vp, str);
+    text = str->chars();
     textlen = (jsint) str->length();
 
     if (argc != 0 && JSVAL_IS_STRING(vp[2])) {
@@ -1232,6 +1232,7 @@ str_lastIndexOf(JSContext *cx, uintN argc, jsval *vp)
         if (!str2)
             return JS_FALSE;
     }
+    pat = str2->chars();
     patlen = (jsint) str2->length();
 
     i = textlen - patlen; // Start searching here
@@ -1266,8 +1267,6 @@ str_lastIndexOf(JSContext *cx, uintN argc, jsval *vp)
         return JS_TRUE;
     }
 
-    const jschar *text = str->chars();
-    const jschar *pat = str2->chars();
     const jschar *t = text + i;
     const jschar *textend = text - 1;
     const jschar p0 = *pat;
@@ -1525,7 +1524,7 @@ MatchCallback(JSContext *cx, size_t count, void *p)
         arrayval = OBJECT_TO_JSVAL(arrayobj);
     }
 
-    JSString *str = cx->regExpStatics.pendingInput;
+    JSString *str = cx->regExpStatics.input;
     JSSubString &match = cx->regExpStatics.lastMatch;
     ptrdiff_t off = match.chars - str->chars();
     JS_ASSERT(off >= 0 && size_t(off) <= str->length());
@@ -1978,6 +1977,7 @@ find_split(JSContext *cx, JSString *str, JSRegExp *re, jsint *ip,
 {
     jsint i, j, k;
     size_t length;
+    jschar *chars;
 
     /*
      * Stop if past end of string.  If at end of string, we will compare the
@@ -1994,6 +1994,8 @@ find_split(JSContext *cx, JSString *str, JSRegExp *re, jsint *ip,
     length = str->length();
     if ((size_t)i > length)
         return -1;
+
+    chars = str->chars();
 
     /*
      * Match a regular expression against the separator at or above index i.
@@ -2060,7 +2062,6 @@ find_split(JSContext *cx, JSString *str, JSRegExp *re, jsint *ip,
      * the first separator char.  Otherwise, return length.
      */
     j = 0;
-    jschar *chars = str->chars();
     while ((size_t)(k = i + j) < length) {
         if (chars[k] == sep->chars[j]) {
             if ((size_t)++j == sep->length)
@@ -2097,7 +2098,6 @@ str_split(JSContext *cx, uintN argc, jsval *vp)
         v = STRING_TO_JSVAL(str);
         ok = arrayobj->setProperty(cx, INT_TO_JSID(0), &v);
     } else {
-        JSString *str2 = NULL;
         if (VALUE_IS_REGEXP(cx, vp[2])) {
             re = (JSRegExp *) JSVAL_TO_OBJECT(vp[2])->getPrivate();
             sep = &tmp;
@@ -2106,11 +2106,20 @@ str_split(JSContext *cx, uintN argc, jsval *vp)
             sep->chars = NULL;
             sep->length = 0;
         } else {
-            str2 = js_ValueToString(cx, vp[2]);
+            JSString *str2 = js_ValueToString(cx, vp[2]);
             if (!str2)
                 return JS_FALSE;
             vp[2] = STRING_TO_JSVAL(str2);
+
+            /*
+             * Point sep at a local copy of str2's header because find_split
+             * will modify sep->length.
+             */
+            str2->getCharsAndLength(tmp.chars, tmp.length);
+            sep = &tmp;
+            re = NULL;
         }
+
         /* Use the second argument as the split limit, if given. */
         limited = (argc > 1) && !JSVAL_IS_VOID(vp[3]);
         limit = 0; /* Avoid warning. */
@@ -2123,16 +2132,6 @@ str_split(JSContext *cx, uintN argc, jsval *vp)
             limit = js_DoubleToECMAUint32(d);
             if (limit > str->length())
                 limit = 1 + str->length();
-        }
-
-        if (str2) {
-            /*
-             * Point sep at a local copy of str2's header because find_split
-             * will modify sep->length.
-             */
-            str2->getCharsAndLength(tmp.chars, tmp.length);
-            sep = &tmp;
-            re = NULL;
         }
 
         len = i = 0;

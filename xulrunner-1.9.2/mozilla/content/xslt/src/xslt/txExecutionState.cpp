@@ -86,12 +86,13 @@ txLoadedDocumentsHash::~txLoadedDocumentsHash()
 
 txExecutionState::txExecutionState(txStylesheet* aStylesheet,
                                    PRBool aDisableLoads)
-    : mOutputHandler(nsnull),
-      mResultHandler(nsnull),
-      mStylesheet(aStylesheet),
+    : mStylesheet(aStylesheet),
       mNextInstruction(nsnull),
       mLocalVariables(nsnull),
       mRecursionDepth(0),
+      mTemplateRules(nsnull),
+      mTemplateRulesBufferSize(0),
+      mTemplateRuleCount(0),
       mEvalContext(nsnull),
       mInitialEvalContext(nsnull),
       mGlobalParams(nsnull),
@@ -108,6 +109,12 @@ txExecutionState::~txExecutionState()
     delete mResultHandler;
     delete mLocalVariables;
     delete mEvalContext;
+
+    PRInt32 i;
+    for (i = 0; i < mTemplateRuleCount; ++i) {
+        NS_IF_RELEASE(mTemplateRules[i].mModeLocalName);
+    }
+    delete [] mTemplateRules;
     
     txStackIterator varsIter(&mLocalVarsStack);
     while (varsIter.hasNext()) {
@@ -197,14 +204,7 @@ txExecutionState::init(const txXPathNode& aNode,
 nsresult
 txExecutionState::end(nsresult aResult)
 {
-    NS_ASSERTION(NS_FAILED(aResult) || mTemplateRules.Length() == 1,
-                 "Didn't clean up template rules properly");
-    if (NS_SUCCEEDED(aResult)) {
-        popTemplateRule();
-    }
-    else if (!mOutputHandler) {
-        return NS_OK;
-    }
+    popTemplateRule();
     return mOutputHandler->endDocument(aResult);
 }
 
@@ -408,22 +408,35 @@ txExecutionState::pushTemplateRule(txStylesheet::ImportFrame* aFrame,
                                    const txExpandedName& aMode,
                                    txVariableMap* aParams)
 {
-    TemplateRule* rule = mTemplateRules.AppendElement();
-    NS_ENSURE_TRUE(rule, NS_ERROR_OUT_OF_MEMORY);
+    if (mTemplateRuleCount == mTemplateRulesBufferSize) {
+        PRInt32 newSize =
+            mTemplateRulesBufferSize ? mTemplateRulesBufferSize * 2 : 10;
+        TemplateRule* newRules = new TemplateRule[newSize];
+        NS_ENSURE_TRUE(newRules, NS_ERROR_OUT_OF_MEMORY);
+        
+        memcpy(newRules, mTemplateRules,
+               mTemplateRuleCount * sizeof(TemplateRule));
+        delete [] mTemplateRules;
+        mTemplateRules = newRules;
+        mTemplateRulesBufferSize = newSize;
+    }
 
-    rule->mFrame = aFrame;
-    rule->mModeNsId = aMode.mNamespaceID;
-    rule->mModeLocalName = aMode.mLocalName;
-    rule->mParams = aParams;
-
+    mTemplateRules[mTemplateRuleCount].mFrame = aFrame;
+    mTemplateRules[mTemplateRuleCount].mModeNsId = aMode.mNamespaceID;
+    mTemplateRules[mTemplateRuleCount].mModeLocalName = aMode.mLocalName;
+    mTemplateRules[mTemplateRuleCount].mParams = aParams;
+    NS_IF_ADDREF(mTemplateRules[mTemplateRuleCount].mModeLocalName);
+    ++mTemplateRuleCount;
+    
     return NS_OK;
 }
 
 void
 txExecutionState::popTemplateRule()
 {
-    NS_PRECONDITION(!mTemplateRules.IsEmpty(), "No rules to pop");
-    mTemplateRules.RemoveElementAt(mTemplateRules.Length() - 1);
+    // decrement outside of RELEASE, that would decrement twice
+    --mTemplateRuleCount;
+    NS_IF_RELEASE(mTemplateRules[mTemplateRuleCount].mModeLocalName);
 }
 
 txIEvalContext*
@@ -487,8 +500,7 @@ txExecutionState::getKeyNodes(const txExpandedName& aKeyName,
 txExecutionState::TemplateRule*
 txExecutionState::getCurrentTemplateRule()
 {
-    NS_PRECONDITION(!mTemplateRules.IsEmpty(), "No current rule!");
-    return &mTemplateRules[mTemplateRules.Length() - 1];
+    return mTemplateRules + mTemplateRuleCount - 1;
 }
 
 txInstruction*

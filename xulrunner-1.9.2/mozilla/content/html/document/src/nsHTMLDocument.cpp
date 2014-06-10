@@ -1824,16 +1824,6 @@ nsHTMLDocument::OpenCommon(const nsACString& aContentType, PRBool aReplace)
     return NS_ERROR_DOM_NOT_SUPPORTED_ERR;
   }
 
-  // No calling document.open() without a script global object
-  if (!mScriptGlobalObject) {
-    return NS_OK;
-  }
-
-  nsPIDOMWindow* outer = GetWindow();
-  if (!outer || (GetInnerWindow() != outer->GetCurrentInnerWindow())) {
-    return NS_OK;
-  }
-
   // check whether we're in the middle of unload.  If so, ignore this call.
   nsCOMPtr<nsIDocShell> shell = do_QueryReferent(mDocumentContainer);
   if (!shell) {
@@ -3055,45 +3045,15 @@ nsHTMLDocument::ChangeContentEditableCount(nsIContent *aElement,
 
   mContentEditableCount += aChange;
 
-  class DeferredContentEditableCountChangeEvent : public nsRunnable
-  {
-  public:
-    DeferredContentEditableCountChangeEvent(nsHTMLDocument *aDoc, nsIContent *aElement)
-      : mDoc(aDoc)
-      , mElement(aElement)
-    {
-    }
-
-    NS_IMETHOD Run() {
-      if (mElement->GetOwnerDoc() == mDoc) {
-        mDoc->DeferredContentEditableCountChange(mElement);
-      }
-      return NS_OK;
-    }
-
-  private:
-    nsRefPtr<nsHTMLDocument> mDoc;
-    nsCOMPtr<nsIContent> mElement;
-  };
-
-  nsContentUtils::AddScriptRunner(
-    new DeferredContentEditableCountChangeEvent(this, aElement));
-
-  return NS_OK;
-}
-
-void
-nsHTMLDocument::DeferredContentEditableCountChange(nsIContent *aElement)
-{
   if (mParser ||
       (mUpdateNestLevel > 0 && mContentEditableCount > 0 != IsEditingOn())) {
-    return;
+    return NS_OK;
   }
 
   EditingState oldState = mEditingState;
 
   nsresult rv = EditingStateChanged();
-  NS_ENSURE_SUCCESS(rv, );
+  NS_ENSURE_SUCCESS(rv, rv);
 
   if (oldState == mEditingState && mEditingState == eContentEditable) {
     // We just changed the contentEditable state of a node, we need to reset
@@ -3102,37 +3062,40 @@ nsHTMLDocument::DeferredContentEditableCountChange(nsIContent *aElement)
     if (node) {
       nsPIDOMWindow *window = GetWindow();
       if (!window)
-        return;
+        return NS_ERROR_FAILURE;
 
       nsIDocShell *docshell = window->GetDocShell();
       if (!docshell)
-        return;
+        return NS_ERROR_FAILURE;
 
       nsCOMPtr<nsIEditorDocShell> editorDocShell =
         do_QueryInterface(docshell, &rv);
-      NS_ENSURE_SUCCESS(rv, );
+      NS_ENSURE_SUCCESS(rv, rv);
 
       nsCOMPtr<nsIEditor> editor;
       editorDocShell->GetEditor(getter_AddRefs(editor));
       if (editor) {
         nsCOMPtr<nsIDOMRange> range;
         rv = NS_NewRange(getter_AddRefs(range));
-        NS_ENSURE_SUCCESS(rv, );
+        NS_ENSURE_SUCCESS(rv, rv);
 
         rv = range->SelectNode(node);
-        NS_ENSURE_SUCCESS(rv, );
+        NS_ENSURE_SUCCESS(rv, rv);
 
         nsCOMPtr<nsIInlineSpellChecker> spellChecker;
         rv = editor->GetInlineSpellChecker(PR_FALSE,
                                            getter_AddRefs(spellChecker));
-        NS_ENSURE_SUCCESS(rv, );
+        NS_ENSURE_SUCCESS(rv, rv);
 
         if (spellChecker) {
           rv = spellChecker->SpellCheckRange(range);
+          NS_ENSURE_SUCCESS(rv, rv);
         }
       }
     }
   }
+
+  return NS_OK;
 }
 
 static PRBool

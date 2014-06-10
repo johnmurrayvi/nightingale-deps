@@ -45,8 +45,6 @@
 #include "imgILoader.h"
 #include "ImageErrors.h"
 #include "ImageLogging.h"
-#include "imgFrame.h"
-#include "imgContainer.h"
 
 #include "netCore.h"
 
@@ -180,10 +178,7 @@ nsresult imgRequest::RemoveProxy(imgRequestProxy *proxy, nsresult aStatus, PRBoo
 {
   LOG_SCOPE_WITH_PARAM(gImgLog, "imgRequest::RemoveProxy", "proxy", proxy);
 
-  if (!mObservers.RemoveElement(proxy)) {
-    // Not one of our proxies; we're done
-    return NS_OK;
-  }
+  mObservers.RemoveElement(proxy);
 
   /* Check mState below before we potentially call Cancel() below. Since
      Cancel() may result in OnStopRequest being called back before Cancel()
@@ -344,7 +339,9 @@ void imgRequest::Cancel(nsresult aStatus)
   if (!(mImageStatus & imgIRequest::STATUS_LOAD_PARTIAL))
     mImageStatus |= imgIRequest::STATUS_ERROR;
 
-  RemoveFromCache();
+  if (aStatus != NS_IMAGELIB_ERROR_NO_DECODER) {
+    RemoveFromCache();
+  }
 
   if (mRequest && mLoading)
     mRequest->Cancel(aStatus);
@@ -714,14 +711,7 @@ NS_IMETHODIMP imgRequest::OnStartRequest(nsIRequest *aRequest, nsISupports *ctxt
 
   /* set our state variables to their initial values, but advance mState
      to onStartRequest. */
-  if (mIsMultiPartChannel) {
-    // Don't blow away our status altogether
-    mImageStatus &= ~imgIRequest::STATUS_LOAD_PARTIAL;
-    mImageStatus &= ~imgIRequest::STATUS_LOAD_COMPLETE;
-    mImageStatus &= ~imgIRequest::STATUS_FRAME_COMPLETE;
-  } else {
-    mImageStatus = imgIRequest::STATUS_NONE;
-  }
+  mImageStatus = imgIRequest::STATUS_NONE;
   mState = onStartRequest;
 
   nsCOMPtr<nsIChannel> channel(do_QueryInterface(aRequest));
@@ -991,26 +981,8 @@ NS_IMETHODIMP imgRequest::OnDataAvailable(nsIRequest *aRequest, nsISupports *ctx
     return NS_BINDING_ABORTED;
   }
 
-  // The decoder will start decoding into the current frame (if we have one).
-  // When it needs to add another frame, we will unlock this frame and lock the
-  // new frame.
-  // Our invariant is that, while in the decoder, the last frame is always
-  // locked, and all others are unlocked.
-  imgContainer *image = reinterpret_cast<imgContainer*>(mImage.get());
-  if (image->mFrames.Length() > 0) {
-    imgFrame *curframe = image->mFrames.ElementAt(image->mFrames.Length() - 1);
-    curframe->LockImageData();
-  }
-
   PRUint32 wrote;
   nsresult rv = mDecoder->WriteFrom(inStr, count, &wrote);
-
-  // We unlock the current frame, even if that frame is different from the
-  // frame we entered the decoder with. (See above.)
-  if (image->mFrames.Length() > 0) {
-    imgFrame *curframe = image->mFrames.ElementAt(image->mFrames.Length() - 1);
-    curframe->UnlockImageData();
-  }
 
   if (NS_FAILED(rv)) {
     PR_LOG(gImgLog, PR_LOG_WARNING,

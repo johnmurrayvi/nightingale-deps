@@ -47,7 +47,6 @@
 #include "nsPIDOMWindow.h"
 #include "nsIDocShell.h"
 #include "nsIURI.h"
-#include "nsITextToSubURI.h"
 #include "nsContentErrors.h"
 
 // Print Options
@@ -1204,18 +1203,7 @@ nsPrintEngine::GetDocumentTitleAndURL(nsIDocument* aDoc,
 
   nsCAutoString urlCStr;
   exposableURI->GetSpec(urlCStr);
-
-  nsresult rv;
-  nsCOMPtr<nsITextToSubURI> textToSubURI = 
-    do_GetService(NS_ITEXTTOSUBURI_CONTRACTID, &rv);
-  if (NS_FAILED(rv)) return;
-
-  nsAutoString unescapedURI;
-  rv = textToSubURI->UnEscapeURIForUI(NS_LITERAL_CSTRING("UTF-8"),
-                                      urlCStr, unescapedURI);
-  if (NS_FAILED(rv)) return;
-
-  *aURLStr = ToNewUnicode(unescapedURI);
+  *aURLStr = UTF8ToNewUnicode(urlCStr);
 }
 
 //---------------------------------------------------------------------

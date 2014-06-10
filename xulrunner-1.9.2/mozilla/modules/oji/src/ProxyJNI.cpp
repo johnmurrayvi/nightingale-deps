@@ -47,7 +47,6 @@
 #include "nsVoidArray.h"
 #include "plstr.h"
 #include "ProxyClassLoader.h"
-#include "nsCSecurityContext.h"
 
 #include "ProxyJNI.h"
 #include "nsDataHashtable.h"
@@ -282,7 +281,6 @@ private:
     nsISecureEnv* mSecureEnv;
     nsISecurityContext* mContext;
     jbool mInProxyFindClass;
-    nsXPIDLCString mFakeOrigin;
 
     static ProxyJNIEnv& GetProxyEnv(JNIEnv* env) { return *(ProxyJNIEnv*)env; }
 
@@ -293,27 +291,6 @@ private:
             mContext->AddRef();
             return mContext;
         }
-    }
-
-    // Don't generate a new fake origin on every call to
-    // nsCSecurityContext::GetOrigin().
-    nsresult getOrSetFakeOrigin(nsCSecurityContext *securityContext)
-    {
-        if (!securityContext)
-            return NS_OK;
-        if (!mFakeOrigin.IsVoid())
-            securityContext->SetFakeOrigin(mFakeOrigin);
-        char origin[256];
-        nsresult rv = securityContext->GetOrigin(origin, 256);
-        if (NS_FAILED(rv))
-            return rv;
-        if (mFakeOrigin.IsVoid()) {
-            const nsCString& contextFakeOrigin =
-               securityContext->GetFakeOrigin();
-            if (!contextFakeOrigin.IsVoid())
-                mFakeOrigin.Assign(contextFakeOrigin);
-        }
-        return NS_OK;
     }
 
     static jint JNICALL GetVersion(JNIEnv* env)
@@ -522,10 +499,10 @@ private:
         ProxyJNIEnv& proxyEnv = GetProxyEnv(env);
         nsISecureEnv* secureEnv = GetSecureEnv(env);
         nsISecurityContext* securityContext = proxyEnv.getContext();
-        nsresult rv = proxyEnv.getOrSetFakeOrigin((nsCSecurityContext*)securityContext);
-        if (NS_SUCCEEDED(rv))
-            secureEnv->NewObject(clazz, method->mMethodID, jargs, &outObject, securityContext);
+        nsresult result;
+        result = secureEnv->NewObject(clazz, method->mMethodID, jargs, &outObject, securityContext);
         NS_IF_RELEASE(securityContext);
+        
         return outObject;
     }
 
@@ -536,9 +513,8 @@ private:
         nsISecureEnv* secureEnv = GetSecureEnv(env);
         JNIMethod* method = (JNIMethod*)methodID;
         nsISecurityContext* securityContext = proxyEnv.getContext();
-        nsresult rv = proxyEnv.getOrSetFakeOrigin((nsCSecurityContext*)securityContext);
-        if (NS_SUCCEEDED(rv))
-            secureEnv->NewObject(clazz, method->mMethodID, args, &outObject, securityContext);
+        nsresult result;
+        result = secureEnv->NewObject(clazz, method->mMethodID, args, &outObject, securityContext);
         NS_IF_RELEASE(securityContext);
         return outObject;
     }
@@ -592,9 +568,7 @@ private:
         ProxyJNIEnv& proxyEnv = GetProxyEnv(env);
         nsISecureEnv* secureEnv = GetSecureEnv(env);
         nsISecurityContext* securityContext = proxyEnv.getContext();
-        nsresult rv = proxyEnv.getOrSetFakeOrigin((nsCSecurityContext*)securityContext);
-        if (NS_SUCCEEDED(rv))
-            rv = secureEnv->CallMethod(method->mReturnType, obj, method->mMethodID, args, &outValue, securityContext);
+        nsresult rv = secureEnv->CallMethod(method->mReturnType, obj, method->mMethodID, args, &outValue, securityContext);
         NS_IF_RELEASE(securityContext);
         return NS_SUCCEEDED(rv) ? outValue : kErrorValue;
     }
@@ -612,9 +586,8 @@ private:
         ProxyJNIEnv& proxyEnv = GetProxyEnv(env);
         nsISecureEnv* secureEnv = GetSecureEnv(env);
         nsISecurityContext* securityContext = proxyEnv.getContext();
-        nsresult rv = proxyEnv.getOrSetFakeOrigin((nsCSecurityContext*)securityContext);
-        if (NS_SUCCEEDED(rv))
-            secureEnv->CallMethod(jvoid_type, obj, method->mMethodID, args, &unusedValue, securityContext);
+        nsresult result;
+        result = secureEnv->CallMethod(jvoid_type, obj, method->mMethodID, args, &unusedValue, securityContext);
         NS_IF_RELEASE(securityContext);
     }
 
@@ -702,9 +675,7 @@ private:
         ProxyJNIEnv& proxyEnv = GetProxyEnv(env);
         nsISecureEnv* secureEnv = GetSecureEnv(env);
         nsISecurityContext* securityContext = proxyEnv.getContext();
-        nsresult rv = proxyEnv.getOrSetFakeOrigin((nsCSecurityContext*)securityContext);
-        if (NS_SUCCEEDED(rv))
-            rv = secureEnv->CallNonvirtualMethod(method->mReturnType, obj, clazz, method->mMethodID, args, &outValue, securityContext);
+        nsresult rv = secureEnv->CallNonvirtualMethod(method->mReturnType, obj, clazz, method->mMethodID, args, &outValue, securityContext);
         NS_IF_RELEASE(securityContext);
         return NS_SUCCEEDED(rv) ? outValue : kErrorValue;
     }
@@ -722,9 +693,8 @@ private:
         ProxyJNIEnv& proxyEnv = GetProxyEnv(env);
         nsISecureEnv* secureEnv = GetSecureEnv(env);
         nsISecurityContext* securityContext = proxyEnv.getContext();
-        nsresult rv = proxyEnv.getOrSetFakeOrigin((nsCSecurityContext*)securityContext);
-        if (NS_SUCCEEDED(rv))
-            secureEnv->CallNonvirtualMethod(jvoid_type, obj, clazz, method->mMethodID, args, &unusedValue, securityContext);
+        nsresult result;
+        result = secureEnv->CallNonvirtualMethod(jvoid_type, obj, clazz, method->mMethodID, args, &unusedValue, securityContext);
         NS_IF_RELEASE(securityContext);
     }
 
@@ -810,9 +780,7 @@ private:
         ProxyJNIEnv& proxyEnv = GetProxyEnv(env);
         nsISecureEnv* secureEnv = GetSecureEnv(env);
         nsISecurityContext* securityContext = proxyEnv.getContext();
-        nsresult rv = proxyEnv.getOrSetFakeOrigin((nsCSecurityContext*)securityContext);
-        if (NS_SUCCEEDED(rv))
-            rv = secureEnv->GetField(field->mFieldType, obj, field->mFieldID, &outValue, securityContext);
+        nsresult rv = secureEnv->GetField(field->mFieldType, obj, field->mFieldID, &outValue, securityContext);
         NS_IF_RELEASE(securityContext);
         return NS_SUCCEEDED(rv) ? outValue : kErrorValue;
     }
@@ -840,9 +808,8 @@ private:
         ProxyJNIEnv& proxyEnv = GetProxyEnv(env);
         nsISecureEnv* secureEnv = GetSecureEnv(env);
         nsISecurityContext* securityContext = proxyEnv.getContext();
-        nsresult rv = proxyEnv.getOrSetFakeOrigin((nsCSecurityContext*)securityContext);
-        if (NS_SUCCEEDED(rv))
-            secureEnv->SetField(field->mFieldType, obj, field->mFieldID, value, securityContext);
+        nsresult result;
+        result = secureEnv->SetField(field->mFieldType, obj, field->mFieldID, value, securityContext);
         NS_IF_RELEASE(securityContext);
     }
 
@@ -897,9 +864,7 @@ private:
         ProxyJNIEnv& proxyEnv = GetProxyEnv(env);
         nsISecureEnv* secureEnv = GetSecureEnv(env);
         nsISecurityContext* securityContext = proxyEnv.getContext();
-        nsresult rv = proxyEnv.getOrSetFakeOrigin((nsCSecurityContext*)securityContext);
-        if (NS_SUCCEEDED(rv))
-            rv = secureEnv->CallStaticMethod(method->mReturnType, clazz, method->mMethodID, args, &outValue, securityContext);
+        nsresult rv = secureEnv->CallStaticMethod(method->mReturnType, clazz, method->mMethodID, args, &outValue, securityContext);
         NS_IF_RELEASE(securityContext);
         return NS_SUCCEEDED(rv) ? outValue : kErrorValue;
     }
@@ -917,9 +882,8 @@ private:
         ProxyJNIEnv& proxyEnv = GetProxyEnv(env);
         nsISecureEnv* secureEnv = GetSecureEnv(env);
         nsISecurityContext* securityContext = proxyEnv.getContext();
-        nsresult rv = proxyEnv.getOrSetFakeOrigin((nsCSecurityContext*)securityContext);
-        if (NS_SUCCEEDED(rv))
-            secureEnv->CallStaticMethod(jvoid_type, clazz, method->mMethodID, args, &unusedValue, securityContext);
+        nsresult result;
+        result = secureEnv->CallStaticMethod(jvoid_type, clazz, method->mMethodID, args, &unusedValue, securityContext);
         NS_IF_RELEASE(securityContext);
     }
 
@@ -1005,9 +969,7 @@ private:
         ProxyJNIEnv& proxyEnv = GetProxyEnv(env);
         nsISecureEnv* secureEnv = GetSecureEnv(env);
         nsISecurityContext* securityContext = proxyEnv.getContext();
-        nsresult rv = proxyEnv.getOrSetFakeOrigin((nsCSecurityContext*)securityContext);
-        if (NS_SUCCEEDED(rv))
-            rv = secureEnv->GetStaticField(field->mFieldType, clazz, field->mFieldID, &outValue, securityContext);
+        nsresult rv = secureEnv->GetStaticField(field->mFieldType, clazz, field->mFieldID, &outValue, securityContext);
         NS_IF_RELEASE(securityContext);
         return NS_SUCCEEDED(rv) ? outValue : kErrorValue;
     }
@@ -1035,9 +997,8 @@ private:
         ProxyJNIEnv& proxyEnv = GetProxyEnv(env);
         nsISecureEnv* secureEnv = GetSecureEnv(env);
         nsISecurityContext* securityContext = proxyEnv.getContext();
-        nsresult rv = proxyEnv.getOrSetFakeOrigin((nsCSecurityContext*)securityContext);
-        if (NS_SUCCEEDED(rv))
-            secureEnv->SetStaticField(field->mFieldType, clazz, field->mFieldID, value, securityContext);
+        nsresult result;
+        result = secureEnv->SetStaticField(field->mFieldType, clazz, field->mFieldID, value, securityContext);
         NS_IF_RELEASE(securityContext);
     }
 
@@ -1773,8 +1734,9 @@ ProxyJNIEnv::ProxyJNIEnv(nsIJVMPlugin* jvmPlugin, nsISecureEnv* secureEnv)
 ProxyJNIEnv::~ProxyJNIEnv()
 {
     this->functions = NULL;
-
-    NS_IF_RELEASE(mSecureEnv);
+    
+    if (mSecureEnv != NULL)
+        mSecureEnv->Release();
 }
 
 JNIEnv* CreateProxyJNI(nsIJVMPlugin* jvmPlugin, nsISecureEnv* inSecureEnv)

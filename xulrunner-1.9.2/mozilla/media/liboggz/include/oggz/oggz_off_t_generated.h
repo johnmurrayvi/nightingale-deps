@@ -59,7 +59,7 @@
 
 #include <sys/types.h>
 
-#if defined(__APPLE__) || defined(SOLARIS) || defined(OS2) || defined (_AIX)
+#if defined(__APPLE__) || defined(SOLARIS) || defined(OS2)
 typedef off_t oggz_off_t;
 #else
 typedef loff_t oggz_off_t;

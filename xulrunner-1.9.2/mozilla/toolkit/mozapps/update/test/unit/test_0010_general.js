@@ -39,11 +39,8 @@
 /* General Update Service Tests */
 
 function run_test() {
-  do_test_pending();
-  do_register_cleanup(end_test);
-
   // Verify write access to the custom app dir
-  logTestInfo("testing write access to the application directory");
+  dump("Testing: write access is required to the application directory\n");
   removeUpdateDirsAndFiles();
   var testFile = getCurrentProcessDir();
   testFile.append("update_write_access_test");
@@ -52,21 +49,10 @@ function run_test() {
   testFile.remove(false);
   do_check_false(testFile.exists());
 
-  standardInit();
+  startAUS();
 
-  // Check if available updates can be checked for
-  logTestInfo("testing nsIApplicationUpdateService:canCheckForUpdates");
-  do_check_true(gAUS.canCheckForUpdates);
-  // Check if updates can be applied
-  logTestInfo("testing nsIApplicationUpdateService:canApplyUpdates");
-  do_check_true(gAUS.canApplyUpdates);
   // Check if the update dir can be written to
-  logTestInfo("testing nsIApplicationUpdateService:canUpdate");
+  dump("Testing: nsIApplicationUpdateService:canUpdate\n");
   do_check_true(gAUS.canUpdate);
-
-  do_test_finished();
-}
-
-function end_test() {
   cleanUp();
 }

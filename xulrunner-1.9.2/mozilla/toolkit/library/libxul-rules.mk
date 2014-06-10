@@ -44,7 +44,6 @@ EXTRA_DSO_LDOPTS += \
 	$(MOZ_JS_LIBS) \
 	$(NSS_LIBS) \
 	$(MOZ_CAIRO_LIBS) \
-	$(MOZ_OTS_LIBS) \
 	$(NULL)
 
 ifdef MOZ_NATIVE_ZLIB
@@ -55,10 +54,6 @@ endif
 
 ifdef MOZ_NATIVE_HUNSPELL
 EXTRA_DSO_LDOPTS += $(MOZ_HUNSPELL_LIBS)
-endif
-
-ifdef MOZ_NATIVE_LIBEVENT
-EXTRA_DSO_LDOPTS += $(MOZ_LIBEVENT_LIBS)
 endif
 
 # need widget/src/windows for resource.h (included from widget.rc)

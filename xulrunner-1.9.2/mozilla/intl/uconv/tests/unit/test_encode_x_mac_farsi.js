@@ -9,25 +9,11 @@ const charset = "x-mac-farsi";
 function run_test() {
     var ScriptableUnicodeConverter =
 	Components.Constructor("@mozilla.org/intl/scriptableunicodeconverter",
-			       "nsIScriptableUnicodeConverter_1_9_BRANCH");
+			       "nsIScriptableUnicodeConverter");
 
     var converter = new ScriptableUnicodeConverter();
-    try {
-	converter.charset = charset;
-    } catch(e) {
-	// expected to throw before we set isInternal
-	converter.charset = "iso-8859-1";
-    }
-
-    var outString = converter.ConvertFromUnicode(inString) + converter.Finish();
-    do_check_neq(outString, expectedString);
-
-    // Set isInternal and try again
-    converter.isInternal = true;
-
     converter.charset = charset;
 
     var outString = converter.ConvertFromUnicode(inString) + converter.Finish();
-    // expected to pass this time
     do_check_eq(outString, expectedString);
 }

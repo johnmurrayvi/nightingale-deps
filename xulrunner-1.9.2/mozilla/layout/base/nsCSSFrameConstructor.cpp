@@ -6443,11 +6443,9 @@ nsCSSFrameConstructor::ContentAppended(nsIContent*     aContainer,
   }
 
   nsIAtom* frameType = parentFrame->GetType();
-  PRBool haveNoXBLChildren =
-    mDocument->BindingManager()->GetXBLChildNodesFor(aContainer) == nsnull;
+
   FrameConstructionItemList items;
-  if (aNewIndexInContainer > 0 && GetParentType(frameType) == eTypeBlock &&
-      haveNoXBLChildren) {
+  if (aNewIndexInContainer > 0 && GetParentType(frameType) == eTypeBlock) {
     // If there's a text node in the normal content list just before the new
     // items, and it has no frame, make a frame construction item for it. If it
     // doesn't need a frame, ConstructFramesFromItemList below won't give it
@@ -6498,7 +6496,8 @@ nsCSSFrameConstructor::ContentAppended(nsIContent*     aContainer,
   // To suppress whitespace-only text frames, we have to verify that
   // our container's DOM child list matches its flattened tree child list.
   // This is guaranteed to be true if GetXBLChildNodesFor() returns null.
-  items.SetParentHasNoXBLChildren(haveNoXBLChildren);
+  items.SetParentHasNoXBLChildren(
+      !mDocument->BindingManager()->GetXBLChildNodesFor(aContainer));
 
   nsFrameItems frameItems;
   ConstructFramesFromItemList(state, items, parentFrame, frameItems);
@@ -6831,9 +6830,7 @@ nsCSSFrameConstructor::ContentInserted(nsIContent*            aContainer,
 
   FrameConstructionItemList items;
   ParentType parentType = GetParentType(frameType);
-  PRBool haveNoXBLChildren =
-    mDocument->BindingManager()->GetXBLChildNodesFor(aContainer) == nsnull;
-  if (aIndexInContainer > 0 && parentType == eTypeBlock && haveNoXBLChildren) {
+  if (aIndexInContainer > 0 && parentType == eTypeBlock) {
     // If there's a text node in the normal content list just before the
     // new node, and it has no frame, make a frame construction item for
     // it, because it might need a frame now.  No need to do this if our
@@ -6846,7 +6843,7 @@ nsCSSFrameConstructor::ContentInserted(nsIContent*            aContainer,
   AddFrameConstructionItems(state, aChild, aIndexInContainer, parentFrame, items);
 
   if (aIndexInContainer + 1 < PRInt32(aContainer->GetChildCount()) &&
-      parentType == eTypeBlock && haveNoXBLChildren) {
+      parentType == eTypeBlock) {
     // If there's a text node in the normal content list just after the
     // new node, and it has no frame, make a frame construction item for
     // it, because it might need a frame now.  No need to do this if our
@@ -7064,6 +7061,11 @@ DoDeletingFrameSubtree(nsFrameManager*      aFrameManager,
                        nsIFrame*            aRemovedFrame,
                        nsIFrame*            aFrame)
 {
+#undef RECURSE
+#define RECURSE(top, child)                                                  \
+  DoDeletingFrameSubtree(aFrameManager, aDestroyQueue, (top), (child));      \
+  DoDeletingOverflowContainers(aFrameManager, aDestroyQueue, (top), (child));
+
   // Remove the mapping from the content object to its frame.
   nsIContent* content = aFrame->GetContent();
   if (content) {
@@ -7078,15 +7080,10 @@ DoDeletingFrameSubtree(nsFrameManager*      aFrameManager,
     // Walk aFrame's normal flow child frames looking for placeholder frames.
     nsIFrame* childFrame = aFrame->GetFirstChild(childListName);
     for (; childFrame; childFrame = childFrame->GetNextSibling()) {
-      if (childFrame->GetStateBits() & NS_FRAME_OUT_OF_FLOW) {
-        NS_ASSERTION(childListName == nsGkAtoms::overflowContainersList ||
-                     childListName == nsGkAtoms::excessOverflowContainersList,
-                     "out-of-flow on wrong child list");
-        continue;
-      }
+      NS_ASSERTION(!(childFrame->GetStateBits() & NS_FRAME_OUT_OF_FLOW),
+                   "out-of-flow on wrong child list");
       if (NS_LIKELY(nsGkAtoms::placeholderFrame != childFrame->GetType())) {
-        DoDeletingFrameSubtree(aFrameManager, aDestroyQueue,
-                               aRemovedFrame, childFrame);
+        RECURSE(aRemovedFrame, childFrame);
       } else {
         nsIFrame* outOfFlowFrame =
           nsPlaceholderFrame::GetRealFrameForPlaceholder(childFrame);
@@ -7104,29 +7101,24 @@ DoDeletingFrameSubtree(nsFrameManager*      aFrameManager,
                        "out-of-flow is already in the destroy queue");
           aDestroyQueue.AppendElement(outOfFlowFrame);
           // Recurse into the out-of-flow, it is now the aRemovedFrame.
-          DoDeletingFrameSubtree(aFrameManager, aDestroyQueue,
-                                 outOfFlowFrame, outOfFlowFrame);
-          DoDeletingOverflowContainers(aFrameManager, aDestroyQueue,
-                                       outOfFlowFrame, outOfFlowFrame);
+          RECURSE(outOfFlowFrame, outOfFlowFrame);
         }
         else {
           // Also recurse into the out-of-flow when it's a descendant of aRemovedFrame
           // since we don't walk those lists, see |childListName| increment below.
-          DoDeletingFrameSubtree(aFrameManager, aDestroyQueue,
-                                 aRemovedFrame, outOfFlowFrame);
-          DoDeletingOverflowContainers(aFrameManager, aDestroyQueue,
-                                       aRemovedFrame, outOfFlowFrame);
+          RECURSE(aRemovedFrame, outOfFlowFrame);
         }
       }
     }
 
     // Move to next child list but skip lists with frames we should have
-    // a placeholder for.  Note that we only process in-flow overflow
-    // containers on the overflowContainersList/excessOverflowContainersList,
-    // out-of-flows are reached through the next-in-flow chain (bug 468563).
+    // a placeholder for or that contains only next-in-flow overflow containers
+    // (which we walk explicitly above).
     do {
       childListName = aFrame->GetAdditionalChildListName(childListIndex++);
-    } while (IsOutOfFlowList(childListName));
+    } while (IsOutOfFlowList(childListName) ||
+             childListName == nsGkAtoms::overflowContainersList ||
+             childListName == nsGkAtoms::excessOverflowContainersList);
   } while (childListName);
 }
 
@@ -7554,15 +7546,13 @@ UpdateViewsForTree(nsIFrame* aFrame, nsIViewManager* aViewManager,
       if (!(child->GetStateBits() & NS_FRAME_OUT_OF_FLOW)
           || (child->GetStateBits() & NS_FRAME_IS_OVERFLOW_CONTAINER)) {
         // only do frames that don't have placeholders
-        if (nsGkAtoms::placeholderFrame == child->GetType()) {
-          // do the out-of-flow frame and its continuations
+        if (nsGkAtoms::placeholderFrame == child->GetType()) { // placeholder
+          // get out of flow frame and start over there
           nsIFrame* outOfFlowFrame =
             nsPlaceholderFrame::GetRealFrameForPlaceholder(child);
-          do {
-            DoApplyRenderingChangeToTree(outOfFlowFrame, aViewManager,
-                                         aFrameManager, aChange);
-          } while ((outOfFlowFrame = outOfFlowFrame->GetNextContinuation()) &&
-                   (outOfFlowFrame->GetStateBits() & NS_FRAME_IS_OVERFLOW_CONTAINER));
+
+          DoApplyRenderingChangeToTree(outOfFlowFrame, aViewManager,
+                                       aFrameManager, aChange);
         }
         else {  // regular frame
           UpdateViewsForTree(child, aViewManager, aFrameManager, aChange);
@@ -8179,10 +8169,7 @@ nsCSSFrameConstructor::EndUpdate()
     RecalcQuotesAndCounters();
     NS_ASSERTION(mUpdateCount == 1, "Odd update count");
   }
-  // Negative update counts don't make sense
-  if (mUpdateCount > 0) {
-    --mUpdateCount;
-  }
+  --mUpdateCount;
 }
 
 void
@@ -9120,16 +9107,6 @@ nsCSSFrameConstructor::MaybeRecreateContainerForFrameRemoval(nsIFrame* aFrame,
       return PR_TRUE;
     }
   }
-
-#ifdef MOZ_XUL
-  if (aFrame->GetType() == nsGkAtoms::popupSetFrame) {
-    nsIRootBox* rootBox = nsIRootBox::GetRootBox(mPresShell);
-    if (rootBox && rootBox->GetPopupSetFrame() == aFrame) {
-      *aResult = ReconstructDocElementHierarchy();
-      return PR_TRUE;
-    }
-  }
-#endif
 
   // Might need to reconstruct things if this frame's nextSibling is a table
   // pseudo, since removal of this frame might mean that this pseudo needs to

@@ -43,6 +43,8 @@
 #include <string>
 #include <sstream>
 
+using namespace std;
+
 typedef enum  {
   DM_DEFAULT,
   DM_SOLID_COLOR
@@ -53,18 +55,8 @@ typedef enum {
   FUNCTION_NPP_GETURL,
   FUNCTION_NPP_GETURLNOTIFY,
   FUNCTION_NPP_POSTURL,
-  FUNCTION_NPP_POSTURLNOTIFY,
-  FUNCTION_NPP_NEWSTREAM,
-  FUNCTION_NPP_WRITEREADY,
-  FUNCTION_NPP_WRITE,
-  FUNCTION_NPP_DESTROYSTREAM,
-  FUNCTION_NPP_WRITE_RPC
+  FUNCTION_NPP_POSTURLNOTIFY
 } TestFunction;
-
-typedef struct FunctionTable {
-  TestFunction funcId;
-  const char* funcName;
-} FunctionTable;
 
 typedef enum {
   POSTMODE_FRAME,
@@ -88,33 +80,18 @@ typedef struct InstanceData {
   NPWindow window;
   TestNPObject* scriptableObject;
   PlatformData* platformData;
-  int32_t instanceCountWatchGeneration;
+  uint32_t instanceCountWatchGeneration;
   bool lastReportedPrivateModeState;
   bool hasWidget;
   bool npnNewStream;
-  bool throwOnNextInvoke;
-  uint32_t timerID[2];
-  bool timerTestResult;
-  bool asyncCallbackResult;
-  int32_t winX;
-  int32_t winY;
   int32_t lastMouseX;
   int32_t lastMouseY;
-  int32_t widthAtLastPaint;
   int32_t paintCount;
-  int32_t writeCount;
-  int32_t writeReadyCount;
-  int32_t asyncTestPhase;
   TestFunction testFunction;
-  TestFunction functionToFail;
-  NPError failureCode;
-  NPObject* callOnDestroy;
   PostMode postMode;
-  std::string testUrl;
-  std::string frame;
-  std::string timerTestScriptCallback;
-  std::string asyncTestScriptCallback;
-  std::ostringstream err;
+  string testUrl;
+  string frame;
+  ostringstream err;
   uint16_t streamMode;
   int32_t streamChunkSize;
   int32_t streamBufSize;
@@ -122,9 +99,6 @@ typedef struct InstanceData {
   TestRange* testrange;
   void* streamBuf;
   void* fileBuf;
-  bool crashOnDestroy;
 } InstanceData;
-
-void notifyDidPaint(InstanceData* instanceData);
 
 #endif // nptest_h_

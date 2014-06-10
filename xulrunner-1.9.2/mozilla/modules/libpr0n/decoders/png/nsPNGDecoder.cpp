@@ -301,16 +301,11 @@ NS_IMETHODIMP nsPNGDecoder::Init(imgILoad *aLoad)
       return NS_ERROR_OUT_OF_MEMORY;
       
     mImageLoad->SetImage(mImage);
-
-    // Don't discard if we're multipart, and assume we are for safety.
-    PRBool multipart = PR_TRUE;
-    if (NS_SUCCEEDED(mImageLoad->GetIsMultiPartChannel(&multipart)) && !multipart) {
-      if (NS_FAILED(mImage->SetDiscardable("image/png"))) {
-        PR_LOG(gPNGDecoderAccountingLog, PR_LOG_DEBUG,
-               ("PNGDecoderAccounting: info_callback(): failed to set image container %p as discardable",
-                mImage.get()));
-        return NS_ERROR_FAILURE;
-      }
+    if (NS_FAILED(mImage->SetDiscardable("image/png"))) {
+      PR_LOG(gPNGDecoderAccountingLog, PR_LOG_DEBUG,
+             ("PNGDecoderAccounting: info_callback(): failed to set image container %p as discardable",
+              mImage.get()));
+      return NS_ERROR_FAILURE;
     }
   }
 
@@ -762,9 +757,6 @@ row_callback(png_structp png_ptr, png_bytep new_row,
   
   // skip this frame
   if (decoder->mFrameIsHidden)
-    return;
-
-  if (row_num >= decoder->mFrameRect.height)
     return;
 
   if (new_row) {

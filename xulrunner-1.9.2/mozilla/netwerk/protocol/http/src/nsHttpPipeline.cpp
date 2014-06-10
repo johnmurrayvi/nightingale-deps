@@ -1,4 +1,3 @@
-
 /* -*- Mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -278,7 +277,7 @@ nsHttpPipeline::PushBack(const char *data, PRUint32 length)
     }
     else if (length > mPushBackMax) {
         // grow push back buffer as necessary.
-        NS_ASSERTION(length <= nsIOService::gDefaultSegmentSize, "too big");
+        NS_ASSERTION(length <= NS_HTTP_SEGMENT_SIZE, "too big");
         mPushBackMax = length;
         mPushBackBuf = (char *) realloc(mPushBackBuf, mPushBackMax);
         if (!mPushBackBuf)
@@ -559,8 +558,8 @@ nsHttpPipeline::FillSendBuf()
         // allocate a single-segment pipe
         rv = NS_NewPipe(getter_AddRefs(mSendBufIn),
                         getter_AddRefs(mSendBufOut),
-                        nsIOService::gDefaultSegmentSize,
-                        nsIOService::gDefaultSegmentSize,
+                        NS_HTTP_SEGMENT_SIZE,
+                        NS_HTTP_SEGMENT_SIZE,
                         PR_TRUE, PR_TRUE,
                         nsIOService::gBufferCache);
         if (NS_FAILED(rv)) return rv;

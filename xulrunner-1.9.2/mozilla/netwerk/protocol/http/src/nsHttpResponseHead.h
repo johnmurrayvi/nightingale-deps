@@ -106,7 +106,7 @@ public:
     void     ParseStatusLine(char *line);
 
     // parse a header line. line must be null terminated. parsing is destructive.
-    nsresult ParseHeaderLine(char *line);
+    void     ParseHeaderLine(char *line);
 
     // cache validation support methods
     nsresult ComputeFreshnessLifetime(PRUint32 *);

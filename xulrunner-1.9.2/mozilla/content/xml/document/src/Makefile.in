@@ -91,7 +91,6 @@ LOCAL_INCLUDES	= \
 		-I$(srcdir)/../../../xul/content/src \
 		-I$(srcdir)/../../../events/src \
 		-I$(srcdir)/../../../../dom/base \
-		-I$(srcdir)/../../../../caps/include \
 		$(NULL)
 
 DEFINES += -D_IMPL_NS_LAYOUT
