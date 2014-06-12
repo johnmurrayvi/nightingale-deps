@@ -18,4 +18,4 @@ ac_add_options --enable-splashscreen
 ac_add_options --disable-mochitest
 ac_add_options --with-windows-version=600
 
-export WIN32_CRT_SRC_DIR="/d/msvc8/VC/crt/src"
+export WIN32_CRT_SRC_DIR="/c/Program Files (x86)/Microsoft Visual Studio 8/VC/crt/src"
