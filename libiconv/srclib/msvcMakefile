@@ -1,0 +1,38 @@
+
+OBJECTS = \
+  error.obj \
+  progname.obj progreloc.obj \
+  xmalloc.obj xstrdup.obj \
+  \
+  relocatable.obj \
+  setenv.obj unsetenv.obj
+
+all: icrt.lib
+
+error.obj: error.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c error.c
+
+progname.obj: progname.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c progname.c
+
+progreloc.obj: progreloc.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c progreloc.c
+
+xmalloc.obj: xmalloc.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c xmalloc.c
+
+xstrdup.obj: xstrdup.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c xstrdup.c
+
+relocatable.obj: relocatable.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c relocatable.c
+
+setenv.obj: setenv.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c setenv.c
+
+unsetenv.obj: unsetenv.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c unsetenv.c
+
+icrt.lib : $(OBJECTS)
+	-$(RM) icrt.lib
+	$(AR) $(AR_FLAGS)icrt.lib $(OBJECTS)

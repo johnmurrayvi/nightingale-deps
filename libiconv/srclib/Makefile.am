@@ -23,6 +23,9 @@ MOSTLYCLEANFILES =
 
 RM = rm -f
 
+
+include $(srcdir)/msvcMakefile
+
 noinst_LIBRARIES = libicrt.a
 
 # Sources that are compiled on all platforms.
