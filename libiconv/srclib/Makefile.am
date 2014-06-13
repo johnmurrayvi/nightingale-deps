@@ -23,8 +23,9 @@ MOSTLYCLEANFILES =
 
 RM = rm -f
 
-
+if ENABLE_MSVC
 include $(srcdir)/msvcMakefile
+endif
 
 noinst_LIBRARIES = libicrt.a
 

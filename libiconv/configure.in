@@ -74,11 +74,15 @@ AC_EXEEXT
 
 dnl           check for build configuration
 
-AC_DISABLE_STATIC
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 AM_ICONV
 AM_GNU_GETTEXT([external])
+
+AC_ARG_ENABLE([msvc],
+[  --enable-msvc  build using msvc [default=no]],
+enable_msvc="$enableval", enable_msvc="no")
+AM_CONDITIONAL([ENABLE_MSVC], [test x"$enable_msvc" = x"yes"])
 
 dnl           checks for header files
 
