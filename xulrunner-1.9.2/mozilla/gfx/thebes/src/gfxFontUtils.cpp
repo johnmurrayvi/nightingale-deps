@@ -257,8 +257,7 @@ gfxFontUtils::ReadCMAPTableFormat12(PRUint8 *aBuf, PRUint32 aLength, gfxSparseBi
     NS_ENSURE_TRUE(tablelen <= aLength, NS_ERROR_GFX_CMAP_MALFORMED);
     NS_ENSURE_TRUE(tablelen >= 16, NS_ERROR_GFX_CMAP_MALFORMED);
 
-    NS_ENSURE_TRUE(ReadLongAt(aBuf, OffsetLanguage) == 0, 
-                   NS_ERROR_GFX_CMAP_MALFORMED);
+    // ignore the language code of the font (should be 0 but sometimes not)
 
     const PRUint32 numGroups  = ReadLongAt(aBuf, OffsetNumberGroups);
     NS_ENSURE_TRUE(tablelen >= 16 + (12 * numGroups), 
@@ -296,11 +295,7 @@ gfxFontUtils::ReadCMAPTableFormat4(PRUint8 *aBuf, PRUint32 aLength, gfxSparseBit
     NS_ENSURE_TRUE(tablelen <= aLength, NS_ERROR_GFX_CMAP_MALFORMED);
     NS_ENSURE_TRUE(tablelen > 16, NS_ERROR_GFX_CMAP_MALFORMED);
     
-    // some buggy fonts on Mac OS report lang = English (e.g. Arial Narrow Bold, v. 1.1 (Tiger))
-#if defined(XP_WIN)
-    NS_ENSURE_TRUE(ReadShortAt(aBuf, OffsetLanguage) == 0, 
-                   NS_ERROR_GFX_CMAP_MALFORMED);
-#endif
+    // ignore the language code of the font (should be 0 but sometimes not)
 
     PRUint16 segCountX2 = ReadShortAt(aBuf, OffsetSegCountX2);
     NS_ENSURE_TRUE(tablelen >= 16 + (segCountX2 * 4), 

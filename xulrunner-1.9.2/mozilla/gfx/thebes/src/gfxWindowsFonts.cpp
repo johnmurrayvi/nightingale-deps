@@ -286,7 +286,7 @@ FontFamily::FindStyleVariations()
         char msgBuf[256];
         (void)sprintf(msgBuf, "no styles available in family \"%s\"",
                       NS_ConvertUTF16toUTF8(mName).get());
-        NS_ASSERTION(mAvailableFonts.Length() != 0, msgBuf);
+        NS_WARNING(msgBuf);
     }
 #endif
 
