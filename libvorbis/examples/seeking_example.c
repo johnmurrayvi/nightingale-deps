@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: illustrate seeking, and test it too
- last mod: $Id: seeking_example.c 17561 2010-10-23 10:34:24Z xiphmont $
+ last mod: $Id: seeking_example.c 16037 2009-05-26 21:10:58Z xiphmont $
 
  ********************************************************************/
 
@@ -29,13 +29,11 @@ void _verify(OggVorbis_File *ov,
              ogg_int64_t val,ogg_int64_t pcmval,double timeval,
              ogg_int64_t pcmlength,
              char *bigassbuffer){
-  off_t i;
   int j;
   long bread;
   char buffer[4096];
   int dummy;
   ogg_int64_t pos;
-  int hs = ov_halfrate_p(ov);
 
   /* verify the raw position, the pcm position and position decode */
   if(val!=-1 && ov_raw_tell(ov)<val){
@@ -60,24 +58,15 @@ void _verify(OggVorbis_File *ov,
   }
   bread=ov_read(ov,buffer,4096,1,1,1,&dummy);
   for(j=0;j<bread;j++){
-    if(buffer[j]!=bigassbuffer[j+((pos>>hs)*2)]){
-      fprintf(stderr,"data after seek doesn't match declared pcm position %ld\n",(long)pos);
+    if(buffer[j]!=bigassbuffer[j+pos*2]){
+      fprintf(stderr,"data position after seek doesn't match pcm position\n");
 
-      for(i=0;i<(pcmlength>>hs)*2-bread;i++){
-        for(j=0;j<bread;j++)
-          if(buffer[j] != bigassbuffer[i+j])break;
-        if(j==bread){
-          fprintf(stderr,"data after seek appears to match position %ld\n",(long)((i/2)<<hs));
-        }
-      }
       {
         FILE *f=fopen("a.m","w");
-        for(j=0;j<bread;j++)fprintf(f,"%d %d\n",j,(int)buffer[j]);
+        for(j=0;j<bread;j++)fprintf(f,"%d\n",(int)buffer[j]);
         fclose(f);
         f=fopen("b.m","w");
-        for(j=-4096;j<bread+4096;j++)
-          if(j+((pos*2)>>hs)>=0 && (j+((pos*2)>>hs))<(pcmlength>>hs)*2)
-             fprintf(f,"%d %d\n",j,(int)bigassbuffer[j+((pos*2)>>hs)]);
+        for(j=0;j<bread;j++)fprintf(f,"%d\n",(int)bigassbuffer[j+pos*2]);
         fclose(f);
       }
 
@@ -93,7 +82,6 @@ int main(){
   double timelength;
   char *bigassbuffer;
   int dummy;
-  int hs=0;
 
 #ifdef _WIN32 /* We need to set stdin/stdout to binary mode. Damn windows. */
   _setmode( _fileno( stdin ), _O_BINARY );
@@ -105,14 +93,6 @@ int main(){
     fprintf(stderr,"Could not open input as an OggVorbis file.\n\n");
     exit(1);
   }
-
-#if 0 /*enable this code to test seeking with halfrate decode */
-  if(ov_halfrate(&ov,1)){
-    fprintf(stderr,"Sorry; unable to set half-rate decode.\n\n");
-    exit(1);
-  }else
-    hs=1;
-#endif
 
   if(ov_seekable(&ov)){
 
@@ -132,21 +112,18 @@ int main(){
        does what it claimed, decode the entire file into memory */
     pcmlength=ov_pcm_total(&ov,-1);
     timelength=ov_time_total(&ov,-1);
-    bigassbuffer=malloc((pcmlength>>hs)*2); /* w00t */
+    bigassbuffer=malloc(pcmlength*2); /* w00t */
     i=0;
-    while(i<(pcmlength>>hs)*2){
-      int ret=ov_read(&ov,bigassbuffer+i,((pcmlength>>hs)*2)-i,1,1,1,&dummy);
-      if(ret<0){
-        fprintf(stderr,"Error reading file.\n");
-        exit(1);
-      }
+    while(i<pcmlength*2){
+      int ret=ov_read(&ov,bigassbuffer+i,pcmlength*2-i,1,1,1,&dummy);
+      if(ret<0)continue;
       if(ret){
         i+=ret;
       }else{
-        pcmlength=(i/2)<<hs;
+        pcmlength=i/2;
       }
       fprintf(stderr,"\rloading.... [%ld left]              ",
-              (long)((pcmlength>>hs)*2-i));
+              (long)(pcmlength*2-i));
     }
     
     {
@@ -186,7 +163,7 @@ int main(){
 
       }
     }
-
+    
     fprintf(stderr,"\r");
     {
       fprintf(stderr,"testing pcm exact seeking to random places in %ld samples....\n",
@@ -200,7 +177,7 @@ int main(){
           fprintf(stderr,"seek failed: %d\n",ret);
           exit(1);
         }
-        if(ov_pcm_tell(&ov)!=((val>>hs)<<hs)){
+        if(ov_pcm_tell(&ov)!=val){
           fprintf(stderr,"Declared position didn't perfectly match request: %ld != %ld\n",
                  (long)val,(long)ov_pcm_tell(&ov));
           exit(1);
