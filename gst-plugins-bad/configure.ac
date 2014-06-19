@@ -433,7 +433,7 @@ int main ()
 
   if test "x$HAVE_DIRECTDRAW" = "xyes";  then
     dnl this is much more than we want
-    DIRECTDRAW_LIBS="-lddraw -Wl,-ldxguid -lgdi32"
+    DIRECTDRAW_LIBS="-lddraw -ldxguid -lgdi32"
     AC_SUBST(DIRECTX_CFLAGS)
     AC_SUBST(DIRECTX_LDFLAGS)
     AC_SUBST(DIRECTDRAW_LIBS)
