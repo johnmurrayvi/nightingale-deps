@@ -795,8 +795,8 @@ libgstdshowdecwrapper_la_CXXFLAGS = $(GST_CFLAGS) -I$(top_srcdir)/gst-libs/gst \
    -I$(WINDOWS_SDK_DIR)/Samples/Multimedia/DirectShow/BaseClasses \
    -DUNICODE -D_UNICODE
 
-libgstdshowdecwrapper_la_LIBADD = $(GST_LIBS) -lstrmbase -lwinmm \
-                                 -ldmoguids -lwmcodecdspuuid
+libgstdshowdecwrapper_la_LIBADD = $(GST_LIBS) -Wl,-lstrmbase -lwinmm \
+                                 -Wl,-ldmoguids -Wl,-lwmcodecdspuuid
 
 libgstdshowdecwrapper_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS) \
    -L$(DIRECTSHOW_LIB_DIR) \
