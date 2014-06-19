@@ -369,7 +369,7 @@ AG_GST_CHECK_FEATURE(DIRECTSOUND, [DirectSound], directsoundsrc, [
   save_LIBS="$LIBS"
   CFLAGS="$CFLAGS $DIRECTX_CFLAGS"
   LDFLAGS="$LDFLAGS $DIRECTX_LDFLAGS"
-  LIBS="$LIBS -ldsound -ldxerr9 -luser32"
+  LIBS="$LIBS -ldsound -Wl,-ldxerr9 -luser32"
   AC_MSG_CHECKING(for DirectSound LDFLAGS)
   AC_LINK_IFELSE([
 #include <windows.h>
@@ -393,7 +393,7 @@ int main ()
 
   if test "x$HAVE_DIRECTSOUND" = "xyes";  then
     dnl this is much more than we want
-    DIRECTSOUND_LIBS="-ldsound -ldxerr9 -luser32"
+    DIRECTSOUND_LIBS="-ldsound -Wl,-ldxerr9 -luser32"
     AC_SUBST(DIRECTX_CFLAGS)
     AC_SUBST(DIRECTX_LDFLAGS)
     AC_SUBST(DIRECTSOUND_LIBS)
@@ -433,7 +433,7 @@ int main ()
 
   if test "x$HAVE_DIRECTDRAW" = "xyes";  then
     dnl this is much more than we want
-    DIRECTDRAW_LIBS="-lddraw -ldxguid -lgdi32"
+    DIRECTDRAW_LIBS="-lddraw -Wl,-ldxguid -lgdi32"
     AC_SUBST(DIRECTX_CFLAGS)
     AC_SUBST(DIRECTX_LDFLAGS)
     AC_SUBST(DIRECTDRAW_LIBS)
@@ -480,7 +480,7 @@ AG_GST_CHECK_FEATURE(QUICKTIME, [QuickTime wrapper], qtwrapper, [
             [
               HAVE_QUICKTIME="yes"
               QUICKTIME_CFLAGS="-I$QUICKTIME_SDK_DIR/CIncludes"
-              QUICKTIME_LDFLAGS="-L$QUICKTIME_SDK_DIR/Libraries -lCVClient -lQTMLClient -luser32 -ladvapi32"
+              QUICKTIME_LDFLAGS="-L$QUICKTIME_SDK_DIR/Libraries -Wl,-lCVClient -Wl,-lQTMLClient -luser32 -ladvapi32"
             ], 
             [
               HAVE_QUICKTIME="no"
@@ -1811,7 +1811,7 @@ AC_ARG_WITH(mozilla,
         [  --with-mozilla=PATH     Specify path to Mozilla installation ],
         [
           MOZILLA_CFLAGS="-I$withval/include/necko -I$withval/include/xpcom -I$withval/include/string -I$withval/include/nspr -I$withval/include -I$withval/include/windowwatcher"
-          MOZILLA_LIBS="-L$withval/lib -lxpcomglue_s -lxpcom -lplds4 -lplc4 -lnspr4"
+          MOZILLA_LIBS="-L$withval/lib -Wl,-lxpcomglue_s -lxpcom -lplds4 -lplc4 -lnspr4"
         ],
         [
           MOZILLA_CFLAGS=""

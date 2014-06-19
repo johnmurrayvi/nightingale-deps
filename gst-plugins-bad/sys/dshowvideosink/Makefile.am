@@ -12,7 +12,7 @@ libgstdshowvideosink_la_LIBADD = $(GST_LIBS) \
     $(GST_PLUGINS_BASE_LIBS) \
     -lgstinterfaces-$(GST_MAJORMINOR) \
     -lgstbase-$(GST_MAJORMINOR) \
-   -lstrmbase -lwinmm -lstrmiids \
+   -Wl,-lstrmbase -lwinmm -Wl,-lstrmiids \
    -lole32 -luser32 -ladvapi32 -lgdi32 -loleaut32
 libgstdshowvideosink_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS) \
    -L$(DIRECTSHOW_LIB_DIR) \

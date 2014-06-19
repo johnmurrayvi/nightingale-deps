@@ -11,9 +11,9 @@ libgstdmoenc_la_LIBADD =     \
     -lgstaudio-$(GST_MAJORMINOR) \
     -lgsttag-$(GST_MAJORMINOR)   \
     -lmsdmo                      \
-    -ldmoguids                   \
-    -lwmcodecdspuuid             \
-    -lstrmiids                   \
+    -Wl,-ldmoguids               \
+    -Wl,-lwmcodecdspuuid         \
+    -Wl,-lstrmiids               \
     -lole32
 
 libgstdmoenc_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS) \
