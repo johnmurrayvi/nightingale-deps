@@ -520,8 +520,8 @@ endif
 # libIDL
 #
 ifeq (Darwin,$(SB_VENDOR_ARCH))
-   ifneq ($(wildcard $(SB_VENDOR_BINARIES_DIR)/libIDL/$(SB_BUILD_TYPE)),)
-      ifneq (,$(call enable-sb-lib, libIDL))
+   ifneq (,$(call enable-sb-lib, libIDL))
+      ifneq ($(wildcard $(SB_VENDOR_BINARIES_DIR)/libIDL/$(SB_BUILD_TYPE)),)
          $(info Enabling Songbird vendor lib: libIDL)
          SB_LIBIDL_DIR := $(call find-dep-dir, libIDL)
          SB_PATH += $(SB_LIBIDL_DIR)/bin
@@ -535,6 +535,7 @@ endif
 # gstreamer
 #
 ifneq (,$(call enable-sb-lib, gstreamer))
+  ifneq ($(wildcard $(SB_VENDOR_BINARIES_DIR)/gstreamer/$(SB_BUILD_TYPE)), )
    $(info Enabling Songbird vendor lib: gstreamer)
    SB_GSTREAMER_DIR = $(call find-dep-dir, gstreamer)
    SB_PATH += $(SB_GSTREAMER_DIR)/bin
@@ -545,22 +546,26 @@ ifneq (,$(call enable-sb-lib, gstreamer))
    # base
    GST_BASE_DYLIBS = audio cdda fft interfaces netbuffer pbutils riff \
     rtp rtsp sdp tag video
+  endif
 endif
 
 #
 # gstreamer-plugins-base
 #
 ifneq (,$(call enable-sb-lib, gst-plugins-base))
+  ifneq ($(wildcard $(SB_VENDOR_BINARIES_DIR)/gst-plugins-base/$(SB_BUILD_TYPE)), )
    $(info Enabling Songbird vendor lib: gst-plugins-base)
    SB_GST_PLUGINS_BASE_DIR = $(call find-dep-dir, gst-plugins-base)
    SB_PATH += $(SB_GST_PLUGINS_BASE_DIR)/bin
    SB_PKG_CONFIG_PATH += $(SB_GST_PLUGINS_BASE_DIR)/lib/pkgconfig
+  endif
 endif
 
 #
 # libogg
 #
 ifneq (,$(call enable-sb-lib, ogg))
+  ifneq ($(wildcard $(SB_VENDOR_BINARIES_DIR)/libogg/$(SB_BUILD_TYPE)), )
    $(info Enabling Songbird vendor lib: ogg)
    SB_LIBOGG_DIR = $(call find-dep-dir, libogg)
    SB_OGG_LIBS = -L$(SB_LIBOGG_DIR)/lib -logg
@@ -573,12 +578,14 @@ ifneq (,$(call enable-sb-lib, ogg))
          SB_LIBOGG_LIBS += -Wl,-Zi
       endif
    endif
+  endif
 endif
 
 #
 # libtheora
 #
 ifneq (,$(call enable-sb-lib, theora))
+  ifneq ($(wildcard $(SB_VENDOR_BINARIES_DIR)/libtheora/$(SB_BUILD_TYPE)), )
    $(info Enabling Songbird vendor lib: theora)
    SB_LIBTHEORA_DIR = $(call find-dep-dir, libtheora)
    SB_THEORA_LIBS := -L$(SB_LIBTHEORA_DIR)/lib -ltheora
@@ -592,6 +599,7 @@ ifneq (,$(call enable-sb-lib, theora))
       ifeq (debug,$(SB_BUILD_TYPE))
          SB_THEORA_LIBS += -Wl,-Zi
       endif
+   endif
   endif
 endif
 
@@ -599,6 +607,7 @@ endif
 # libvorbis
 #
 ifneq (,$(call enable-sb-lib, vorbis))
+  ifneq ($(wildcard $(SB_VENDOR_BINARIES_DIR)/libvorbis/$(SB_BUILD_TYPE)), )
    $(info Enabling Songbird vendor lib: vorbis)
    SB_LIBVORBIS_DIR = $(call find-dep-dir, libvorbis)
    SB_VORBIS_LIBS := -L$(SB_LIBVORBIS_DIR)/lib -lvorbis -lvorbisenc
@@ -613,12 +622,14 @@ ifneq (,$(call enable-sb-lib, vorbis))
          SB_VORBIS_LIBS += -Wl,-Zi
       endif
    endif
+  endif
 endif
 
 #
 # libFLAC
 #
 ifneq (,$(call enable-sb-lib, flac))
+  ifneq ($(wildcard $(SB_VENDOR_BINARIES_DIR)/flac/$(SB_BUILD_TYPE)), )
    $(info Enabling Songbird vendor lib: flac)
    SB_LIBFLAC_DIR = $(call find-dep-dir, flac)
    SB_LDFLAGS += -L$(SB_LIBFLAC_DIR)/lib
@@ -631,12 +642,14 @@ ifneq (,$(call enable-sb-lib, flac))
    endif
    SB_CPPFLAGS += -I$(SB_LIBFLAC_DIR)/include
    SB_PKG_CONFIG_PATH += $(SB_LIBFLAC_DIR)/lib/pkgconfig
+  endif
 endif
 
 #
 # libjpeg
 #
 ifneq (,$(call enable-sb-lib, jpeg))
+  ifneq ($(wildcard $(SB_VENDOR_BINARIES_DIR)/libjpeg/$(SB_BUILD_TYPE)), )
    $(info Enabling Songbird vendor lib: jpeg)
    SB_LIBJPEG_DIR = $(call find-dep-dir, libjpeg)
    SB_LDFLAGS += -L$(SB_LIBJPEG_DIR)/lib
@@ -649,6 +662,7 @@ ifneq (,$(call enable-sb-lib, jpeg))
       ifeq (debug,$(SB_BUILD_TYPE))
          SB_JPEG_LIBS += -Wl,-Zi
       endif
+   endif
   endif
 endif
 
