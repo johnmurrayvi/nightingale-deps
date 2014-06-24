@@ -1,11 +1,511 @@
-# The Microsoft C Runtime source code to which this document refers is available
-# directly from Microsoft Corporation, under a separate license.
-# Please ensure that if you are using that source code, you have appropriate
-# rights to use it.  By providing you access to this file, Mozilla Corporation
-# and its affiliates do not purport to grant any rights in that source code. 
-# Binaries are available under separate licenses at 
-# http://www.microsoft.com/downloads/details.aspx?familyid=9B2DA534-3E03-4391-8A4D-074B9F2BC1BF&displaylang=en
-diff -re crt/src/_sample_.rc crtsrc/_sample_.rc
+diff -re crt/src/crt0.c crtsrc/crt0.c
+213a
+#endif
+.
+212a
+#ifdef MOZ_MEMORY
+        /*
+         * this used to happen in _mtinit, but we need it before malloc
+         */
+        _init_pointers();       /* initialize global function pointers */
+
+        if ( malloc_init_hard() )                /* initialize heap */
+#else
+.
+87a
+#ifdef MOZ_MEMORY
+extern BOOL malloc_init_hard(void);
+#endif
+.
+diff -re crt/src/crt0dat.c crtsrc/crt0dat.c
+837a
+#endif
+.
+836a
+#ifndef MOZ_MEMORY
+.
+826a
+#endif
+.
+825a
+#ifndef MOZ_MEMORY
+.
+diff -re crt/src/crtdbg.h crtsrc/crtdbg.h
+1151c
+#if (!defined (_M_CEE_PURE) && !defined(MOZ_MEMORY))
+.
+1137c
+#if (!defined(_DEBUG) || defined(MOZ_MEMORY))
+
+.
+1127a
+#endif
+.
+1054a
+#ifndef MOZ_MEMORY
+.
+1009a
+#endif
+.
+1006a
+#ifndef MOZ_MEMORY
+.
+928a
+#endif  /* MOZ_MEMORY */
+
+.
+924a
+#ifndef MOZ_MEMORY
+.
+922a
+#endif /* MOZ_MEMORY */ 
+.
+920a
+#ifndef MOZ_MEMORY
+.
+802a
+#endif /* MOZ_MEMORY */ 
+.
+688a
+#ifndef MOZ_MEMORY
+.
+625a
+#if (defined(_CRTDBG_MAP_ALLOC) && !defined(MOZ_MEMORY))
+.
+624d
+616a
+#endif
+.
+603a
+#ifndef MOZ_MEMORY
+.
+474a
+#endif
+.
+471a
+#ifndef MOZ_MEMORY
+.
+339a
+#ifdef MOZ_MEMORY
+// Defined in dbgint.h, but tc-Int doesn't include that header
+#define _free_base free
+#define _malloc_base malloc
+#endif
+.
+329c
+#endif /* not defined _DEBUG */
+
+#ifdef _DEBUG
+.
+322a
+#endif
+.
+318a
+#if (!defined(MOZ_MEMORY) && !defined(MOZ_MEMORY_DEBUG))
+.
+314a
+#endif
+.
+309a
+#if (!defined(MOZ_MEMORY) && !defined(MOZ_MEMORY_DEBUG))
+.
+308a
+#endif
+.
+302a
+#if (!defined(MOZ_MEMORY) && !defined(MOZ_MEMORY_DEBUG))
+.
+300a
+#endif /* MOZ_MEMORY_DEBUG */
+
+.
+204a
+#ifndef MOZ_MEMORY_DEBUG
+.
+191c
+#if (!(defined(_DEBUG)) || defined(MOZ_MEMORY))
+.
+diff -re crt/src/crtexe.c crtsrc/crtexe.c
+323a
+#endif
+.
+322a
+#ifndef MOZ_MEMORY
+.
+diff -re crt/src/crtheap.c crtsrc/crtheap.c
+61a
+#endif
+.
+60a
+#ifdef MOZ_MEMORY
+    pv = calloc(count, size);
+#else
+.
+58a
+#endif
+.
+57a
+#ifndef MOZ_MEMORY
+.
+diff -re crt/src/crtlib.c crtsrc/crtlib.c
+692a
+#endif
+.
+685a
+#ifndef MOZ_MEMORY
+.
+355a
+#endif
+.
+354a
+#ifndef MOZ_MEMORY
+.
+339a
+#ifdef MOZ_MEMORY
+                malloc_shutdown();
+#endif
+.
+338c
+#endif  /* _DEBUG && MOZ_MEMORY */
+.
+330c
+#if defined(_DEBUG) && !defined(MOZ_MEMORY)
+// XXX: should do jemalloc's memory_statistics call here? -preed
+.
+298a
+#endif
+.
+297a
+#ifndef MOZ_MEMORY
+.
+279a
+#endif
+.
+278a
+#ifndef MOZ_MEMORY
+.
+249a
+#endif
+.
+248a
+#ifndef MOZ_MEMORY
+.
+239a
+#endif
+.
+238a
+#ifndef MOZ_MEMORY
+.
+226a
+#endif
+.
+225a
+#ifdef MOZ_MEMORY
+            /*
+             * this used to happen in _mtinit, but we need it before malloc
+             */
+            _init_pointers();       /* initialize global function pointers */
+
+            if ( malloc_init_hard() )   /* initialize heap */
+#else
+.
+43a
+#ifdef MOZ_MEMORY
+extern BOOL malloc_init_hard(void);
+extern void malloc_shutdown(void);
+#endif
+
+.
+diff -re crt/src/dbgint.h crtsrc/dbgint.h
+208a
+#endif
+.
+205a
+#ifndef MOZ_MEMORY
+.
+162a
+#endif
+.
+159a
+#ifndef MOZ_MEMORY
+.
+154a
+#endif
+.
+137a
+#ifndef MOZ_MEMORY
+.
+126,128c
+#ifdef _DEBUG
+.
+124a
+#endif /* mozilla memory and not debug */
+#endif /* not debug and jemalloc */
+.
+108a
+#if (!defined(MOZ_MEMORY) || (defined(MOZ_MEMORY) && !defined(MOZ_MEMORY_DEBUG)))
+.
+107a
+#endif /* mozilla memory and not debug */
+.
+100a
+#if (defined(MOZ_MEMORY) && !defined(_DEBUG))
+.
+88c
+#if defined (_SYSCRT) || defined (MRTDLL) || defined (_M_CEE_PURE) || defined(MOZ_MEMORY)
+.
+67,68c
+#if (!(defined(_DEBUG)) || defined(MOZ_MEMORY))
+/* Following comment is misleading; debug is off *or* we're jemalloc. */
+.
+diff -re crt/src/delete.cpp crtsrc/delete.cpp
+11c
+#if (!defined(_DEBUG) || defined(MOZ_MEMORY))
+.
+diff -re crt/src/dllcrt0.c crtsrc/dllcrt0.c
+190a
+#endif
+.
+188a
+#ifndef MOZ_MEMORY
+.
+136a
+#endif
+.
+135a
+#ifndef MOZ_MEMORY
+.
+126a
+#endif
+.
+125a
+#ifndef MOZ_MEMORY
+.
+111a
+#endif
+.
+110a
+#ifndef MOZ_MEMORY
+.
+107a
+#endif
+.
+103a
+#ifndef MOZ_MEMORY
+.
+diff -re crt/src/fullpath.c crtsrc/fullpath.c
+121c
+#if (defined(_DEBUG) && !defined(MOZ_MEMORY))
+.
+diff -re crt/src/getcwd.c crtsrc/getcwd.c
+292c
+#if (defined(_DEBUG) && !defined(MOZ_MEMORY))
+.
+diff -re crt/src/getenv.c crtsrc/getenv.c
+359c
+#if (defined(_DEBUG) && !defined(MOZ_MEMORY))
+.
+diff -re crt/src/makefile crtsrc/makefile
+1244a
+!endif
+.
+1243a
+!if "$(MOZ_MEMORY)"!="1"
+.
+1240a
+!if "$(MOZ_MEMORY)"!="1"
+OBJS_WITH_EXPORTS_DLL_RAW= \
+        $(OBJS_WITH_EXPORTS_DLL_RAW) \
+        $(OBJDIR_DLL_RAW)\handler.obj \
+        $(OBJDIR_DLL_RAW)\setnewh.obj \
+        $(OBJDIR_DLL_RAW)\new_mode.obj
+!endif
+.
+1235,1237d
+1040c
+xdll_ :: $(OBJROOT) $(OBJCPUDIR) $(OBJDIR_DLL_DBG) \
+	$(OBJDIR_DLL_DBG)\$(PURE_OBJ_DIR) $(OBJDIR_DLL_DBG)\$(CLR_OBJ_DIR) \
+    $(OBJDIR_DLL_DBG)\$(CPP_OBJ_DIR) $(RELDIR_CPU) $(PDBDIR_CPU_DLL) \
+    $(MAKE_DIRS_DLL)
+.
+760c
+dll_ :: $(OBJROOT) $(OBJCPUDIR) $(OBJDIR_DLL) $(OBJDIR_DLL)\$(PURE_OBJ_DIR) \
+   	$(OBJDIR_DLL)\$(CPP_OBJ_DIR) \
+   	$(RELDIR_CPU) $(PDBDIR_CPU_DLL) $(MAKE_DIRS_DLL)
+.
+340c
+CC_OPTS_BASE=-c -nologo -Zlp8 -W3 -GFy -DWIND32
+!if "$(MOZ_MEMORY)" != "1"
+CC_OPTS_BASE=$(CC_OPTS_BASE) -WX
+!endif
+.
+311,313c
+LINKER=link
+LINKLIB=link -lib
+LINKIMPLIB=link -lib
+.
+306,308c
+LINKER=link -nologo
+LINKLIB=link -lib -nologo
+LINKIMPLIB=link -lib -nologo
+.
+213a
+!endif
+.
+212a
+!if "$(MOZ_MEMORY)" != "1"
+.
+21,41c
+RETAIL_DLL_NAME=mozcrt19
+RETAIL_LIB_NAME=mozcrt19
+RETAIL_DLLCPP_NAME=mozcrt19_p
+RETAIL_LIBCPP_NAME=mozcrt19_p
+RETAIL_DLLMIXED_NAME=mozcrt19_m
+RETAIL_LIBMIXED_NAME=mozcrt19_m
+RETAIL_LIBPURE_NAME=mozcrt19_u
+RETAIL_PT_LIBMIXED_NAME=mozcrt19_pm
+RETAIL_PT_LIBPURE_NAME=mozcrt19_pu
+DEBUG_DLL_NAME=mozcrt19d
+DEBUG_LIB_NAME=mozcrt19d
+DEBUG_DLLCPP_NAME=mozcrt19d_p
+DEBUG_LIBCPP_NAME=mozcrt19d_p
+DEBUG_DLLMIXED_NAME=mozcrt19d_m
+DEBUG_LIBMIXED_NAME=mozcrt19d_m
+DEBUG_LIBPURE_NAME=mozcrt19d_u
+DEBUG_PT_LIBMIXED_NAME=mozcrt19d_pm
+DEBUG_PT_LIBPURE_NAME=mozcrt19d_pu
+RC_NAME=mozcrt19
+RCCPP_NAME=mozcrt19_p
+RCMIXED_NAME=mozcrt19_m
+.
+diff -re crt/src/makefile.inc crtsrc/makefile.inc
+1538a
+!endif
+.
+1536a
+!if "$(MOZ_MEMORY)"=="1" && "$(BLD_DBG)"=="1"
+$(OBJDIR)\eh.lib: $(CPUDIR)\dll_lib\eh.lib
+        copy $(CPUDIR)\dll_lib\eh.lib $@
+!else
+.
+1313a
+!if "$(MOZ_MEMORY)" == "1"
+        $(PURE_OBJDIR)\jemalloc.obj \
+!endif
+.
+1260a
+!if "$(MOZ_MEMORY)" == "1"
+        $(CLR_OBJDIR)\jemalloc.obj \
+!endif
+.
+760a
+!endif
+.
+758a
+!if "$(MOZ_MEMORY)" != "1"
+.
+628a
+!endif
+.
+626a
+!if "$(MOZ_MEMORY)" != "1"
+.
+625a
+!endif
+.
+620a
+!if "$(MOZ_MEMORY)" != "1"
+.
+405a
+!endif
+.
+404a
+!if "$(MOZ_MEMORY)" != "1"
+.
+356a
+!else
+        $(OBJDIR)\jemalloc.obj \
+!endif
+.
+343a
+!if "$(MOZ_MEMORY)" != "1"
+.
+337a
+!endif
+.
+335a
+!if "$(MOZ_MEMORY)" != "1"
+.
+332a
+!endif
+.
+330a
+!if "$(MOZ_MEMORY)" != "1"
+.
+329a
+!endif
+.
+328a
+!if "$(MOZ_MEMORY)" != "1"
+.
+325a
+!endif
+.
+324a
+!if "$(MOZ_MEMORY)" != "1"
+.
+322a
+!endif
+.
+320a
+!if "$(MOZ_MEMORY)" != "1"
+.
+diff -re crt/src/makefile.sub crtsrc/makefile.sub
+66a
+!endif
+.
+65a
+!if "$(MOZ_MEMORY)"=="1"
+CFLAGS=$(CFLAGS) -O2
+!else
+.
+56c
+CFLAGS=-D_CRT_NOFORCE_MANIFEST -D_STL_NOFORCE_MANIFEST $(CFLAGS) $(MOZ_CFLAGS)
+.
+54a
+!if "$(MOZ_MEMORY)"=="1"
+# I'm in ur crt, munging your cflags...
+MOZ_CFLAGS=-DMOZ_MEMORY=1 -DMOZ_MEMORY_WINDOWS=1
+!if "$(MOZ_DEBUG)" == "1"
+MOZ_CFLAGS=$(MOZ_CFLAGS) -DMOZ_MEMORY_DEBUG=1 -DMOZ_DEBUG=1
+!endif
+!else
+MOZ_CFLAGS=
+!endif
+.
+diff -re crt/src/malloc.h crtsrc/malloc.h
+189a
+#endif /* MOZ_MEMORY */
+.
+177a
+
+#ifndef MOZ_MEMORY
+.
+161d
+83a
+#endif  /* MOZ_MEMORY */
+.
+70a
+#ifndef MOZ_MEMORY
+.
+diff -re crt/src/mlock.c crtsrc/mlock.c
+274c
+#endif
+.
+262a
+#ifndef MOZ_MEMORY
+.
+diff -re crt/src/mozcrt19.rc crtsrc/mozcrt19.rc
 41c
             VALUE "ProductName", "Mozilla Custom C Runtime"
 .
@@ -24,198 +524,149 @@ diff -re crt/src/_sample_.rc crtsrc/_sample_.rc
 27c
             VALUE "CompanyName", "Mozilla Foundation"
 .
-diff -re crt/src/crt0.c crtsrc/crt0.c
-212c
-        /*
-         * this used to happen in _mtinit, but we need it before malloc
-         */
-        _init_pointers();       /* initialize global function pointers */
-
-        if ( malloc_init_hard() )                /* initialize heap */
-.
-87a
-extern BOOL malloc_init_hard(void);
-.
-diff -re crt/src/crt0dat.c crtsrc/crt0dat.c
-837d
-826d
-diff -re crt/src/crtdll.c crtsrc/crtdll.c
-31,40d
-diff -re crt/src/crtexe.c crtsrc/crtexe.c
-322,324d
-35,45d
-diff -re crt/src/crtheap.c crtsrc/crtheap.c
-61c
-    pv = calloc(count, size);
-.
-58,59d
-diff -re crt/src/crtlib.c crtsrc/crtlib.c
-686,693d
-355d
-339a
-                 malloc_shutdown();
-
-.
-298d
-279d
-249,250d
-239d
-226c
-            /*
-             * this used to happen in _mtinit, but we need it before malloc
-             */
-            _init_pointers();       /* initialize global function pointers */
-
-            if ( malloc_init_hard() )   /* initialize heap */
-.
-43a
-extern BOOL malloc_init_hard(void);
-extern void malloc_shutdown(void);
-
-.
-diff -re crt/src/dllcrt0.c crtsrc/dllcrt0.c
-189,190d
-136d
-126d
-111d
-106,108d
-diff -re crt/src/intel/_sample_.def crtsrc/intel/_sample_.def
-1198d
-718,719d
-664a
-    posix_memalign
-.
-638a
-    memalign
-.
-495a
-    malloc_usable_size
-.
-467a
-    jemalloc_stats
-.
-331,336d
-319d
-313,314d
-81d
-9c
-LIBRARY MOZCRT19
-.
-diff -re crt/src/internal.h crtsrc/internal.h
-413a
-#endif
-.
-409c
-#if 0
-.
-diff -re crt/src/makefile crtsrc/makefile
-1873c
--def:$(DEFFILE2_DIR)\sample_p.def
-.
-1841c
- $(DEFFILE2_DIR)\sample_p.def $(CPPSRC_OBJS_DLL:*=dll) \
-.
-1771a
-$(DEFFILE_DIR)\$(RETAIL_LIB_NAME).def : $(DEFFILE_DIR)\_sample_.def
-	copy $** $@
-.
-1290d
-1235,1237d
-760c
-dll_ :: $(OBJROOT) $(OBJCPUDIR) $(OBJDIR_DLL) $(OBJDIR_DLL)\$(PURE_OBJ_DIR) \
-   	$(OBJDIR_DLL)\$(CPP_OBJ_DIR) \
-   	$(RELDIR_CPU) $(PDBDIR_CPU_DLL) $(MAKE_DIRS_DLL)
-.
-340c
-CC_OPTS_BASE=-c -nologo -Zlp8 -W3 -GFy -DWIND32
-.
-213d
-21,24c
-RETAIL_DLL_NAME=MOZCRT19
-RETAIL_LIB_NAME=mozcrt19
-RETAIL_DLLCPP_NAME=MOZCPP19
-RETAIL_LIBCPP_NAME=mozcpp19
-.
-diff -re crt/src/makefile.inc crtsrc/makefile.inc
-1636a
-$(OBJDIR)\unhandld.obj: $(PREOBJDIR)\unhandld.obj
-        copy $(PREOBJDIR)\unhandld.obj $@
-
-.
-623d
-621d
-405d
-344,356c
-        $(OBJDIR)\jemalloc.obj  \
-.
-336,337d
-331,332d
-329d
-325d
-321,322d
-diff -re crt/src/makefile.sub crtsrc/makefile.sub
-66c
-CFLAGS=$(CFLAGS) -O2 -DMOZ_MEMORY=1 -DMOZ_MEMORY_WINDOWS=1
-.
-diff -re crt/src/malloc.h crtsrc/malloc.h
-189a
-#endif
-.
-177a
-
-#if 0
-.
-83a
-#endif
-.
-70a
-#if 0
-.
-diff -re crt/src/mlock.c crtsrc/mlock.c
-274c
-#endif
-.
-262a
-#if 0
-.
-diff -re crt/src/new.cpp crtsrc/new.cpp
-60d
-52,55d
-37,38c
-        break;
-.
-diff -re crt/src/nothrownew.cpp crtsrc/nothrownew.cpp
-38c
-#endif
-.
-31a
-#if 1
-        break;
-#else
-
-.
-diff -re crt/src/sample_p.def crtsrc/sample_p.def
+diff -re crt/src/mozcrt19_m.def crtsrc/mozcrt19_m.def
 8c
-LIBRARY mozcpp19
+LIBRARY MOZCRT19_M
 .
-diff -re crt/src/sample_p.rc crtsrc/sample_p.rc
+diff -re crt/src/mozcrt19_m.rc crtsrc/mozcrt19_m.rc
 41c
-            VALUE "ProductName", "Mozilla Custom C++ Runtime"
+            VALUE "ProductName", "Mozilla Custom C Runtime"
 .
 39c
-            VALUE "OriginalFilename", "MOZCPP19.DLL"
+            VALUE "OriginalFilename", "MOZCRT19_M.DLL"
 .
 37c
-            VALUE "OriginalFilename", "MOZCPP19D.DLL"
+            VALUE "OriginalFilename", "MOZCRT19_M.DLL"
 .
 33c
-            VALUE "InternalName", "MOZCPP19.DLL"
+            VALUE "InternalName", "MOZCRT19_M.DLL"
 .
 31c
-            VALUE "InternalName", "MOZCPP19D.DLL"
+            VALUE "InternalName", "MOZCRT19D_M.DLL"
 .
 27c
             VALUE "CompanyName", "Mozilla Foundation"
 .
+diff -re crt/src/mozcrt19_p.def crtsrc/mozcrt19_p.def
+8c
+LIBRARY MOZCRT19_P
+.
+diff -re crt/src/mozcrt19_p.rc crtsrc/mozcrt19_p.rc
+41c
+            VALUE "ProductName", "Mozilla Custom C Runtime"
+.
+39c
+            VALUE "OriginalFilename", "MOZCRT19_P.DLL"
+.
+37c
+            VALUE "OriginalFilename", "MOZCRT19D_P.DLL"
+.
+33c
+            VALUE "InternalName", "MOZCRT19_P.DLL"
+.
+31c
+            VALUE "InternalName", "MOZCRT19D_P.DLL"
+.
+27c
+            VALUE "CompanyName", "Mozilla Foundation"
+.
+diff -re crt/src/mozcrt19_u.def crtsrc/mozcrt19_u.def
+8c
+LIBRARY MOZCRT19_M
+.
+diff -re crt/src/mozcrt19d_m.def crtsrc/mozcrt19d_m.def
+8c
+LIBRARY MOZCRT19D_M
+.
+diff -re crt/src/mozcrt19d_p.def crtsrc/mozcrt19d_p.def
+8c
+LIBRARY MOZCRT19D_P
+.
+diff -re crt/src/mozcrt19d_u.def crtsrc/mozcrt19d_u.def
+8c
+LIBRARY MOZCRT19D_M
+.
+diff -re crt/src/new.cpp crtsrc/new.cpp
+60a
+#endif
+.
+59a
+#ifndef MOZ_MEMORY
+.
+54a
+#endif
+.
+51a
+#ifndef MOZ_MEMORY
+.
+37a
+#endif
+.
+36a
+#ifndef MOZ_MEMORY
+.
+diff -re crt/src/nothrownew.cpp crtsrc/nothrownew.cpp
+71a
+#endif
+.
+56a
+#ifndef MOZ_MEMORY
+.
+37a
+#endif
+.
+31a
+#ifdef MOZ_MEMORY
+        break;
+#else
+
+.
+diff -re crt/src/stdthrow.cpp crtsrc/stdthrow.cpp
+24c
+            //::_CrtDbgBreak();
+            _CrtDbgBreak();
+.
+diff -re crt/src/strdup.c crtsrc/strdup.c
+74c
+#if (defined(_DEBUG) && !defined(MOZ_MEMORY))
+.
+diff -re crt/src/tempnam.c crtsrc/tempnam.c
+142c
+#if (defined(_DEBUG) && !defined(MOZ_MEMORY))
+.
 diff -re crt/src/tidtable.c crtsrc/tidtable.c
-360,361d
+360a
+#endif
+.
+359a
+#ifndef MOZ_MEMORY
+.
+diff -re crt/src/wcsdup.c crtsrc/wcsdup.c
+76c
+#if (defined(_DEBUG) && !defined(MOZ_MEMORY))
+.
+diff -re crt/src/winheap.h crtsrc/winheap.h
+175a
+#endif
+.
+172a
+#ifndef MOZ_MEMORY
+.
+170a
+#endif
+.
+169a
+#ifndef MOZ_MEMORY
+.
+diff -re crt/src/xdebug crtsrc/xdebug
+22c
+ #if (defined(_DEBUG) && !defined(MOZ_MEMORY))
+.
+diff -re crt/src/xdebug.cpp crtsrc/xdebug.cpp
+3c
+ #if (defined(_DEBUG) && !defined(MOZ_MEMORY))
+.
+diff -re crt/src/xlocale crtsrc/xlocale
+142c
+ #if (defined(_DEBUG) && !defined(_M_X64) && !defined(MOZ_MEMORY))
+.
