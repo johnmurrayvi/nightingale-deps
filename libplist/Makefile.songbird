@@ -30,7 +30,7 @@
 ################################################################################
 ################################################################################
 
-SB_VENDOR_TARGET_DEP_MODULES :=
+SB_VENDOR_TARGET_DEP_MODULES := xml
 
 SB_VENDOR_TARGET = libplist
 SB_VENDOR_TARGET_VERSION = 1.11
@@ -44,4 +44,8 @@ SB_VENDOR_TARGET_DYLIB_FIXUPS :=
 include $(CURDIR)/../songbird-vendor-rules.mk
 
 module_setup_build:
+ifeq (Linux, $(SB_VENDOR_ARCH))
+	cd $(SB_VENDOR_BUILD_DIR) && libtoolize && autoreconf -f -i -I /usr/share/aclocal
+else
 	cd $(SB_VENDOR_BUILD_DIR) && ./autogen.sh
+endif

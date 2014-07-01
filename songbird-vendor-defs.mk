@@ -633,7 +633,7 @@ ifneq (,$(call enable-sb-lib, jpeg))
    SB_LIBJPEG_DIR = $(call find-dep-dir, libjpeg)
    SB_LDFLAGS += -L$(SB_LIBJPEG_DIR)/lib
 
-   SB_CFLAGS = -I$(SB_LIBJPEG_DIR)/include
+   SB_CFLAGS += -I$(SB_LIBJPEG_DIR)/include
 
    ifeq (Msys,$(SB_VENDOR_ARCH))
       SB_JPEG_LIBS += "-ljpeg-7"
@@ -644,3 +644,43 @@ ifneq (,$(call enable-sb-lib, jpeg))
   endif
 endif
 
+
+# idevice deps
+
+#
+# libxml2
+#
+ifneq (,$(call enable-sb-lib, xml))
+   $(info Enabling Songbird vendor lib: xml)
+   SB_LIBXML2_DIR = $(call find-dep-dir, libxml2)
+   SB_CFLAGS += -I$(SB_LIBXML2_DIR)/include
+   SB_LDFLAGS += -L$(SB_LIBXML2_DIR)/lib
+   SB_PKG_CONFIG_PATH += $(SB_LIBXML2_DIR)/lib/pkgconfig
+
+   ifeq (Msys,$(SB_VENDOR_ARCH))
+      SB_XML2_LIBS += "-lxml2"
+      SB_PATH += $(SB_LIBXML2_DIR)/bin
+      ifeq (debug,$(SB_BUILD_TYPE))
+         SB_XML2_LIBS += -Wl,-Zi
+      endif
+   endif
+endif
+
+#
+# libplist
+#
+ifneq (,$(call enable-sb-lib, plist))
+   $(info Enabling Songbird vendor lib: plist)
+   SB_PLIST_DIR = $(call find-dep-dir, libplist)
+   SB_CFLAGS += -I$(SB_PLIST_DIR)/include
+   SB_LDFLAGS += -L$(SB_PLIST_DIR)/lib
+   SB_PKG_CONFIG_PATH += $(SB_PLIST_DIR)/lib/pkgconfig
+
+   ifeq (Msys,$(SB_VENDOR_ARCH))
+      SB_PLIST_LIB += "-lplist"
+      SB_PATH += $(SB_PLIST_DIR)/bin
+      ifeq (debug,$(SB_BUILD_TYPE))
+         SB_PLIST_LIB += -Wl,-Zi
+      endif
+   endif
+endif

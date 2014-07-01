@@ -30,7 +30,7 @@
 ################################################################################
 ################################################################################
 
-SB_VENDOR_TARGET_DEP_MODULES :=
+SB_VENDOR_TARGET_DEP_MODULES := xml plist
 
 SB_VENDOR_TARGET = libgpod
 SB_VENDOR_TARGET_VERSION = 0.8.0
