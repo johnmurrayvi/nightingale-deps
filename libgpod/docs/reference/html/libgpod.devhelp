@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE book PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "">
+<book xmlns="http://www.devhelp.net/book" title="libgpod Reference Manual" link="index.html" author="Jorg SchulerChristophe Fergeau" name="libgpod">
+  <chapters>
+    <sub name="iPod database" link="itunesdb.html">
+      <sub name="iPod database reading/writing" link="libgpod-The-Itdb-iTunesDB-structure.html"/>
+      <sub name="File handling functions" link="libgpod-File-handling-functions.html"/>
+      <sub name="Time handling" link="libgpod-Time-handling.html"/>
+      <sub name="Low-level functions" link="libgpod-Low-level-functions.html"/>
+      <sub name="iPod database components" link="ch01.html">
+        <sub name="Tracks" link="libgpod-Tracks.html"/>
+        <sub name="Playlists" link="libgpod-Playlists.html"/>
+        <sub name="Smart Playlists" link="libgpod-Smart-Playlists.html"/>
+        <sub name="Artwork" link="libgpod-Artwork.html"/>
+        <sub name="Chapter Data" link="libgpod-Chapter-Data.html"/>
+        <sub name="Device" link="libgpod-Device.html"/>
+      </sub>
+    </sub>
+    <sub name="Photo database" link="photodb.html">
+      <sub name="Photo database" link="libgpod-Photo-database.html"/>
+    </sub>
+  </chapters>
+  <functions>
+    <function name="Itdb_iTunesDB" link="libgpod-The-Itdb-iTunesDB-structure.html#Itdb-iTunesDB"/>
+    <function name="Itdb_iTunesDB_Private" link="libgpod-The-Itdb-iTunesDB-structure.html#Itdb-iTunesDB-Private"/>
+    <function name="enum ItdbFileError" link="libgpod-The-Itdb-iTunesDB-structure.html#ItdbFileError"/>
+    <function name="itdb_new ()" link="libgpod-The-Itdb-iTunesDB-structure.html#itdb-new"/>
+    <function name="itdb_free ()" link="libgpod-The-Itdb-iTunesDB-structure.html#itdb-free"/>
+    <function name="itdb_parse ()" link="libgpod-The-Itdb-iTunesDB-structure.html#itdb-parse"/>
+    <function name="itdb_write ()" link="libgpod-The-Itdb-iTunesDB-structure.html#itdb-write"/>
+    <function name="itdb_set_mountpoint ()" link="libgpod-The-Itdb-iTunesDB-structure.html#itdb-set-mountpoint"/>
+    <function name="itdb_get_mountpoint ()" link="libgpod-The-Itdb-iTunesDB-structure.html#itdb-get-mountpoint"/>
+    <function name="itdb_init_ipod ()" link="libgpod-The-Itdb-iTunesDB-structure.html#itdb-init-ipod"/>
+    <function name="itdb_tracks_number ()" link="libgpod-The-Itdb-iTunesDB-structure.html#itdb-tracks-number"/>
+    <function name="itdb_tracks_number_nontransferred ()" link="libgpod-The-Itdb-iTunesDB-structure.html#itdb-tracks-number-nontransferred"/>
+    <function name="itdb_playlists_number ()" link="libgpod-The-Itdb-iTunesDB-structure.html#itdb-playlists-number"/>
+    <function name="ItdbUserDataDestroyFunc ()" link="libgpod-The-Itdb-iTunesDB-structure.html#ItdbUserDataDestroyFunc"/>
+    <function name="ItdbUserDataDuplicateFunc ()" link="libgpod-The-Itdb-iTunesDB-structure.html#ItdbUserDataDuplicateFunc"/>
+    <function name="itdb_cp_track_to_ipod ()" link="libgpod-File-handling-functions.html#itdb-cp-track-to-ipod"/>
+    <function name="itdb_filename_fs2ipod ()" link="libgpod-File-handling-functions.html#itdb-filename-fs2ipod"/>
+    <function name="itdb_filename_ipod2fs ()" link="libgpod-File-handling-functions.html#itdb-filename-ipod2fs"/>
+    <function name="itdb_filename_on_ipod ()" link="libgpod-File-handling-functions.html#itdb-filename-on-ipod"/>
+    <function name="itdb_musicdirs_number ()" link="libgpod-File-handling-functions.html#itdb-musicdirs-number"/>
+    <function name="itdb_rename_files ()" link="libgpod-File-handling-functions.html#itdb-rename-files"/>
+    <function name="itdb_start_sync ()" link="libgpod-File-handling-functions.html#itdb-start-sync"/>
+    <function name="itdb_stop_sync ()" link="libgpod-File-handling-functions.html#itdb-stop-sync"/>
+    <function name="itdb_time_get_mac_time ()" link="libgpod-Time-handling.html#itdb-time-get-mac-time"/>
+    <function name="itdb_time_mac_to_host ()" link="libgpod-Time-handling.html#itdb-time-mac-to-host"/>
+    <function name="itdb_time_host_to_mac ()" link="libgpod-Time-handling.html#itdb-time-host-to-mac"/>
+    <function name="itdb_get_control_dir ()" link="libgpod-Low-level-functions.html#itdb-get-control-dir"/>
+    <function name="itdb_get_itunes_dir ()" link="libgpod-Low-level-functions.html#itdb-get-itunes-dir"/>
+    <function name="itdb_get_music_dir ()" link="libgpod-Low-level-functions.html#itdb-get-music-dir"/>
+    <function name="itdb_get_artwork_dir ()" link="libgpod-Low-level-functions.html#itdb-get-artwork-dir"/>
+    <function name="itdb_get_device_dir ()" link="libgpod-Low-level-functions.html#itdb-get-device-dir"/>
+    <function name="itdb_get_photos_dir ()" link="libgpod-Low-level-functions.html#itdb-get-photos-dir"/>
+    <function name="itdb_get_itunesdb_path ()" link="libgpod-Low-level-functions.html#itdb-get-itunesdb-path"/>
+    <function name="itdb_get_itunessd_path ()" link="libgpod-Low-level-functions.html#itdb-get-itunessd-path"/>
+    <function name="itdb_get_itunescdb_path ()" link="libgpod-Low-level-functions.html#itdb-get-itunescdb-path"/>
+    <function name="itdb_get_artworkdb_path ()" link="libgpod-Low-level-functions.html#itdb-get-artworkdb-path"/>
+    <function name="itdb_get_photodb_path ()" link="libgpod-Low-level-functions.html#itdb-get-photodb-path"/>
+    <function name="itdb_get_photos_thumb_dir ()" link="libgpod-Low-level-functions.html#itdb-get-photos-thumb-dir"/>
+    <function name="itdb_get_path ()" link="libgpod-Low-level-functions.html#itdb-get-path"/>
+    <function name="itdb_resolve_path ()" link="libgpod-Low-level-functions.html#itdb-resolve-path"/>
+    <function name="itdb_cp ()" link="libgpod-Low-level-functions.html#itdb-cp"/>
+    <function name="itdb_cp_get_dest_filename ()" link="libgpod-Low-level-functions.html#itdb-cp-get-dest-filename"/>
+    <function name="itdb_cp_finalize ()" link="libgpod-Low-level-functions.html#itdb-cp-finalize"/>
+    <function name="itdb_parse_file ()" link="libgpod-Low-level-functions.html#itdb-parse-file"/>
+    <function name="itdb_write_file ()" link="libgpod-Low-level-functions.html#itdb-write-file"/>
+    <function name="itdb_shuffle_write ()" link="libgpod-Low-level-functions.html#itdb-shuffle-write"/>
+    <function name="itdb_shuffle_write_file ()" link="libgpod-Low-level-functions.html#itdb-shuffle-write-file"/>
+    <function name="itdb_duplicate ()" link="libgpod-Low-level-functions.html#itdb-duplicate"/>
+    <function name="Itdb_Track" link="libgpod-Tracks.html#Itdb-Track"/>
+    <function name="Itdb_Track_Private" link="libgpod-Tracks.html#Itdb-Track-Private"/>
+    <function name="enum Itdb_Mediatype" link="libgpod-Tracks.html#Itdb-Mediatype"/>
+    <function name="ITDB_RATING_STEP" link="libgpod-Tracks.html#ITDB-RATING-STEP:CAPS"/>
+    <function name="itdb_track_new ()" link="libgpod-Tracks.html#itdb-track-new"/>
+    <function name="itdb_track_free ()" link="libgpod-Tracks.html#itdb-track-free"/>
+    <function name="itdb_track_add ()" link="libgpod-Tracks.html#itdb-track-add"/>
+    <function name="itdb_track_remove ()" link="libgpod-Tracks.html#itdb-track-remove"/>
+    <function name="itdb_track_unlink ()" link="libgpod-Tracks.html#itdb-track-unlink"/>
+    <function name="itdb_track_duplicate ()" link="libgpod-Tracks.html#itdb-track-duplicate"/>
+    <function name="itdb_track_by_id ()" link="libgpod-Tracks.html#itdb-track-by-id"/>
+    <function name="itdb_track_id_tree_create ()" link="libgpod-Tracks.html#itdb-track-id-tree-create"/>
+    <function name="itdb_track_id_tree_destroy ()" link="libgpod-Tracks.html#itdb-track-id-tree-destroy"/>
+    <function name="itdb_track_id_tree_by_id ()" link="libgpod-Tracks.html#itdb-track-id-tree-by-id"/>
+    <function name="itdb_track_get_thumbnail ()" link="libgpod-Tracks.html#itdb-track-get-thumbnail"/>
+    <function name="itdb_track_has_thumbnails ()" link="libgpod-Tracks.html#itdb-track-has-thumbnails"/>
+    <function name="itdb_track_set_thumbnails ()" link="libgpod-Tracks.html#itdb-track-set-thumbnails"/>
+    <function name="itdb_track_set_thumbnails_from_data ()" link="libgpod-Tracks.html#itdb-track-set-thumbnails-from-data"/>
+    <function name="itdb_track_set_thumbnails_from_pixbuf ()" link="libgpod-Tracks.html#itdb-track-set-thumbnails-from-pixbuf"/>
+    <function name="itdb_track_remove_thumbnails ()" link="libgpod-Tracks.html#itdb-track-remove-thumbnails"/>
+    <function name="Itdb_Playlist" link="libgpod-Playlists.html#Itdb-Playlist"/>
+    <function name="Itdb_Playlist_Private" link="libgpod-Playlists.html#Itdb-Playlist-Private"/>
+    <function name="enum ItdbPlaylistSortOrder" link="libgpod-Playlists.html#ItdbPlaylistSortOrder"/>
+    <function name="itdb_playlist_new ()" link="libgpod-Playlists.html#itdb-playlist-new"/>
+    <function name="itdb_playlist_free ()" link="libgpod-Playlists.html#itdb-playlist-free"/>
+    <function name="itdb_playlist_duplicate ()" link="libgpod-Playlists.html#itdb-playlist-duplicate"/>
+    <function name="itdb_playlist_add ()" link="libgpod-Playlists.html#itdb-playlist-add"/>
+    <function name="itdb_playlist_move ()" link="libgpod-Playlists.html#itdb-playlist-move"/>
+    <function name="itdb_playlist_remove ()" link="libgpod-Playlists.html#itdb-playlist-remove"/>
+    <function name="itdb_playlist_unlink ()" link="libgpod-Playlists.html#itdb-playlist-unlink"/>
+    <function name="itdb_playlist_add_track ()" link="libgpod-Playlists.html#itdb-playlist-add-track"/>
+    <function name="itdb_playlist_remove_track ()" link="libgpod-Playlists.html#itdb-playlist-remove-track"/>
+    <function name="itdb_playlist_contains_track ()" link="libgpod-Playlists.html#itdb-playlist-contains-track"/>
+    <function name="itdb_playlist_contain_track_number ()" link="libgpod-Playlists.html#itdb-playlist-contain-track-number"/>
+    <function name="itdb_playlist_tracks_number ()" link="libgpod-Playlists.html#itdb-playlist-tracks-number"/>
+    <function name="itdb_playlist_mpl ()" link="libgpod-Playlists.html#itdb-playlist-mpl"/>
+    <function name="itdb_playlist_is_mpl ()" link="libgpod-Playlists.html#itdb-playlist-is-mpl"/>
+    <function name="itdb_playlist_set_mpl ()" link="libgpod-Playlists.html#itdb-playlist-set-mpl"/>
+    <function name="itdb_playlist_podcasts ()" link="libgpod-Playlists.html#itdb-playlist-podcasts"/>
+    <function name="itdb_playlist_is_podcasts ()" link="libgpod-Playlists.html#itdb-playlist-is-podcasts"/>
+    <function name="itdb_playlist_set_podcasts ()" link="libgpod-Playlists.html#itdb-playlist-set-podcasts"/>
+    <function name="itdb_playlist_exists ()" link="libgpod-Playlists.html#itdb-playlist-exists"/>
+    <function name="itdb_playlist_by_id ()" link="libgpod-Playlists.html#itdb-playlist-by-id"/>
+    <function name="itdb_playlist_by_nr ()" link="libgpod-Playlists.html#itdb-playlist-by-nr"/>
+    <function name="itdb_playlist_by_name ()" link="libgpod-Playlists.html#itdb-playlist-by-name"/>
+    <function name="itdb_playlist_randomize ()" link="libgpod-Playlists.html#itdb-playlist-randomize"/>
+    <function name="Itdb_SPLPref" link="libgpod-Smart-Playlists.html#Itdb-SPLPref"/>
+    <function name="Itdb_SPLRule" link="libgpod-Smart-Playlists.html#Itdb-SPLRule"/>
+    <function name="Itdb_SPLRules" link="libgpod-Smart-Playlists.html#Itdb-SPLRules"/>
+    <function name="enum ItdbLimitSort" link="libgpod-Smart-Playlists.html#ItdbLimitSort"/>
+    <function name="enum ItdbLimitType" link="libgpod-Smart-Playlists.html#ItdbLimitType"/>
+    <function name="enum ItdbSPLAction" link="libgpod-Smart-Playlists.html#ItdbSPLAction"/>
+    <function name="enum ItdbSPLActionLast" link="libgpod-Smart-Playlists.html#ItdbSPLActionLast"/>
+    <function name="enum ItdbSPLActionType" link="libgpod-Smart-Playlists.html#ItdbSPLActionType"/>
+    <function name="enum ItdbSPLField" link="libgpod-Smart-Playlists.html#ItdbSPLField"/>
+    <function name="enum ItdbSPLFieldType" link="libgpod-Smart-Playlists.html#ItdbSPLFieldType"/>
+    <function name="enum ItdbSPLMatch" link="libgpod-Smart-Playlists.html#ItdbSPLMatch"/>
+    <function name="ITDB_SPL_DATE_IDENTIFIER" link="libgpod-Smart-Playlists.html#ITDB-SPL-DATE-IDENTIFIER:CAPS"/>
+    <function name="ITDB_SPL_STRING_MAXLEN" link="libgpod-Smart-Playlists.html#ITDB-SPL-STRING-MAXLEN:CAPS"/>
+    <function name="itdb_splr_get_field_type ()" link="libgpod-Smart-Playlists.html#itdb-splr-get-field-type"/>
+    <function name="itdb_splr_get_action_type ()" link="libgpod-Smart-Playlists.html#itdb-splr-get-action-type"/>
+    <function name="itdb_splr_validate ()" link="libgpod-Smart-Playlists.html#itdb-splr-validate"/>
+    <function name="itdb_splr_remove ()" link="libgpod-Smart-Playlists.html#itdb-splr-remove"/>
+    <function name="itdb_splr_new ()" link="libgpod-Smart-Playlists.html#itdb-splr-new"/>
+    <function name="itdb_splr_add ()" link="libgpod-Smart-Playlists.html#itdb-splr-add"/>
+    <function name="itdb_splr_add_new ()" link="libgpod-Smart-Playlists.html#itdb-splr-add-new"/>
+    <function name="itdb_spl_copy_rules ()" link="libgpod-Smart-Playlists.html#itdb-spl-copy-rules"/>
+    <function name="itdb_splr_eval ()" link="libgpod-Smart-Playlists.html#itdb-splr-eval"/>
+    <function name="itdb_spl_update ()" link="libgpod-Smart-Playlists.html#itdb-spl-update"/>
+    <function name="itdb_spl_update_all ()" link="libgpod-Smart-Playlists.html#itdb-spl-update-all"/>
+    <function name="itdb_spl_update_live ()" link="libgpod-Smart-Playlists.html#itdb-spl-update-live"/>
+    <function name="Itdb_Artwork" link="libgpod-Artwork.html#Itdb-Artwork"/>
+    <function name="itdb_artwork_new ()" link="libgpod-Artwork.html#itdb-artwork-new"/>
+    <function name="itdb_artwork_duplicate ()" link="libgpod-Artwork.html#itdb-artwork-duplicate"/>
+    <function name="itdb_artwork_free ()" link="libgpod-Artwork.html#itdb-artwork-free"/>
+    <function name="itdb_artwork_get_pixbuf ()" link="libgpod-Artwork.html#itdb-artwork-get-pixbuf"/>
+    <function name="itdb_artwork_set_thumbnail ()" link="libgpod-Artwork.html#itdb-artwork-set-thumbnail"/>
+    <function name="itdb_artwork_set_thumbnail_from_data ()" link="libgpod-Artwork.html#itdb-artwork-set-thumbnail-from-data"/>
+    <function name="itdb_artwork_set_thumbnail_from_pixbuf ()" link="libgpod-Artwork.html#itdb-artwork-set-thumbnail-from-pixbuf"/>
+    <function name="itdb_artwork_remove_thumbnails ()" link="libgpod-Artwork.html#itdb-artwork-remove-thumbnails"/>
+    <function name="Itdb_Thumb" link="libgpod-Artwork.html#Itdb-Thumb"/>
+    <function name="itdb_thumb_duplicate ()" link="libgpod-Artwork.html#itdb-thumb-duplicate"/>
+    <function name="itdb_thumb_free ()" link="libgpod-Artwork.html#itdb-thumb-free"/>
+    <function name="itdb_thumb_to_pixbuf_at_size ()" link="libgpod-Artwork.html#itdb-thumb-to-pixbuf-at-size"/>
+    <function name="itdb_thumb_to_pixbufs ()" link="libgpod-Artwork.html#itdb-thumb-to-pixbufs"/>
+    <function name="Itdb_Chapter" link="libgpod-Chapter-Data.html#Itdb-Chapter"/>
+    <function name="Itdb_Chapterdata" link="libgpod-Chapter-Data.html#Itdb-Chapterdata"/>
+    <function name="itdb_chapter_new ()" link="libgpod-Chapter-Data.html#itdb-chapter-new"/>
+    <function name="itdb_chapter_duplicate ()" link="libgpod-Chapter-Data.html#itdb-chapter-duplicate"/>
+    <function name="itdb_chapter_free ()" link="libgpod-Chapter-Data.html#itdb-chapter-free"/>
+    <function name="itdb_chapterdata_new ()" link="libgpod-Chapter-Data.html#itdb-chapterdata-new"/>
+    <function name="itdb_chapterdata_add_chapter ()" link="libgpod-Chapter-Data.html#itdb-chapterdata-add-chapter"/>
+    <function name="itdb_chapterdata_duplicate ()" link="libgpod-Chapter-Data.html#itdb-chapterdata-duplicate"/>
+    <function name="itdb_chapterdata_remove_chapter ()" link="libgpod-Chapter-Data.html#itdb-chapterdata-remove-chapter"/>
+    <function name="itdb_chapterdata_remove_chapters ()" link="libgpod-Chapter-Data.html#itdb-chapterdata-remove-chapters"/>
+    <function name="itdb_chapterdata_unlink_chapter ()" link="libgpod-Chapter-Data.html#itdb-chapterdata-unlink-chapter"/>
+    <function name="itdb_chapterdata_free ()" link="libgpod-Chapter-Data.html#itdb-chapterdata-free"/>
+    <function name="Itdb_Device" link="libgpod-Device.html#Itdb-Device"/>
+    <function name="itdb_device_new ()" link="libgpod-Device.html#itdb-device-new"/>
+    <function name="itdb_device_free ()" link="libgpod-Device.html#itdb-device-free"/>
+    <function name="itdb_device_set_mountpoint ()" link="libgpod-Device.html#itdb-device-set-mountpoint"/>
+    <function name="itdb_device_supports_artwork ()" link="libgpod-Device.html#itdb-device-supports-artwork"/>
+    <function name="itdb_device_supports_chapter_image ()" link="libgpod-Device.html#itdb-device-supports-chapter-image"/>
+    <function name="itdb_device_supports_photo ()" link="libgpod-Device.html#itdb-device-supports-photo"/>
+    <function name="itdb_device_supports_podcast ()" link="libgpod-Device.html#itdb-device-supports-podcast"/>
+    <function name="itdb_device_supports_video ()" link="libgpod-Device.html#itdb-device-supports-video"/>
+    <function name="Itdb_IpodInfo" link="libgpod-Device.html#Itdb-IpodInfo"/>
+    <function name="itdb_device_get_ipod_info ()" link="libgpod-Device.html#itdb-device-get-ipod-info"/>
+    <function name="itdb_info_get_ipod_info_table ()" link="libgpod-Device.html#itdb-info-get-ipod-info-table"/>
+    <function name="enum Itdb_IpodGeneration" link="libgpod-Device.html#Itdb-IpodGeneration"/>
+    <function name="itdb_info_get_ipod_generation_string ()" link="libgpod-Device.html#itdb-info-get-ipod-generation-string"/>
+    <function name="enum Itdb_IpodModel" link="libgpod-Device.html#Itdb-IpodModel"/>
+    <function name="itdb_info_get_ipod_model_name_string ()" link="libgpod-Device.html#itdb-info-get-ipod-model-name-string"/>
+    <function name="Itdb_ArtworkFormat" link="libgpod-Device.html#Itdb-ArtworkFormat"/>
+    <function name="itdb_device_read_sysinfo ()" link="libgpod-Device.html#itdb-device-read-sysinfo"/>
+    <function name="itdb_device_get_sysinfo ()" link="libgpod-Device.html#itdb-device-get-sysinfo"/>
+    <function name="itdb_device_set_sysinfo ()" link="libgpod-Device.html#itdb-device-set-sysinfo"/>
+    <function name="itdb_device_write_sysinfo ()" link="libgpod-Device.html#itdb-device-write-sysinfo"/>
+    <function name="Itdb_PhotoDB" link="libgpod-Photo-database.html#Itdb-PhotoDB"/>
+    <function name="itdb_photodb_create ()" link="libgpod-Photo-database.html#itdb-photodb-create"/>
+    <function name="itdb_photodb_free ()" link="libgpod-Photo-database.html#itdb-photodb-free"/>
+    <function name="itdb_photodb_parse ()" link="libgpod-Photo-database.html#itdb-photodb-parse"/>
+    <function name="itdb_photodb_write ()" link="libgpod-Photo-database.html#itdb-photodb-write"/>
+    <function name="itdb_photodb_add_photo ()" link="libgpod-Photo-database.html#itdb-photodb-add-photo"/>
+    <function name="itdb_photodb_add_photo_from_data ()" link="libgpod-Photo-database.html#itdb-photodb-add-photo-from-data"/>
+    <function name="itdb_photodb_add_photo_from_pixbuf ()" link="libgpod-Photo-database.html#itdb-photodb-add-photo-from-pixbuf"/>
+    <function name="itdb_photodb_remove_photo ()" link="libgpod-Photo-database.html#itdb-photodb-remove-photo"/>
+    <function name="Itdb_PhotoAlbum" link="libgpod-Photo-database.html#Itdb-PhotoAlbum"/>
+    <function name="itdb_photodb_photoalbum_free ()" link="libgpod-Photo-database.html#itdb-photodb-photoalbum-free"/>
+    <function name="itdb_photodb_photoalbum_new ()" link="libgpod-Photo-database.html#itdb-photodb-photoalbum-new"/>
+    <function name="itdb_photodb_photoalbum_add ()" link="libgpod-Photo-database.html#itdb-photodb-photoalbum-add"/>
+    <function name="itdb_photodb_photoalbum_unlink ()" link="libgpod-Photo-database.html#itdb-photodb-photoalbum-unlink"/>
+    <function name="itdb_photodb_photoalbum_create ()" link="libgpod-Photo-database.html#itdb-photodb-photoalbum-create"/>
+    <function name="itdb_photodb_photoalbum_add_photo ()" link="libgpod-Photo-database.html#itdb-photodb-photoalbum-add-photo"/>
+    <function name="itdb_photodb_photoalbum_by_name ()" link="libgpod-Photo-database.html#itdb-photodb-photoalbum-by-name"/>
+    <function name="itdb_photodb_photoalbum_remove ()" link="libgpod-Photo-database.html#itdb-photodb-photoalbum-remove"/>
+  </functions>
+</book>
