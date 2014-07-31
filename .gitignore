@@ -10,12 +10,12 @@
 .project
 .settings
 ignore*/
-build
-checkout
+build/*
+checkout/*
 xulrunner*/mozilla-release
-xulrunner*/mozilla/*
+xulrunner*/mozilla/compiled
 xulrunner*/xulrunner*.source.tar.bz2
-xulrunner*/songbird/*
+xulrunner*/compiled/*
 linux-i686*/*
 linux-x86_64*/*
 macosx-i686*/*
