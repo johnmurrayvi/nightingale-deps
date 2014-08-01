@@ -14,6 +14,7 @@ build/*
 checkout/*
 xulrunner*/mozilla-release
 xulrunner*/mozilla/compiled
+xulrunner*/mozilla/.mozconfig*
 xulrunner*/xulrunner*.source.tar.bz2
 xulrunner*/compiled/*
 linux-i686*/*
