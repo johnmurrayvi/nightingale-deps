@@ -485,7 +485,10 @@ hdestroy(HTAB *hashp)
 		if (hashp->is_temp)
 			(void)unlink(hashp->filename);
 #endif
+	/* Leak this memory to prevent CRT assertion being thrown */
+#if !(defined(_WIN32) && defined(DEBUG))
 		free(hashp->filename);
+#endif
 	}
 	if (hashp->tmp_buf)
 	    free(hashp->tmp_buf);
