@@ -47,7 +47,7 @@ ifneq (Msys,$(NG_VENDOR_ARCH))
    endif
 endif
 
-NG_USE_MOZCRT = 1
+# NG_USE_MOZCRT = 1
 
 ifneq (1, $(NG_VENDOR_CROSS_COMP))
   LOC := "-Zi -Zc:wchar_t-"
@@ -60,7 +60,7 @@ else
 
   ifneq (, $(CROSS_LIBTYPE))
     NG_RUN_CONFIGURE := 0
-  
+
     ifeq (static, $(CROSS_LIBTYPE))
       SUBMAKE_CMD = $(MAKE) -f Makefile.ngmingw32.proxy SHARED_MODE=0
     endif
@@ -68,17 +68,15 @@ else
       SUBMAKE_CMD = $(MAKE) -f Makefile.ngmingw32.proxy SHARED_MODE=1
     endif
 
-    NG_RUN_CONFIGURE := 0
-  
     # We don't have a debug zlib build right now, so disable it, but also
     # copy the result of the build to both the debug and release dirs (export these
     # values so Makefile.ngmingw32.proxy can use them.
-  
+
     NG_VENDOR_SKIP_DEBUG_BUILD = 1
-  
+
     export FINAL_DEBUG_INSTALL_DIR = $(NG_VENDOR_BINARIES_DIR)/$(NG_VENDOR_TARGET)/debug
     export FINAL_RELEASE_INSTALL_DIR = $(NG_VENDOR_BINARIES_DIR)/$(NG_VENDOR_TARGET)/release
-  
+
     # export some other things Makefile.ngmingw32.proxy uses
     export CP
     export MKDIR
@@ -86,8 +84,26 @@ else
 
   else 
 
-  NG_RUN_CONFIGURE := 1
+  	ifeq (1, $(CROSS_ZLIB_W64))
+      NG_RUN_CONFIGURE := 0
 
+      SUBMAKE_CMD = $(MAKE) -C $(NG_VENDOR_BUILD_DIR) -f Makefile.ngmingw32.proxy SHARED_MODE=1 ; \
+                    $(MAKE) -C $(NG_VENDOR_BUILD_DIR) -f Makefile.ngmingw32.proxy SHARED_MODE=1 install ; \
+                    $(MAKE) -f Makefile.ngmingw32.proxy SHARED_MODE=0
+      NG_VENDOR_SKIP_DEBUG_BUILD = 1
+
+      export FINAL_DEBUG_INSTALL_DIR = $(NG_VENDOR_BINARIES_DIR)/$(NG_VENDOR_TARGET)/debug
+      export FINAL_RELEASE_INSTALL_DIR = $(NG_VENDOR_BINARIES_DIR)/$(NG_VENDOR_TARGET)/release
+      # export some other things Makefile.ngmingw32.proxy uses
+      export CP
+      export MKDIR
+      export NG_VENDOR_CHECKOUT
+
+    else
+
+      NG_RUN_CONFIGURE := 1
+
+  	endif
   endif
 
 endif

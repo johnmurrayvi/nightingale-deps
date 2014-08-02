@@ -49,18 +49,29 @@ install:: zlib.h zconf.h
 
 else
 
-ifeq (static, $(CROSS_LIBTYPE))
-ZLIB_LIB = libz.a
-endif
-ifeq (shared, $(CROSS_LIBTYPE))
-ZLIB_LIB = zlib1.dll
-ZLIB_IMPLIB = libz.dll.a
+ifneq (, $(CROSS_LIBTYPE))
+  ifeq (static, $(CROSS_LIBTYPE))
+    ZLIB_LIB = libz.a
+  endif
+  ifeq (shared, $(CROSS_LIBTYPE))
+    ZLIB_SH_LIB = zlib1.dll
+    ZLIB_SH_IMPLIB = libz.dll.a
+  endif
+else
+  ifeq (1, $(CROSS_ZLIB_W64))
+    ifeq (0, $(SHARED_MODE))
+      ZLIB_LIB = libz.a
+    else
+      ZLIB_SH_LIB = zlib1.dll
+      ZLIB_SH_IMPLIB = libz.dll.a
+    endif
+  endif
 endif
 
-$(ZLIB_LIB) zlib.h zconf.h:
+$(ZLIB_LIB) $(ZLIB_SH_LIB) zlib.h zconf.h:
 	$(MAKE) -f win32/Makefile.gcc $(MAKEOVERRIDES) $@
 
-install:: $(ZLIB_LIB) $(ZLIB_IMPLIB)
+install:: $(ZLIB_LIB) $(ZLIB_SH_LIB) $(ZLIB_SH_IMPLIB)
 	$(MKDIR) $(FINAL_DEBUG_INSTALL_DIR)/lib/
 	$(MKDIR) $(FINAL_RELEASE_INSTALL_DIR)/lib/
 	$(CP) $+ $(FINAL_DEBUG_INSTALL_DIR)/lib/
