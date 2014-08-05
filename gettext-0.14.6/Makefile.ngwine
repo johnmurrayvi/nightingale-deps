@@ -1,0 +1,72 @@
+################################################################################
+################################################################################
+#
+# BEGIN NIGHTINGALE GPL
+# 
+# This file is part of the Nightingale Media Player.
+#
+# Copyright(c) 2014
+# http://www.getnightingale.com
+# 
+# This file may be licensed under the terms of of the
+# GNU General Public License Version 2 (the "GPL").
+# 
+# Software distributed under the License is distributed 
+# on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
+# express or implied. See the GPL for the specific language 
+# governing rights and limitations.
+#
+# You should have received a copy of the GPL along with this 
+# program. If not, go to http://www.gnu.org/licenses/gpl.html
+# or write to the Free Software Foundation, Inc., 
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# 
+# END NIGHTINGALE GPL
+#
+################################################################################
+#
+# Makefile for building Nightingale vendor: gettext
+#
+################################################################################
+################################################################################
+
+NG_VENDOR_TARGET_DEP_MODULES :=
+
+NG_VENDOR_TARGET = gettext
+NG_VENDOR_TARGET_VERSION = 0.14.6
+
+include $(CURDIR)/../vendor-defs.mk
+
+NG_VENDOR_TARGET_CONFIGURE_OPTS := --enable-relocatable \
+                                   --disable-libsuffix \
+                                   --enable-cxx-warnings=no
+
+ifeq (1,$(NG_VENDOR_CROSS_COMP))
+  ifeq (windows-i686-wine, $(NG_TARGET_ARCH))
+    NG_CC = $(CURDIR)/../cl_wine_wrapper.py
+    NG_CXX = $(CURDIR)/../cl_wine_wrapper.py
+  else
+    NG_CFLAGS += -O2
+    NG_CXXFLAGS += -O2
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-threads=win32 \
+                                       --without-libintl-prefix
+    ifeq (static, $(CROSS_LIBTYPE))
+      NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                         --enable-static
+    endif
+    ifeq (shared, $(CROSS_LIBTYPE))
+      NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                         --disable-static
+    endif
+  endif
+
+endif
+
+NG_VENDOR_TARGET_DYLIB_FIXUPS := \
+    libintl \
+    libasprintf \
+    libgettextlib \
+    libgettextsrc \
+    libgettextpo
+
+include $(CURDIR)/../vendor-rules.mk

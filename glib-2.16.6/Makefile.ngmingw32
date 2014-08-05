@@ -1,0 +1,74 @@
+################################################################################
+################################################################################
+#
+# BEGIN NIGHTINGALE GPL
+# 
+# This file is part of the Nightingale Media Player.
+#
+# Copyright(c) 2014
+# http://www.getnightingale.com
+# 
+# This file may be licensed under the terms of of the
+# GNU General Public License Version 2 (the "GPL").
+# 
+# Software distributed under the License is distributed 
+# on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
+# express or implied. See the GPL for the specific language 
+# governing rights and limitations.
+#
+# You should have received a copy of the GPL along with this 
+# program. If not, go to http://www.gnu.org/licenses/gpl.html
+# or write to the Free Software Foundation, Inc., 
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# 
+# END NIGHTINGALE GPL
+#
+################################################################################
+#
+# Makefile for building Nightingale vendor: glib
+#
+################################################################################
+################################################################################
+
+
+# We don't want this on linux because -lintl (which this will add) doesn't
+# exist there - it's integrated into libc.
+ifneq (,$(filter Linux,$(NG_VENDOR_ARCH)))
+  NG_VENDOR_TARGET_DEP_MODULES := gettext
+endif
+
+ifeq (1,$(NG_VENDOR_CROSS_COMP))
+  NG_VENDOR_TARGET_DEP_MODULES := gettext
+endif
+
+NG_VENDOR_TARGET = glib
+NG_VENDOR_TARGET_VERSION = 2.16.6
+
+include $(CURDIR)/../vendor-defs.mk
+
+NG_VENDOR_TARGET_CONFIGURE_OPTS :=
+
+ifneq (,$(filter Msys Darwin,$(NG_VENDOR_ARCH)))
+  ifneq (1,$(NG_VENDOR_CROSS_COMP))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --with-libiconv=gnu
+  endif
+endif
+
+ifeq (1,$(NG_VENDOR_CROSS_COMP))
+  ifeq (static, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --disable-shared \
+                                       --enable-static
+  endif
+  ifeq (shared, $(CROSS_LIBTYPE))
+    NG_VENDOR_TARGET_CONFIGURE_OPTS += --enable-shared \
+                                       --disable-static
+  endif
+endif
+
+NG_VENDOR_TARGET_DYLIB_FIXUPS := \
+  libglib-2.0 \
+  libgobject-2.0 \
+  libgmodule-2.0 \
+  libgthread-2.0 \
+
+include $(CURDIR)/../vendor-rules.mk
