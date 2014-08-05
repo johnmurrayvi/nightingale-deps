@@ -28,21 +28,22 @@ export NG_VENDOR_CROSS_COMP=1
 # export CROSS_CMAKE_TC_PATH="/opt/cross/mxe/usr"
 
 # mingw-w64
-export PATH="/opt/cross/mingw-w64/bin:$PATH"
+# export PATH="/opt/cross/mingw-w64/bin:$PATH"
 # echo $PATH
-export CROSS="i686-w64-mingw32"
-export CROSS_CMAKE_TC_PATH="/opt/cross/mingw-w64"
+# export CROSS="i686-w64-mingw32"
+# export CROSS_CMAKE_TC_PATH="/opt/cross/mingw-w64"
 
 
 # msvc tools with wine
-# WPRE="/home/jmurray/.wine-32/drive_c"
-# export CROSS="i686-wine-mingw32"
-# export WINEARCH="win32"
-# export WINEPREFIX="/home/jmurray/.wine-32"
-# export BUVER="binutils-2.17.50"
+WPRE="/home/jmurray/.wine-32/drive_c"
+VCVER="VC8"
+export CROSS="i686-wine-mingw32"
+export WINEARCH="win32"
+export WINEPREFIX="/home/jmurray/.wine-32"
+export BUVER="binutils-2.17.50"
 # export PATH="$WPRE:$WPRE/VC10/bin:$PATH"
-# echo $PATH
-
+export PATH="$WPRE:$WPRE/$VCVER/bin:$PATH"
+echo $PATH
 
 
 if [ ! -d "build" ]; then
@@ -51,18 +52,18 @@ fi
 
 case $OSTYPE in
     linux*)
-        if [ ! -d "windows-i686-w64" ]; then
-            mkdir -p "windows-i686-w64"
-        fi
-        if [ ! -d "checkout/windows-i686-w64" ]; then
-            mkdir -p "checkout/windows-i686-w64"
-        fi
-        # if [ ! -d "windows-i686-wine" ]; then
-        #     mkdir -p "windows-i686-wine"
+        # if [ ! -d "windows-i686-w64" ]; then
+        #     mkdir -p "windows-i686-w64"
         # fi
-        # if [ ! -d "checkout/windows-i686-wine" ]; then
-        #     mkdir -p "checkout/windows-i686-wine"
+        # if [ ! -d "checkout/windows-i686-w64" ]; then
+        #     mkdir -p "checkout/windows-i686-w64"
         # fi
+        if [ ! -d "windows-i686-wine" ]; then
+            mkdir -p "windows-i686-wine"
+        fi
+        if [ ! -d "checkout/windows-i686-wine" ]; then
+            mkdir -p "checkout/windows-i686-wine"
+        fi
 
 # ------------------------------------------------------- #
         # echo -e "Building libiconv...\n"
@@ -74,16 +75,16 @@ case $OSTYPE in
 
 #       ### TIER 1 ###
 #       echo -e "Building gettext...\n"
-#        make -C gettext -f Makefile.ngmingw32
+#       make -C gettext -f Makefile.ngmingw32
 ## ------------------------------------------------------- #
-#        make -C libffi -f Makefile.ngmingw32
+#       make -C libffi -f Makefile.ngmingw32
 ## ------------------------------------------------------- #
 #       echo -e "Building zlib...\n"
 #       make -C zlib -f Makefile.ngmingw32
 #       make -C zlib -f Makefile.ngmingw32 CROSS_ZLIB_W64=1
 ## ------------------------------------------------------- #
 #       echo -e "Building glib...\n"
-       # make -C glib -f Makefile.ngmingw32
+#       make -C glib -f Makefile.ngmingw32
 ## ------------------------------------------------------- #
 #       echo -e "Building sqlite...\n"
 #       make -C sqlite -f Makefile.ngmingw32
