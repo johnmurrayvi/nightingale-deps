@@ -30,7 +30,7 @@
 #ifndef _GL_STDLIB_H
 
 /* The include_next requires a split double-inclusion guard.  */
-#@INCLUDE_NEXT@ @NEXT_STDLIB_H@
+// #@INCLUDE_NEXT@ @NEXT_STDLIB_H@
 
 #ifndef _GL_STDLIB_H
 #define _GL_STDLIB_H

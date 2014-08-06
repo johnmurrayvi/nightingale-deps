@@ -23,7 +23,7 @@
 #if defined __need_FILE || defined __need___FILE
 /* Special invocation convention inside glibc header files.  */
 
-#@INCLUDE_NEXT@ @NEXT_STDIO_H@
+// #@INCLUDE_NEXT@ @NEXT_STDIO_H@
 
 #else
 /* Normal invocation convention.  */
@@ -31,7 +31,7 @@
 #ifndef _GL_STDIO_H
 
 /* The include_next requires a split double-inclusion guard.  */
-#@INCLUDE_NEXT@ @NEXT_STDIO_H@
+// #@INCLUDE_NEXT@ @NEXT_STDIO_H@
 
 #ifndef _GL_STDIO_H
 #define _GL_STDIO_H

@@ -23,7 +23,7 @@
 #endif
 
 /* The include_next requires a split double-inclusion guard.  */
-#@INCLUDE_NEXT@ @NEXT_ERRNO_H@
+// #@INCLUDE_NEXT@ @NEXT_ERRNO_H@
 
 #ifndef _GL_ERRNO_H
 #define _GL_ERRNO_H

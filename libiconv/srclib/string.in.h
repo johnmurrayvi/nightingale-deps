@@ -23,7 +23,7 @@
 #endif
 
 /* The include_next requires a split double-inclusion guard.  */
-#@INCLUDE_NEXT@ @NEXT_STRING_H@
+// #@INCLUDE_NEXT@ @NEXT_STRING_H@
 
 #ifndef _GL_STRING_H
 #define _GL_STRING_H

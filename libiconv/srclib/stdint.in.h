@@ -52,7 +52,7 @@
 # if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
 # endif
-# @INCLUDE_NEXT@ @NEXT_STDINT_H@
+// # @INCLUDE_NEXT@ @NEXT_STDINT_H@
 #endif
 
 #if ! defined _GL_STDINT_H && ! defined _GL_JUST_INCLUDE_SYSTEM_STDINT_H
