@@ -1977,7 +1977,7 @@ func_mode_compile ()
       normal )
 	# Accept any command-line options.
 	case $arg in
-	-o)
+	-o | -fo | -Fo)
 	  test -n "$libobj" && \
 	    func_fatal_error "you cannot specify \`-o' more than once"
 	  arg_mode=target
@@ -2022,6 +2022,16 @@ func_mode_compile ()
 	  continue
 	  ;;
 
+  -i)
+    if test "$tagname" != RC ; then
+      # Accept the current argument as the source file.
+      # The previous "srcfile" becomes the current argument.
+      #
+      lastarg="$srcfile"
+      srcfile="$arg"
+    fi
+    continue
+    ;;
 	*)
 	  # Accept the current argument as the source file.
 	  # The previous "srcfile" becomes the current argument.
@@ -2183,18 +2193,39 @@ compiler."
       # Without this assignment, base_compile gets emptied.
       fbsd_hideous_sh_bug=$base_compile
 
-      if test "$pic_mode" != no; then
-	command="$base_compile $qsrcfile $pic_flag"
+      if test "$tagname" = RC ; then
+
+        command="$base_compile"
+        func_mkdir_p "$xdir$objdir"
+
+        if test -z "$output_obj"; then
+          # Place PIC objects in $objdir
+          command+=" -Fo $lobj"
+        fi
+
+        if test "$pic_mode" != no; then
+          command+=" $qsrcfile $pic_flag"
+        else
+          # Don't build PIC code
+          command+=" $qsrcfile"
+        fi
+
       else
-	# Don't build PIC code
-	command="$base_compile $qsrcfile"
-      fi
 
-      func_mkdir_p "$xdir$objdir"
+        if test "$pic_mode" != no; then
+          command="$base_compile $qsrcfile $pic_flag"
+        else
+          # Don't build PIC code
+          command="$base_compile $qsrcfile"
+        fi
 
-      if test -z "$output_obj"; then
-	# Place PIC objects in $objdir
-	func_append command " -o $lobj"
+        func_mkdir_p "$xdir$objdir"
+
+        if test -z "$output_obj"; then
+          # Place PIC objects in $objdir
+          command+=" -Fo$lobj"
+        fi
+
       fi
 
       func_show_eval_locale "$command"	\
