@@ -19,11 +19,12 @@
 
 #include <string.h>
 
-#ifdef _MSC_VER
-# include "strerror.h"
-#endif
 
 #if REPLACE_STRERROR
+
+# ifdef _MSC_VER
+#  include "strerror.h"
+# endif
 
 # include <errno.h>
 # include <stdio.h>
@@ -39,10 +40,10 @@
 /* Use the system functions, not the gnulib overrides in this file.  */
 # undef sprintf
 
-# undef strerror
-# if ! HAVE_DECL_STRERROR
-#  define strerror(n) NULL
-# endif
+// # undef strerror
+// # if ! HAVE_DECL_STRERROR
+// #  define strerror(n) NULL
+// # endif
 
 char *
 rpl_strerror (int n)

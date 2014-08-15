@@ -799,7 +799,7 @@ EXTRA_DIST = alloca.in.h allocator.h areadlink.h canonicalize-lgpl.c \
 	$(top_srcdir)/build-aux/install-reloc safe-read.h signal.in.h \
 	stdio-write.c sigprocmask.c \
 	stdbool.in.h stddef.in.h stdint.in.h stdio.in.h stdlib.in.h \
-	streq.h strerror.c \
+	streq.h strerror.c strerror.h \
 	string.in.h sys_stat.in.h time.in.h unistd.in.h unitypes.in.h \
 	localcharset.h uniwidth.in.h uniwidth/cjk.h unlocked-io.h \
 	verify.h xreadlink.h

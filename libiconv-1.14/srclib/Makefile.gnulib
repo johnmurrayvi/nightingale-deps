@@ -343,7 +343,7 @@ EXTRA_DIST += $(top_srcdir)/build-aux/config.libpath $(top_srcdir)/build-aux/rel
 ## begin gnulib module relocatable-prog-wrapper
 
 
-EXTRA_DIST += allocator.c allocator.h areadlink.c areadlink.h c-ctype.c c-ctype.h canonicalize-lgpl.c careadlinkat.c careadlinkat.h malloca.c malloca.h progname.c progname.h progreloc.c readlink.c relocatable.c relocatable.h relocwrapper.c setenv.c strerror.c
+EXTRA_DIST += allocator.c allocator.h areadlink.c areadlink.h c-ctype.c c-ctype.h canonicalize-lgpl.c careadlinkat.c careadlinkat.h malloca.c malloca.h progname.c progname.h progreloc.c readlink.c relocatable.c relocatable.h relocwrapper.c setenv.c strerror.c strerror.h
 
 EXTRA_DIST += $(top_srcdir)/build-aux/install-reloc
 
@@ -743,7 +743,7 @@ EXTRA_DIST += streq.h
 ## begin gnulib module strerror
 
 
-EXTRA_DIST += strerror.c
+EXTRA_DIST += strerror.c strerror.h
 
 EXTRA_libicrt_a_SOURCES += strerror.c
 
