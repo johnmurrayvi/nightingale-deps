@@ -24,7 +24,12 @@
 @PRAGMA_COLUMNS@
 
 /* The include_next requires a split double-inclusion guard.  */
+#ifdef _MSC_VER
+#include <c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include\errno.h>
+#else
 #@INCLUDE_NEXT@ @NEXT_ERRNO_H@
+#endif
+
 
 #ifndef _GL_ERRNO_H
 #define _GL_ERRNO_H

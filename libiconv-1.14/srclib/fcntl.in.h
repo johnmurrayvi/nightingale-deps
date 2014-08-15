@@ -35,7 +35,12 @@
 #if !(defined __GLIBC__ || defined __UCLIBC__) || (defined __cplusplus && defined GNULIB_NAMESPACE && !(__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)))
 # include <sys/stat.h>
 #endif
+
+#ifdef _MSC_VER
+#include <c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include\fcntl.h>
+#else
 #@INCLUDE_NEXT@ @NEXT_FCNTL_H@
+#endif
 
 #else
 /* Normal invocation convention.  */
@@ -53,7 +58,11 @@
 # include <sys/stat.h>
 #endif
 /* The include_next requires a split double-inclusion guard.  */
+#ifdef _MSC_VER
+#include <c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include\fcntl.h>
+#else
 #@INCLUDE_NEXT@ @NEXT_FCNTL_H@
+#endif
 
 #ifndef _GL_FCNTL_H
 #define _GL_FCNTL_H

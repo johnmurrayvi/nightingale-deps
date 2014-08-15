@@ -39,6 +39,15 @@ orig_stat (const char *filename, struct stat *buf)
 #include <string.h>
 #include "dosname.h"
 
+#ifdef _MSC_VER
+# ifndef PATH_MAX
+#  ifndef MAX_PATH
+#   define MAX_PATH 260
+#  endif
+#  define PATH_MAX MAX_PATH
+# endif
+#endif
+
 /* Store information about NAME into ST.  Work around bugs with
    trailing slashes.  Mingw has other bugs (such as st_ino always
    being 0 on success) which this wrapper does not work around.  But

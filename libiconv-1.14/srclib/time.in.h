@@ -30,13 +30,21 @@
      || defined __need_timespec \
      || defined _GL_TIME_H)
 
-# @INCLUDE_NEXT@ @NEXT_TIME_H@
+# ifdef _MSC_VER
+#  include <c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include\time.h>
+# else
+#  @INCLUDE_NEXT@ @NEXT_TIME_H@
+# endif
 
 #else
 
 # define _GL_TIME_H
 
-# @INCLUDE_NEXT@ @NEXT_TIME_H@
+# ifdef _MSC_VER
+#  include <c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include\time.h>
+# else
+#  @INCLUDE_NEXT@ @NEXT_TIME_H@
+# endif
 
 /* NetBSD 5.0 mis-defines NULL.  */
 # include <stddef.h>

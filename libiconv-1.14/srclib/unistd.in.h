@@ -28,7 +28,7 @@
   && !defined _GL_WINSOCK2_H_WITNESS && defined _WINSOCK2_H
 /* <unistd.h> is being indirectly included for the first time from
    <winsock2.h>; avoid declaring any overrides.  */
-# if @HAVE_UNISTD_H@
+# if @HAVE_UNISTD_H@ && !defined(_MSC_VER)
 #  @INCLUDE_NEXT@ @NEXT_UNISTD_H@
 # else
 #  error unexpected; report this to bug-gnulib@gnu.org
@@ -39,7 +39,7 @@
 #elif !defined _GL_UNISTD_H
 
 /* The include_next requires a split double-inclusion guard.  */
-#if @HAVE_UNISTD_H@
+#if @HAVE_UNISTD_H@ && !defined(_MSC_VER)
 # @INCLUDE_NEXT@ @NEXT_UNISTD_H@
 #endif
 

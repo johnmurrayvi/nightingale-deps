@@ -54,7 +54,13 @@
      in <inttypes.h> would reinclude us, skipping our contents because
      _GL_STDINT_H is defined.
      The include_next requires a split double-inclusion guard.  */
-# @INCLUDE_NEXT@ @NEXT_STDINT_H@
+
+# ifdef _MSC_VER
+#  include <c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include\stdint.h>
+# else
+#  @INCLUDE_NEXT@ @NEXT_STDINT_H@
+# endif
+
 #endif
 
 #if ! defined _GL_STDINT_H && ! defined _GL_JUST_INCLUDE_SYSTEM_STDINT_H

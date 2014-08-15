@@ -30,7 +30,11 @@
      In this situation, the functions are not yet declared, therefore we cannot
      provide the C++ aliases.  */
 
+#ifdef _MSC_VER
+#include <c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include\stdio.h>
+#else
 #@INCLUDE_NEXT@ @NEXT_STDIO_H@
+#endif
 
 #else
 /* Normal invocation convention.  */
@@ -40,7 +44,11 @@
 #define _GL_ALREADY_INCLUDING_STDIO_H
 
 /* The include_next requires a split double-inclusion guard.  */
+#ifdef _MSC_VER
+#include <c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include\stdio.h>
+#else
 #@INCLUDE_NEXT@ @NEXT_STDIO_H@
+#endif
 
 #undef _GL_ALREADY_INCLUDING_STDIO_H
 

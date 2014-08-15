@@ -19,6 +19,10 @@
 
 #include <string.h>
 
+#ifdef _MSC_VER
+# include "strerror.h"
+#endif
+
 #if REPLACE_STRERROR
 
 # include <errno.h>

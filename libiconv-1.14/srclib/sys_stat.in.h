@@ -29,7 +29,14 @@
 #if defined __need_system_sys_stat_h
 /* Special invocation convention.  */
 
+#ifdef _MSC_VER
+#include <c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include\sys\stat.h>
+# ifndef mode_t
+#  define mode_t int
+# endif
+#else
 #@INCLUDE_NEXT@ @NEXT_SYS_STAT_H@
+#endif
 
 #else
 /* Normal invocation convention.  */
@@ -43,7 +50,14 @@
 #include <time.h>
 
 /* The include_next requires a split double-inclusion guard.  */
+#ifdef _MSC_VER
+#include <c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include\sys\stat.h>
+# ifndef mode_t
+#  define mode_t int
+# endif
+#else
 #@INCLUDE_NEXT@ @NEXT_SYS_STAT_H@
+#endif
 
 #ifndef _GL_SYS_STAT_H
 #define _GL_SYS_STAT_H

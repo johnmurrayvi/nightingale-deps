@@ -24,7 +24,11 @@
 @PRAGMA_COLUMNS@
 
 /* The include_next requires a split double-inclusion guard.  */
+#ifdef _MSC_VER
+#include <c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include\string.h>
+#else
 #@INCLUDE_NEXT@ @NEXT_STRING_H@
+#endif
 
 #ifndef _GL_STRING_H
 #define _GL_STRING_H

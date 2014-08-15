@@ -23,7 +23,11 @@
 #if defined __need_malloc_and_calloc
 /* Special invocation convention inside glibc header files.  */
 
+#ifdef _MSC_VER
+#include <c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include\stdlib.h>
+#else
 #@INCLUDE_NEXT@ @NEXT_STDLIB_H@
+#endif
 
 #else
 /* Normal invocation convention.  */
@@ -31,7 +35,11 @@
 #ifndef _GL_STDLIB_H
 
 /* The include_next requires a split double-inclusion guard.  */
+#ifdef _MSC_VER
+#include <c:\Program Files (x86)\Microsoft Visual Studio 8\VC\include\stdlib.h>
+#else
 #@INCLUDE_NEXT@ @NEXT_STDLIB_H@
+#endif
 
 #ifndef _GL_STDLIB_H
 #define _GL_STDLIB_H
