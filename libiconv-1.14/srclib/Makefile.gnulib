@@ -14,7 +14,7 @@
 
 MOSTLYCLEANFILES += core *.stackdump
 
-noinst_LIBRARIES += libicrt.a
+noinst_LIBRARIES += icrt.lib
 
 libicrt_a_SOURCES =
 libicrt_a_LIBADD = $(gl_LIBOBJS)
