@@ -93,7 +93,7 @@ WOE32=$is_woe32
 AC_SUBST([WOE32])
 if test $WOE32 = yes; then
   dnl Check for a program that compiles Windows resource files.
-  AC_CHECK_TOOL([WINDRES], [windres])
+  AC_CHECK_TOOL([RC], [rc])
 fi
 
 gl_VISIBILITY

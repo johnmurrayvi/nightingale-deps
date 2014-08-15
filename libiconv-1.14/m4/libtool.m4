@@ -7492,7 +7492,7 @@ dnl AC_DEFUN([LT_AC_PROG_GCJ], [])
 # LT_PROG_RC
 # ----------
 AC_DEFUN([LT_PROG_RC],
-[AC_CHECK_TOOL(RC, windres,)
+[AC_CHECK_TOOL(RC, rc,)
 ])
 
 # Old name:
