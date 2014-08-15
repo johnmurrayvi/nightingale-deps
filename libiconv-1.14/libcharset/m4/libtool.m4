@@ -2300,17 +2300,17 @@ cygwin* | mingw* | pw32* | cegcc*)
     case $host_os in
     cygwin*)
       # Cygwin DLLs use 'cyg' prefix rather than 'lib'
-      soname_spec='`echo ${libname} | sed -e 's/^lib/cyg/'``echo ${release} | $SED -e 's/[[.]]/-/g'`${versuffix}${shared_ext}'
+      soname_spec='`echo ${libname} | sed -e 's/^lib/cyg/'``echo ${release} | $SED -e 's/[[.]]/-/g'`${shared_ext}'
 m4_if([$1], [],[
       sys_lib_search_path_spec="$sys_lib_search_path_spec /usr/lib/w32api"])
       ;;
     mingw* | cegcc*)
       # MinGW DLLs use traditional 'lib' prefix
-      soname_spec='${libname}`echo ${release} | $SED -e 's/[[.]]/-/g'`${versuffix}${shared_ext}'
+      soname_spec='${libname}`echo ${release} | $SED -e 's/[[.]]/-/g'`${shared_ext}'
       ;;
     pw32*)
       # pw32 DLLs use 'pw' prefix rather than 'lib'
-      library_names_spec='`echo ${libname} | sed -e 's/^lib/pw/'``echo ${release} | $SED -e 's/[[.]]/-/g'`${versuffix}${shared_ext}'
+      library_names_spec='`echo ${libname} | sed -e 's/^lib/pw/'``echo ${release} | $SED -e 's/[[.]]/-/g'`${shared_ext}'
       ;;
     esac
     dynamic_linker='Win32 ld.exe'
@@ -2319,8 +2319,8 @@ m4_if([$1], [],[
   *,cl*)
     # Native MSVC
     libname_spec='$name'
-    soname_spec='${libname}`echo ${release} | $SED -e 's/[[.]]/-/g'`${versuffix}${shared_ext}'
-    library_names_spec='${libname}.dll.lib'
+    soname_spec='${libname}`echo ${release} | $SED -e 's/[[.]]/-/g'`${shared_ext}'
+    library_names_spec='${libname}.lib'
 
     case $build_os in
     mingw*)
@@ -2374,7 +2374,7 @@ m4_if([$1], [],[
 
   *)
     # Assume MSVC wrapper
-    library_names_spec='${libname}`echo ${release} | $SED -e 's/[[.]]/-/g'`${versuffix}${shared_ext} $libname.lib'
+    library_names_spec='${libname}`echo ${release} | $SED -e 's/[[.]]/-/g'`${shared_ext} $libname.lib'
     dynamic_linker='Win32 ld.exe'
     ;;
   esac
@@ -5059,7 +5059,7 @@ _LT_EOF
 	  else
 	    sed -e 's/\\\\\\\(.*\\\\\\\)/-link\\\ -EXPORT:\\\\\\\1/' < $export_symbols > $output_objdir/$soname.exp;
 	  fi~
-	  $CC -o $tool_output_objdir$soname $libobjs $compiler_flags $deplibs "@$tool_output_objdir$soname.exp" -Wl,-DLL,-IMPLIB:"$tool_output_objdir$libname.dll.lib"~
+	  $CC -o $tool_output_objdir$soname $libobjs $compiler_flags $deplibs "@$tool_output_objdir$soname.exp" -Wl,-DLL,-IMPLIB:"$tool_output_objdir$libname.lib"~
 	  linknames='
 	# The linker will not automatically build a static lib if we build a DLL.
 	# _LT_TAGVAR(old_archive_from_new_cmds, $1)='true'
@@ -6066,7 +6066,7 @@ if test "$_lt_caught_CXX_error" != yes; then
 	    else
 	      $SED -e 's/\\\\\\\(.*\\\\\\\)/-link\\\ -EXPORT:\\\\\\\1/' < $export_symbols > $output_objdir/$soname.exp;
 	    fi~
-	    $CC -o $tool_output_objdir$soname $libobjs $compiler_flags $deplibs "@$tool_output_objdir$soname.exp" -Wl,-DLL,-IMPLIB:"$tool_output_objdir$libname.dll.lib"~
+	    $CC -o $tool_output_objdir$soname $libobjs $compiler_flags $deplibs "@$tool_output_objdir$soname.exp" -Wl,-DLL,-IMPLIB:"$tool_output_objdir$libname.lib"~
 	    linknames='
 	  # The linker will not automatically build a static lib if we build a DLL.
 	  # _LT_TAGVAR(old_archive_from_new_cmds, $1)='true'
