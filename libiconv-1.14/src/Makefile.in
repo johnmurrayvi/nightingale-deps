@@ -70,12 +70,12 @@ OBJECTS_RES_no =
 # i.e. during "make install". The intermediate 'iconv' executable is built
 # without internationalization and not linked with libintl.
 
-all : iconv_no_i18n$(EXEEXT) iconv.@OBJEXT@ $(OBJECTS_RES_@WOE32@)
+all : iconv_no_i18n$(EXEEXT) iconv.@OBJEXT@ $(OBJECTS_RES_@WOE32@) ../srclib/relocatable.obj
 	test `ls -ld . | sed -e 's/^d\(.........\).*/\1/'` = rwxrwxrwx || chmod 777 .
 
 # This is the temporary iconv executable, without internationalization.
 iconv_no_i18n$(EXEEXT) : iconv_no_i18n.@OBJEXT@ ../lib/libiconv.la $(OBJECTS_RES_@WOE32@)
-	$(LIBTOOL_LINK) $(CC) $(LDFLAGS) $(CFLAGS) iconv_no_i18n.@OBJEXT@ ../srclib/icrt.lib ../srclib/strerror.obj ../lib/libiconv.la $(OBJECTS_RES_@WOE32@) -o $@
+	$(LIBTOOL_LINK) $(CC) $(LDFLAGS) $(CFLAGS) iconv_no_i18n.@OBJEXT@ ../srclib/icrt.lib ../lib/libiconv.la $(OBJECTS_RES_@WOE32@) -o $@
 
 iconv_no_i18n.@OBJEXT@ : $(srcdir)/iconv_no_i18n.c $(srcdir)/iconv.c
 	$(CC) -c $(INCLUDES) -I../lib $(CFLAGS) $(CPPFLAGS) -DINSTALLDIR=\"$(bindir)\" -DLOCALEDIR=\"$(localedir)\" $(srcdir)/iconv_no_i18n.c
@@ -85,6 +85,9 @@ iconv.@OBJEXT@ : $(srcdir)/iconv.c
 
 iconv.res : $(srcdir)/../windows/iconv.rc
 	$(WINDRES) `$(SHELL) $(srcdir)/../windows/windres-options $(PACKAGE_VERSION)` -fo iconv.res $(srcdir)/../windows/iconv.rc
+
+../srclib/relocatable.obj : ../srclib/relocatable.c
+	$(CC) -c $(INCLUDES) -I../lib $(CFLAGS) $(CPPFLAGS) -DINSTALLDIR=\"$(bindir)\" -DLOCALEDIR=\"$(localedir)\" $(srcdir)/../srclib/relocatable.c -o $(srcdir)/../srclib/relocatable.obj
 
 # The following rule is necessary to avoid a toplevel "make -n check" failure.
 ../lib/libiconv.la :
@@ -113,7 +116,7 @@ install : all force
 	if [ ! -d $(DESTDIR)$(bindir) ] ; then $(mkinstalldirs) $(DESTDIR)$(bindir) ; fi
 	case "@host_os@" in \
 	  hpux*) $(CC) $(LDFLAGS) $(CFLAGS) $(iconv_LDFLAGS) iconv.@OBJEXT@ ../srclib/icrt.lib -L$(DESTDIR)$(libdir) -liconv @LIBINTL@ $(OBJECTS_RES_@WOE32@) `if test -n '$(DESTDIR)'; then echo " -Wl,+b -Wl,$(libdir)"; fi` -o iconv$(EXEEXT);; \
-	  *) $(LIBTOOL_LINK) $(CC) $(LDFLAGS) $(CFLAGS) $(iconv_LDFLAGS) iconv.@OBJEXT@ ../srclib/icrt.lib $(DESTDIR)$(libdir)/libiconv.la @LTLIBINTL@ $(OBJECTS_RES_@WOE32@) -o iconv$(EXEEXT);; \
+	  *) $(LIBTOOL_LINK) $(CC) $(LDFLAGS) $(CFLAGS) $(iconv_LDFLAGS) iconv.@OBJEXT@ ../srclib/icrt.lib ../srclib/relocatable.@OBJEXT@ $(DESTDIR)$(libdir)/libiconv.la @LTLIBINTL@ $(OBJECTS_RES_@WOE32@) -o iconv$(EXEEXT);; \
 	esac
 	$(INSTALL_PROGRAM_ENV) $(LIBTOOL_INSTALL) $(INSTALL_PROGRAM) iconv$(EXEEXT) $(DESTDIR)$(bindir)/iconv$(EXEEXT)
 
