@@ -5553,7 +5553,6 @@ $as_echo "$ac_cv_safe_to_define___extensions__" >&6; }
   # Code from module stdlib:
   # Code from module streq:
   # Code from module strerror:
-  # Code from module strerror-override:
   # Code from module string:
   # Code from module sys_stat:
   # Code from module time:
@@ -21199,7 +21198,7 @@ if test -n "$ERRNO_H" || test $REPLACE_STRERROR_0 = 1; then
 
 
 
-  gl_LIBOBJS="$gl_LIBOBJS strerror-override.$ac_objext"
+  gl_LIBOBJS="$gl_LIBOBJS"
 
 
 
