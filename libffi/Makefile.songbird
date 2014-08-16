@@ -37,13 +37,16 @@ SB_VENDOR_TARGET_VERSION = 3.1
 
 include $(CURDIR)/../songbird-vendor-defs.mk
 
-SB_VENDOR_TARGET_CONFIGURE_OPTS := 
+SB_VENDOR_TARGET_CONFIGURE_OPTS := --disable-builddir
 
 ifeq (Msys,$(SB_VENDOR_ARCH))
   SB_VENDOR_TARGET_CONFIGURE_OPTS += CC=$(CURDIR)/msvcc.sh LD=link \
                                      CPP='cl -nologo -EP' CFLAGS='-O2' \
                                      --disable-shared
 
+  # Override the flags, which get pulled in by SB_VENDOR_TARGET_DEP_MODULES,
+  # to $(NULL), since the the mvcc.sh script, that libffi provides, doesn't 
+  # handle them the way clwrapper.py would.
   SB_CFLAGS = $(NULL)
   SB_CPPFLAGS = $(NULL)
   SB_CXXFLAGS = $(NULL)
