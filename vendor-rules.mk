@@ -133,20 +133,33 @@ ifneq (,$(BUILD_TARGET_SET))
       export DUMPBIN = dumpbin
       export AS = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/as
       export AR = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/ar
-      export NM = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/nm
+      # export NM = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/nm
+      export NM = dumpbin -symbols
       export OBJDUMP = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/objdump
       export DLLTOOL = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/dlltool
-      export RANLIB = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/ranlib
+      # export RANLIB = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/ranlib
+      export RANLIB = :
+      # export STRIP = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/strip
+      export STRIP = :
       export RC = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/windres
+      # export RC = rc
       export WINDRES = $(WINEPREFIX)/drive_c/ng-deps/$(BUVER)/bin/windres
     endif
   endif
 
-  export CPPFLAGS = $(NG_CPPFLAGS)
-  export CFLAGS = $(NG_CFLAGS)
-  export CXXFLAGS = $(NG_CXXFLAGS)
+  ifneq (i686-wine-mingw32, $(CROSS))
+    export CPPFLAGS = $(NG_CPPFLAGS)
+    export CFLAGS = $(NG_CFLAGS)
+    export CXXFLAGS = $(NG_CXXFLAGS)
+  else
+    export CPPFLAGS = $(NG_CPPFLAGS) $(WINE_C_FLAGS)
+    export CFLAGS = $(NG_CFLAGS) $(WINE_C_FLAGS)
+    export CXXFLAGS = $(NG_CXXFLAGS) $(WINE_C_FLAGS)
+  endif
+
   export LDFLAGS = $(NG_LDFLAGS)
   export ACLOCAL_FLAGS = $(NG_ACLOCAL_FLAGS)
+
 ifeq (1, $(NG_VENDOR_CROSS_COMP))
   ifeq (static, $(CROSS_LIBTYPE))
     export PKG_CONFIG_PATH_i686_pc_mingw32_static = $(NG_PKG_CONFIG_PATH)

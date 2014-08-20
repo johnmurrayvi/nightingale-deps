@@ -36,14 +36,25 @@ export NG_VENDOR_CROSS_COMP=1
 
 # msvc tools with wine
 WPRE="/home/jmurray/.wine-32/drive_c"
-VCVER="VC8"
 export CROSS="i686-wine-mingw32"
 export WINEARCH="win32"
 export WINEPREFIX="/home/jmurray/.wine-32"
 export BUVER="binutils-2.17.50"
-# export PATH="$WPRE:$WPRE/VC10/bin:$PATH"
-export PATH="$WPRE:$WPRE/$VCVER/bin:$PATH"
-echo $PATH
+
+VC_VER="VC8"
+VC_DIR="$WPRE/$VC_VER"
+VC_INC_DIR="$VC_DIR/include"
+
+WIN_SDK_VER="v6.0"
+WIN_SDK_DIR="$WPRE/SDKs/Windows-SDK/$WIN_SDK_VER"
+WIN_SDK_INC_DIR="$WIN_SDK_DIR/Include"
+
+export WINE_C_FLAGS="-I$VC_INC_DIR -I$WIN_SDK_INC_DIR"
+export INCLUDE="$VC_INC_DIR:$WIN_SDK_INC_DIR"
+
+export PATH="$WPRE:$WPRE/$VC_VER/bin:$PATH"
+echo "\$PATH = $PATH"
+echo "which link = `which link`"
 
 
 if [ ! -d "build" ]; then
@@ -65,17 +76,22 @@ case $OSTYPE in
             mkdir -p "checkout/windows-i686-wine"
         fi
 
+        # export CFLAGS="-I$VC_INC_DIR -I$WIN_SDK_INC_DIR"
+        # export CXXFLAGS="-I$VC_INC_DIR -I$WIN_SDK_INC_DIR"
+        # export CPPFLAGS="-I$VC_INC_DIR -I$WIN_SDK_INC_DIR"
+
 # ------------------------------------------------------- #
         # echo -e "Building libiconv...\n"
         # make -C libiconv -f Makefile.ngwine
         # make -C libiconv -f Makefile.ngmingw32
-        # make -C libiconv-1.14 -f Makefile.ngwine
+        make -C libiconv-1.14 -f Makefile.ngwine
         # make -C libiconv-1.14 -f Makefile.ngmingw32
 # ------------------------------------------------------- #
 
 #       ### TIER 1 ###
 #       echo -e "Building gettext...\n"
 #       make -C gettext -f Makefile.ngmingw32
+#       make -C gettext-0.14.6 -f Makefile.ngwine
 ## ------------------------------------------------------- #
 #       make -C libffi -f Makefile.ngmingw32
 ## ------------------------------------------------------- #

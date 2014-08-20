@@ -184,9 +184,7 @@ ifeq (Msys,$(NG_VENDOR_ARCH))
   NG_CC = cl
   NG_CXX = cl
   NG_LD = link
-  ifneq (i686-wine-mingw32, $(CROSS))
-    NG_OBJDUMP = objdump
-  endif
+  NG_OBJDUMP = objdump
 endif
 
 

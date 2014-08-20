@@ -1,6 +1,7 @@
 /* Resources for iconv.dll */
 
-#include <winver.h>
+/* #include <winver.h> */
+#include <WinVer.h>
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION PACKAGE_VERSION_MAJOR,PACKAGE_VERSION_MINOR,PACKAGE_VERSION_SUBMINOR,0
