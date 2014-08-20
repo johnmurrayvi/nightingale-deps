@@ -1,4 +1,4 @@
-dnl Configuration for the toplevel directory of GNU gettext
+\dnl Configuration for the toplevel directory of GNU gettext
 dnl Copyright (C) 1995-1999, 2000-2003, 2005-2006, 2009-2010 Free Software Foundation, Inc.
 dnl
 dnl This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.62])
 AC_INIT([gettext],
-	m4_esyscmd([build-aux/git-version-gen .tarball-version]),
+	[0.19.2],
 	[bug-gnu-gettext@gnu.org])
 AC_CONFIG_SRCDIR([gettext-tools/src/msgfmt.c])
 AC_CONFIG_AUX_DIR([build-aux])

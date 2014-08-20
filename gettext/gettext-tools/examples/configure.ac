@@ -18,7 +18,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.57])
 AC_INIT([gettext-examples],
-	m4_esyscmd([../../build-aux/git-version-gen ../../.tarball-version]),
+	[0.19.2],
 	[bug-gnu-gettext@gnu.org])
 AC_CONFIG_SRCDIR([installpaths.in])
 AC_CONFIG_AUX_DIR([../../build-aux])
