@@ -5,8 +5,8 @@ ignore*/*
 sqlite/autom4te.cache
 checkout/*
 build/*
-msys*
-darwin*
+msys*/
+darwin*/
 linux-*/
 windows-i686*/
 macosx-i686*/
