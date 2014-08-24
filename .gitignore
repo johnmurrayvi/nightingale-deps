@@ -27,3 +27,6 @@ xulrunner*/mozilla/confdefs.h
 xulrunner*/mozilla/config.cache
 xulrunner*/mozilla/config.log
 *.sublime-*
+
+build-*/*
+*-freshcopy/*

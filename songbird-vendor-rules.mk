@@ -149,6 +149,9 @@ ifneq (,$(BUILD_TARGET_SET))
   export PATH = $(SB_PATH)
 ifeq (Msys,$(SB_VENDOR_ARCH))
   export LIBS = $(SB_LIBS)
+
+  export WINGETOPT_CFLAGS = $(SB_WINGETOPT_CFLAGS)
+  export WINGETOPT_LDFLAGS = $(SB_WINGETOPT_LDFLAGS)
 endif
 
   export LIBOIL_CFLAGS = $(SB_LIBOIL_CFLAGS)
@@ -388,8 +391,8 @@ ifeq (Msys,$(SB_VENDOR_ARCH))
 	       $(MSYS_CP) $(SB_VENDOR_BINARIES_CHECKOUT)/$(tgt) \
 	             $(SB_VENDOR_BINARIES_DIR)/$(tgt) --exclude=.svn && \
 	             $(MKDIR) $(SB_VENDOR_BINARIES_DIR)/$(tgt)/.msyscp ; ))
-	@echo Fixing up libtools .la files for first-time use...
-	$(FIND) $(SB_VENDOR_BINARIES_DIR)/ -type f -name '*.la' -exec $(SB_VENDOR_CHECKOUT)/fix-win32-libtool-la-paths.pl -f {} \;
+	# @echo Fixing up libtools .la files for first-time use...
+	# $(FIND) $(SB_VENDOR_BINARIES_DIR)/ -type f -name '*.la' -exec $(SB_VENDOR_CHECKOUT)/fix-win32-libtool-la-paths.pl -f {} \;
 else
 	$(foreach tgt, \
 	  $(SB_VENDOR_BINARIES_TARGETS), \
@@ -397,12 +400,12 @@ else
 	       $(LN) -sv $(SB_VENDOR_BINARIES_CHECKOUT)/$(tgt) \
 	            $(SB_VENDOR_BINARIES_DIR); ))
 endif
-	@echo Fixing up pkg-config .pc files for first time use...
-ifeq (Msys,$(SB_VENDOR_ARCH))
-	$(FIND) $(SB_VENDOR_BINARIES_DIR) -type f -name '*.pc' -exec $(SB_VENDOR_CHECKOUT)/fix-pkg-config-paths.pl -p $(SB_TARGET_ARCH) {} \;
-else
-	$(FIND) -L $(SB_VENDOR_BINARIES_CHECKOUT) -type f -name '*.pc' -exec $(SB_VENDOR_CHECKOUT)/fix-pkg-config-paths.pl -p $(SB_TARGET_ARCH) {} \;
-endif
+# 	@echo Fixing up pkg-config .pc files for first time use...
+# ifeq (Msys,$(SB_VENDOR_ARCH))
+# 	$(FIND) $(SB_VENDOR_BINARIES_DIR) -type f -name '*.pc' -exec $(SB_VENDOR_CHECKOUT)/fix-pkg-config-paths.pl -p $(SB_TARGET_ARCH) {} \;
+# else
+# 	$(FIND) -L $(SB_VENDOR_BINARIES_CHECKOUT) -type f -name '*.pc' -exec $(SB_VENDOR_CHECKOUT)/fix-pkg-config-paths.pl -p $(SB_TARGET_ARCH) {} \;
+# endif
 ifeq (Msys,$(SB_VENDOR_ARCH))
 	(test -e $(SB_VENDOR_BINARIES_DIR)/$(SB_VENDOR_TARGET)/.msyscp && \
           $(RM) -rf $(SB_VENDOR_BINARIES_DIR)/$(SB_VENDOR_TARGET) && \
@@ -441,8 +444,13 @@ ifeq (1,$(SB_RUN_CONFIGURE))
           -C
 endif
 	# We do this submake-cmd insanity to support cmake
+ifneq (, $(SB_MAKE_TARGET))
+	$(SUBMAKE_CMD) -C $(SB_VENDOR_BUILD_DIR) $(SB_MAKE_TARGET)
+	$(SUBMAKE_CMD) -C $(SB_VENDOR_BUILD_DIR) $(SB_MAKE_TARGET)-install
+else
 	$(SUBMAKE_CMD) -C $(SB_VENDOR_BUILD_DIR)
 	$(SUBMAKE_CMD) -C $(SB_VENDOR_BUILD_DIR) install
+endif
 
 $(SB_VENDOR_TARGET_BINARY_DEPS_DIR): $(SB_VENDOR_TARGET_DEPENDENT_DEBS)
 	$(MKDIR) $(SB_VENDOR_TARGET_BINARY_DEPS_DIR)
@@ -481,6 +489,8 @@ setup_build: \
 	@echo PATH = "$(PATH)"
 ifeq (Msys,$(SB_VENDOR_ARCH))
 	@echo LIBS = $(LIBS)
+	@echo WINGETOPT_CFLAGS = $(WINGETOPT_CFLAGS)
+	@echo WINGETOPT_LDFLAGS = $(WINGETOPT_LDFLAGS)
 endif
 	@echo
 	@echo Dependent library settings

@@ -31,6 +31,12 @@
 ################################################################################
 
 SB_VENDOR_TARGET_DEP_MODULES := $(NULL)
+# Set TARGET_DEP_MODULES to something that doesn't exist, so that we don't 
+# catch all of the default modules in -defs.mk, and all of the flags that come 
+# with them. Setting it to $(NULL) causes -defs.mk to pick up the defaults, 
+# thus adding the flags, which the mvcc.sh script, that libffi provides, 
+# doesn't handle.
+# SB_VENDOR_TARGET_DEP_MODULES := target_that_doesn't_exist
 
 SB_VENDOR_TARGET = libffi
 SB_VENDOR_TARGET_VERSION = 3.1

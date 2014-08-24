@@ -218,7 +218,7 @@ ifeq (Msys,$(SB_VENDOR_ARCH))
      -D_CRT_SECURE_NO_WARNINGS -DHAVE_WIN32 -D_WINDOWS \
      -wd4820 -wd4668 -wd4100 -wd4706 -wd4127 -wd4255 -wd4710 -wd4055
 
-   SB_CFLAGS += -Zi 
+   SB_CFLAGS += -Zi
    SB_CXXFLAGS += -Zi
    SB_LDFLAGS += -DEBUG
 
@@ -457,6 +457,23 @@ ifneq (,$(call enable-sb-lib, libtool))
   SB_PATH += $(SB_LIBTOOL_DIR)/bin
   ACLOCAL_FLAGS += -I $(SB_LIBTOOL_DIR)/share/aclocal
 endif
+
+#
+# getopt
+#
+ifeq (Msys,$(SB_VENDOR_ARCH))
+  # ifeq (gettext, $(SB_VENDOR_TARGET))
+  # ifneq (,$(call enable-sb-lib, wingetopt))
+    ifneq ($(wildcard $(SB_VENDOR_BINARIES_DIR)/wingetopt/$(SB_BUILD_TYPE)),)
+      $(info Enabling Songbird vendor lib: wingetopt)
+      SB_WINGETOPT_DIR = $(call find-dep-dir, wingetopt)
+      SB_WINGETOPT_CFLAGS := $(SB_WINGETOPT_DIR)/include
+      SB_WINGETOPT_LDFLAGS := $(SB_WINGETOPT_DIR)/lib -lwingetopt
+    endif
+  # endif
+  # endif
+endif
+
 
 #
 # GNU Gettext 
