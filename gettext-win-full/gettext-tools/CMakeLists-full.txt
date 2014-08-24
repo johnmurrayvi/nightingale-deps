@@ -1,0 +1,220 @@
+cmake_minimum_required(VERSION 2.6)
+set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
+
+include(ConfigureChecks.cmake)
+
+configure_file(gnulib-lib/alloca.in.h gnulib-lib/alloca.h)
+configure_file(gnulib-lib/byteswap.in.h gnulib-lib/byteswap.h)
+configure_file(gnulib-lib/errno.in.h gnulib-lib/errno.h)
+configure_file(gnulib-lib/fcntl.in.h gnulib-lib/fcntl.h)
+configure_file(gnulib-lib/float.in.h gnulib-lib/float.h)
+configure_file(gnulib-lib/fnmatch.in.h gnulib-lib/fnmatch.h)
+configure_file(gnulib-lib/getopt.in.h gnulib-lib/getopt.h)
+configure_file(gnulib-lib/glib.in.h gnulib-lib/glib.h)
+configure_file(gnulib-lib/glibconfig.in.h gnulib-lib/glibconfig.h)
+configure_file(gnulib-lib/iconv.in.h gnulib-lib/iconv.h)
+configure_file(gnulib-lib/locale.in.h gnulib-lib/locale.h)
+configure_file(gnulib-lib/sched.in.h gnulib-lib/sched.h)
+configure_file(gnulib-lib/signal.in.h gnulib-lib/signal.h)
+configure_file(gnulib-lib/spawn.in.h gnulib-lib/spawn.h)
+configure_file(gnulib-lib/stdarg.in.h gnulib-lib/stdarg.h)
+configure_file(gnulib-lib/stdbool.in.h gnulib-lib/stdbool.h)
+configure_file(gnulib-lib/stddef.in.h gnulib-lib/stddef.h)
+configure_file(gnulib-lib/stdint.in.h gnulib-lib/stdint.h)
+configure_file(gnulib-lib/stdio.in.h gnulib-lib/stdio.h)
+configure_file(gnulib-lib/stdlib.in.h gnulib-lib/stdlib.h)
+configure_file(gnulib-lib/string.in.h gnulib-lib/string.h)
+configure_file(gnulib-lib/sys_select.in.h gnulib-lib/sys_select.h)
+configure_file(gnulib-lib/sys_socket.in.h gnulib-lib/sys_socket.h)
+configure_file(gnulib-lib/sys_stat.in.h gnulib-lib/sys_stat.h)
+configure_file(gnulib-lib/sys_time.in.h gnulib-lib/sys_time.h)
+configure_file(gnulib-lib/sys_wait.in.h gnulib-lib/sys_wait.h)
+configure_file(gnulib-lib/time.in.h gnulib-lib/time.h)
+configure_file(gnulib-lib/unistd.in.h gnulib-lib/unistd.h)
+configure_file(gnulib-lib/wchar.in.h gnulib-lib/wchar.h)
+configure_file(gnulib-lib/wctype.in.h gnulib-lib/wctype.h)
+
+### configure_file(libgettextpo/gettext-po.h.in libgettextpo/gettext-po.h)
+
+
+# include_directories(
+#   ${CMAKE_CURRENT_BINARY_DIR}
+#   ${CMAKE_CURRENT_SOURCE_DIR}
+#   ${CMAKE_CURRENT_SOURCE_DIR}/../../gettext-runtime/intl
+#   ${CMAKE_CURRENT_SOURCE_DIR}/../gnulib-lib
+#   ${CMAKE_CURRENT_SOURCE_DIR}/../src
+#   ${CMAKE_CURRENT_SOURCE_DIR}/../woe32dll
+#   ${ICONV_INCLUDE_DIR}
+#   ${GETOPT_INCLUDE_DIR}
+# )
+
+# set(msgmerge_SRCS
+#   gnulib-lib/stpcpy.c
+#   gnulib-lib/stpncpy.c
+#   woe32dll/c++msgmerge.cc
+#   src/msgl-fsearch.c
+#   src/lang-table.c
+#   src/plural-count.c
+# )
+
+set(gettextpo_SRCS
+  libgettextpo/gettext-po.c
+  libgettextpo/progname.c
+  libgettextpo/error-progname.c
+  libgettextpo/error.c
+#  libgettextpo/unistr/u8-check.c
+#  gnulib-lib/progname.c
+#  gnulib-lib/error-progname.c
+#  gnulib-lib/error.c
+  src/str-list.c
+  src/dir-list.c
+  src/message.c
+  src/read-properties.c
+  src/read-stringtable.c
+  src/msgl-ascii.c
+  src/po-error.c
+  src/po-xerror.c
+  src/write-catalog.c
+  src/write-po.c
+  src/open-catalog.c
+  src/po-charset.c
+  src/po-lex.c
+  src/po-gram-gen.c
+  src/read-po.c
+  src/read-catalog-abstract.c
+  src/read-catalog.c
+  src/plural-table.c
+  src/format-c.c
+  src/format-sh.c
+  src/format-python.c
+  src/format-lisp.c
+  src/format-elisp.c
+  src/format-librep.c
+  src/format-scheme.c
+  src/format-java.c
+  src/format-csharp.c
+  src/format-awk.c
+  src/format-pascal.c
+  src/format-ycp.c
+  src/format-tcl.c
+  src/format-perl.c
+  src/format-perl-brace.c
+  src/format-php.c
+  src/format-gcc-internal.c
+  src/format-gfc-internal.c
+  src/format-qt.c
+  src/format-qt-plural.c
+  src/format-kde.c
+  src/format-boost.c
+  src/format.c
+  src/plural-exp.c
+  src/plural-eval.c
+  src/msgl-check.c
+)
+
+set(msgmerge_SRCS
+  woe32dll/c++msgmerge.cc
+  src/message.c
+  src/dir-list.c
+  src/file-list.c
+  src/str-list.c
+  src/po-error.c
+  src/po-xerror.c
+  src/read-catalog-abstract.c
+  src/po-lex.c
+  src/po-charset.c
+  src/read-po.c
+  gnulib-lib/progname.c
+  gnulib-lib/error-progname.c
+  src/read-properties.c
+  src/read-stringtable.c
+  src/open-catalog.c
+  src/msgl-fsearch.c
+  src/lang-table.c
+  src/plural-count.c
+  src/msgl-iconv.c
+  gnulib-lib/backupfile.c
+  gnulib-lib/basename.c
+  gnulib-lib/error.c
+  gnulib-lib/progname.c
+  gnulib-lib/xmalloc.c
+#
+#
+#
+  libgettextpo/gettext-po.c
+  gnulib-lib/c-ctype.c
+  gnulib-lib/concat-filename.c
+  gnulib-lib/hash.c
+  gnulib-lib/obstack.c
+  gnulib-lib/stdio-write.c
+  gnulib-lib/term-ostream.c
+  gnulib-lib/term-ostream.c
+  gnulib-lib/xstrdup.c
+  gnulib-lib/vasprintf.c
+  gnulib-lib/vasnprintf.c
+  gnulib-lib/xasprintf.c
+  gnulib-lib/xvasprintf.c
+  gnulib-lib/unistr/u8-uctomb.c
+  src/color.c
+  src/read-properties.c
+  src/read-stringtable.c
+  src/msgl-ascii.c
+  src/po-error.c
+  src/po-xerror.c
+  src/write-catalog.c
+  src/write-po.c
+  src/open-catalog.c
+  src/po-charset.c
+  src/po-lex.c
+  src/po-gram-gen.c
+  src/read-po.c
+  src/read-catalog-abstract.c
+  src/read-catalog.c
+  src/plural-table.c
+  src/format-c.c
+  src/format-sh.c
+  src/format-python.c
+  src/format-lisp.c
+  src/format-elisp.c
+  src/format-librep.c
+  src/format-scheme.c
+  src/format-java.c
+  src/format-csharp.c
+  src/format-awk.c
+  src/format-pascal.c
+  src/format-ycp.c
+  src/format-tcl.c
+  src/format-perl.c
+  src/format-perl-brace.c
+  src/format-php.c
+  src/format-gcc-internal.c
+  src/format-gfc-internal.c
+  src/format-qt.c
+  src/format-qt-plural.c
+  src/format-kde.c
+  src/format-boost.c
+  src/format.c
+  src/plural-exp.c
+  src/plural-eval.c
+  src/msgl-check.c
+)
+
+#set(CMAKE_C_COMPILER ${CMAKE_CXX_COMPILER})
+set(CMAKE_C_CFLAGS "${CMAKE_C_FLAGS} -Tc")
+
+add_definitions(-Dstpcpy=__stpcpy -Dstpncpy=__stpncpy)
+add_definitions(-DPACKAGE="gettext" -DVERSION=${PACKAGE_VERSION_STRING} -DLOCALEDIR="" -DBISON_LOCALEDIR="")
+
+# add_library(gettextpo ${LIBRARY_TYPE} ${gettextpo_SRCS})
+
+
+
+
+add_executable(msgmerge ${msgmerge_SRCS})
+target_link_libraries(msgmerge ${ICONV_LIBRARIES} ${GETOPT_LIBRARIES})
+if(MSVC)
+set_target_properties(msgmerge PROPERTIES OUTPUT_NAME "msgmerge")
+endif(MSVC)
+
+
+install(TARGETS msgmerge RUNTIME DESTINATION bin)
