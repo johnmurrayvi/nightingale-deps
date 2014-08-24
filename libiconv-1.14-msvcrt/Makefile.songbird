@@ -1,0 +1,81 @@
+################################################################################
+################################################################################
+#
+# BEGIN NIGHTINGALE GPL
+# 
+# This file is part of the Nightingale Media Player.
+#
+# Copyright(c) 2014
+# http://www.getnightingale.com
+# 
+# This file may be licensed under the terms of of the
+# GNU General Public License Version 2 (the "GPL").
+# 
+# Software distributed under the License is distributed 
+# on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either 
+# express or implied. See the GPL for the specific language 
+# governing rights and limitations.
+#
+# You should have received a copy of the GPL along with this 
+# program. If not, go to http://www.gnu.org/licenses/gpl.html
+# or write to the Free Software Foundation, Inc., 
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# 
+# END NIGHTINGALE GPL
+#
+################################################################################
+#
+# Makefile for building Nightingale vendor: libiconv
+#
+################################################################################
+################################################################################
+
+SB_VENDOR_TARGET_DEP_MODULES :=
+
+SB_VENDOR_TARGET = libiconv
+SB_VENDOR_TARGET_VERSION = 1.14
+
+include $(CURDIR)/../songbird-vendor-defs.mk
+
+SB_VENDOR_TARGET_CONFIGURE_OPTS := --enable-relocatable \
+                                   --disable-libsuffix \
+                                   --enable-cxx-warnings=no
+
+ifeq (Msys,$(SB_VENDOR_ARCH))
+  SB_CC = $(CURDIR)/../clwrapper.py
+  SB_CXX = $(CURDIR)/../clwrapper.py
+
+  export RC = rc
+  export WINDRES = rc
+  export PREFIX_TARGET_DIR=$(DEP_DIR_WIN_PATH)\$(SB_TARGET_ARCH)\$(SB_VENDOR_TARGET)
+  export PREFIX=$(DEP_DIR_WIN_PATH)\$(SB_TARGET_ARCH)\$(SB_VENDOR_TARGET)\$(SB_BUILD_TYPE)
+
+
+  SB_RUN_CONFIGURE := 0
+
+
+  SUBMAKE_CMD_FLAGS := 
+
+  ifeq (debug, $(SB_BUILD_TYPE))
+    SUBMAKE_CMD_FLAGS += DEBUG=1
+  endif
+  ifeq (1, $(ICONVDLL))
+    SUBMAKE_CMD_FLAGS += DLL=1
+  endif
+
+  # First, we only build libs. Then we build intl in gettext.
+  # Then we come back and build iconv.exe.
+  # The include path for libintl.h needs to be corrected though.
+  ifeq (1, $(ICONV_ONLY_LIBS))
+    SB_MAKE_TARGET := iconvlib
+  else
+    export INTL_INCDIR=$(DEP_DIR_WIN_PATH)\$(SB_TARGET_ARCH)\gettext\$(SB_BUILD_TYPE)\include
+    export INTL_LIBDIR=$(DEP_DIR_WIN_PATH)\$(SB_TARGET_ARCH)\gettext\$(SB_BUILD_TYPE)\lib
+  endif
+
+  SUBMAKE_CMD = $(CURDIR)/../call-nmake.py -f Makefile.msvc $(SUBMAKE_CMD_FLAGS)
+endif
+
+SB_VENDOR_TARGET_DYLIB_FIXUPS :=
+
+include $(CURDIR)/../songbird-vendor-rules.mk
