@@ -1,0 +1,4 @@
+[submodule "taglib"]
+	path = taglib
+	url = git://github.com/johnmurrayvi/taglib.git
+	branch = patched-v1.7.2-branch
