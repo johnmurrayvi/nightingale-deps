@@ -39,6 +39,7 @@
 #include "nsSplashScreen.h"
 
 #include <windows.h>
+#include <stdlib.h>
 
 static ATOM gSplashScreenClass = 0;
 
@@ -133,8 +134,11 @@ nsSplashScreenWin::Open()
 #ifdef WINCE
             mSplashBitmap = ::SHLoadDIBitmap(path);
 #else
-#warning splashscreen needs some code to load bitmaps on non-WinCE
-            mSplashBitmap = nsnull;
+            mSplashBitmap = (HBITMAP)::LoadImage(NULL,
+                                                 path,
+                                                 IMAGE_BITMAP,
+                                                 0, 0,
+                                                 LR_DEFAULTCOLOR | LR_LOADFROMFILE);
 #endif
 
             if (mSplashBitmap) {
