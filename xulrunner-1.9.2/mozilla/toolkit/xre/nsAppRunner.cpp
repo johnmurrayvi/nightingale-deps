@@ -3713,7 +3713,7 @@ SetupErrorHandling(const char* progname)
 
   SetErrorMode(realMode);
 
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(MOZ_MEMORY)
   // Disable small heap allocator to get heapwalk() giving us
   // accurate heap numbers. Win2k non-debug does not use small heap allocator.
   // Win2k debug seems to be still using it.
