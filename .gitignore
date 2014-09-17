@@ -13,7 +13,7 @@ macosx-i686*/
 packages/win32/*/*
 prebuilt/win32/*/*
 xulrunner*/mozilla/.mozconfig*
-xulrunner*/mozilla/compiled/
+xulrunner*/mozilla/compiled*/
 xulrunner*/mozilla/config/*.pyc
 xulrunner*/mozilla/configure
 xulrunner*/mozilla/js/src/configure
