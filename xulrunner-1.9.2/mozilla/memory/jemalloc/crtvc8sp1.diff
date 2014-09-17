@@ -135,6 +135,12 @@ LINKLIB=link -lib -nologo
 LINKIMPLIB=link -lib -nologo
 .
 209d
+30,33c
+DEBUG_DLL_NAME=MOZCRT19D
+DEBUG_LIB_NAME=mozcrt19d
+DEBUG_DLLCPP_NAME=MOZCPP19D
+DEBUG_LIBCPP_NAME=mozcpp19d
+.
 21,24c
 RETAIL_DLL_NAME=MOZCRT19
 RETAIL_LIB_NAME=mozcrt19
@@ -155,7 +161,9 @@ $(OBJDIR)\unhandld.obj: $(PREOBJDIR)\unhandld.obj
 334,335d
 329,330d
 327d
-323d
+322,324c
+!IF "$(WINHEAP)" == "NO"
+.
 320d
 diff -re crt/src/makefile.sub ./crtsrc/makefile.sub
 103c
