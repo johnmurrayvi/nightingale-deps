@@ -125,6 +125,8 @@ diff -re crt/src/crtdbg.h crtsrc/crtdbg.h
 191c
 #if (!(defined(_DEBUG)) || defined(MOZ_MEMORY))
 .
+diff -re crt/src/crtdll.c crtsrc/crtdll.c
+31,40d
 diff -re crt/src/crtexe.c crtsrc/crtexe.c
 323a
 #endif
@@ -132,6 +134,7 @@ diff -re crt/src/crtexe.c crtsrc/crtexe.c
 322a
 #ifndef MOZ_MEMORY
 .
+35,45d
 diff -re crt/src/crtheap.c crtsrc/crtheap.c
 61a
 #endif
@@ -290,7 +293,7 @@ diff -re crt/src/dllcrt0.c crtsrc/dllcrt0.c
 107a
 #endif
 .
-103a
+105a
 #ifndef MOZ_MEMORY
 .
 diff -re crt/src/fullpath.c crtsrc/fullpath.c
@@ -305,7 +308,67 @@ diff -re crt/src/getenv.c crtsrc/getenv.c
 359c
 #if (defined(_DEBUG) && !defined(MOZ_MEMORY))
 .
+diff -re crt/src/intel/mozcrt19.def crtsrc/intel/mozcrt19.def
+1398a
+    _malloc_crt
+    _calloc_crt
+    _realloc_crt
+.
+1198d
+718,719d
+664a
+    posix_memalign
+.
+638a
+    memalign
+.
+495a
+    malloc_usable_size
+    jemalloc_stats
+.
+331,336d
+319d
+313,314d
+81d
+15,16d
+9c
+LIBRARY MOZCRT19
+.
+diff -re crt/src/intel/mozcrt19d.def crtsrc/intel/mozcrt19d.def
+1398a
+    _malloc_crt
+    _calloc_crt
+    _realloc_crt
+    _calloc_dbg
+    _realloc_dbg
+.
+1198d
+718,719d
+664a
+    posix_memalign
+.
+638a
+    memalign
+.
+495a
+    _malloc_dbg
+    malloc_usable_size
+    jemalloc_stats
+.
+331,336d
+319d
+313,314d
+256a
+    _free_dbg
+.
+88,95d
+81d
+15,16d
+9c
+LIBRARY MOZCRT19D
+.
 diff -re crt/src/makefile crtsrc/makefile
+1290d
 1244a
 !endif
 .
