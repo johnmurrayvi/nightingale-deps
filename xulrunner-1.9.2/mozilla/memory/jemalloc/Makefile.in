@@ -127,7 +127,11 @@ $(CRT_OBJ_DIR)/jemalloc.c: $(srcdir)/$(CRTDIFF)
 ifeq ($(CC_VERSION), 14.00.50727.762)
 	$(foreach i,dll mt xdll xmt,$(EXTRACT_CMD))
 else
+ifeq ($(MOZ_MSVCVERSION), 8)
+	$(foreach i,dll mt xdll xmt,$(EXTRACT_CMD))
+else
 	$(foreach i,dll mt xdll xmt,$(EXTRACT_FULL_CMD))
+endif
 endif
 # truly awful
 #XXX: get ed into mozillabuild, bug 415123
